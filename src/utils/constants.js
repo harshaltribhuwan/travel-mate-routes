@@ -1,0 +1,1 @@
+export const defaultCenter = [20.5937, 78.9629]; // India center

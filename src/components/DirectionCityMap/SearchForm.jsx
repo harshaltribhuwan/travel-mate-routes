@@ -1,0 +1,259 @@
+import React, { useRef, useEffect } from "react";
+import { MdMyLocation, MdAdd, MdSave, MdClear, MdClose } from "react-icons/md";
+import "../../styles/DirectionCityMap.css";
+import { defaultCenter } from "../../utils/constants";
+
+function SearchForm({
+  waypoints,
+  setWaypoints,
+  suggestions,
+  setSuggestions,
+  activeInput,
+  setActiveInput,
+  tracking,
+  setTracking,
+  savedHistory,
+  setSavedHistory,
+  addWaypoint,
+  removeWaypoint,
+  saveRoute,
+  clearRoute,
+}) {
+  const debounceTimerRef = useRef(null);
+
+  const fetchSuggestions = async (value, type) => {
+    if (value.length < 2) {
+      setSuggestions([]);
+      return;
+    }
+    try {
+      const res = await fetch(
+        `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(
+          value
+        )}&limit=5&addressdetails=1`
+      );
+      const data = await res.json();
+      console.log("Suggestions fetched:", data); // Debug
+      setSuggestions(data.map((p) => ({ ...p, inputType: type })));
+    } catch (error) {
+      console.error("Error fetching suggestions:", error);
+      setSuggestions([]);
+    }
+  };
+
+  useEffect(() => {
+    if (activeInput) {
+      const waypoint = waypoints.find((wp) => wp.id === activeInput);
+      if (waypoint?.city) {
+        if (debounceTimerRef.current) clearTimeout(debounceTimerRef.current);
+        debounceTimerRef.current = setTimeout(
+          () => fetchSuggestions(waypoint.city, activeInput),
+          500
+        );
+      }
+    }
+  }, [waypoints, activeInput]);
+
+  const handleInputChange = (id, e) => {
+    const value = e.target.value;
+    setWaypoints((prev) =>
+      prev.map((wp) => (wp.id === id ? { ...wp, city: value } : wp))
+    );
+    setActiveInput(id);
+    if (debounceTimerRef.current) clearTimeout(debounceTimerRef.current);
+    debounceTimerRef.current = setTimeout(
+      () => fetchSuggestions(value, id),
+      500
+    );
+  };
+
+  const handleSuggestionClick = (place) => {
+    const lat = parseFloat(place.lat);
+    const lon = parseFloat(place.lon);
+    const type = place.inputType;
+    console.log("Suggestion clicked:", { place, lat, lon, type }); // Debug
+    setWaypoints((prev) => {
+      const newWaypoints = prev.map((wp) =>
+        wp.id === type
+          ? { ...wp, city: place.display_name, coords: [lat, lon] }
+          : wp
+      );
+      console.log("Updated waypoints:", newWaypoints); // Debug
+      return newWaypoints;
+    });
+    setSavedHistory((prev) => {
+      const newHistory = [
+        {
+          id: `hist${Date.now()}`,
+          query: place.display_name,
+          timestamp: new Date().toISOString(),
+        },
+        ...prev,
+      ].slice(0, 10);
+      return newHistory;
+    });
+    setSuggestions([]);
+    setActiveInput(null);
+  };
+
+  const useMyLocation = async () => {
+    if (!navigator.geolocation) {
+      alert("Geolocation not supported.");
+      return;
+    }
+    navigator.geolocation.getCurrentPosition(
+      async (pos) => {
+        const lat = pos.coords.latitude;
+        const lon = pos.coords.longitude;
+        try {
+          const res = await fetch(
+            `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}`
+          );
+          const data = await res.json();
+          const city =
+            data.address.city ||
+            data.address.town ||
+            data.address.village ||
+            "My Location";
+          setWaypoints((prev) =>
+            prev.map((wp) =>
+              wp.id === "from" ? { ...wp, city, coords: [lat, lon] } : wp
+            )
+          );
+          setSavedHistory((prev) => {
+            const newHistory = [
+              {
+                id: `hist${Date.now()}`,
+                query: city,
+                timestamp: new Date().toISOString(),
+              },
+              ...prev,
+            ].slice(0, 10);
+            return newHistory;
+          });
+        } catch (err) {
+          console.error("Reverse geocoding failed:", err);
+          alert("Failed to detect city.");
+        }
+      },
+      (err) => {
+        alert("Failed to access location.");
+        console.error(err);
+      }
+    );
+  };
+
+  return (
+    <form onSubmit={(e) => e.preventDefault()} className="search-form">
+      {waypoints.map((wp, idx) => (
+        <div key={wp.id} className="input-group">
+          <input
+            id={`${wp.id}-input`}
+            type="text"
+            placeholder={
+              wp.id === "from"
+                ? "Starting point"
+                : wp.id === "to"
+                ? "Destination"
+                : `Stop ${idx}`
+            }
+            className="input-field"
+            value={wp.city}
+            onChange={(e) => handleInputChange(wp.id, e)}
+            autoComplete="off"
+            onFocus={() => setActiveInput(wp.id)}
+            onBlur={() => setTimeout(() => setSuggestions([]), 150)}
+            aria-label={`Enter ${
+              wp.id === "from"
+                ? "starting location"
+                : wp.id === "to"
+                ? "destination"
+                : "stop"
+            }`}
+          />
+          {wp.id === "from" && (
+            <button
+              type="button"
+              onClick={useMyLocation}
+              className="action-button"
+              aria-label="Use my current location"
+              title="Use My Location"
+            >
+              <MdMyLocation />
+            </button>
+          )}
+          {wp.id !== "from" && wp.id !== "to" && (
+            <button
+              type="button"
+              onClick={() => removeWaypoint(wp.id)}
+              className="action-button remove"
+              aria-label="Remove stop"
+              title="Remove Stop"
+            >
+              <MdClose />
+            </button>
+          )}
+          {activeInput === wp.id && suggestions.length > 0 && (
+            <ul className="autocomplete-dropdown">
+              {suggestions
+                .filter((s) => s.inputType === wp.id)
+                .map((place, idx) => (
+                  <li
+                    key={idx}
+                    className="autocomplete-item"
+                    onMouseDown={(e) => e.preventDefault()}
+                    onClick={() => handleSuggestionClick(place)}
+                    tabIndex={0}
+                    role="option"
+                    aria-selected={false}
+                  >
+                    {place.display_name} ({place.class || "Place"})
+                  </li>
+                ))}
+            </ul>
+          )}
+        </div>
+      ))}
+      <div className="action-buttons">
+        <button
+          type="button"
+          onClick={addWaypoint}
+          className="action-button"
+          aria-label="Add stop"
+          title="Add Stop"
+        >
+          <MdAdd />
+        </button>
+        <button
+          type="button"
+          onClick={saveRoute}
+          className="action-button"
+          aria-label="Save route"
+          title="Save Route"
+        >
+          <MdSave />
+        </button>
+        <button
+          type="button"
+          onClick={() => setTracking(!tracking)}
+          className="action-button"
+          aria-label={tracking ? "Stop tracking" : "Start tracking location"}
+          title={tracking ? "Stop Tracking" : "Track Location"}
+        >
+          <MdMyLocation />
+        </button>
+        <button
+          type="button"
+          onClick={clearRoute}
+          className="action-button remove"
+          aria-label="Clear route"
+          title="Clear Route"
+        >
+          <MdClear />
+        </button>
+      </div>
+    </form>
+  );
+}
+
+export default SearchForm;

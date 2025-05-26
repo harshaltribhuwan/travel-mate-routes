@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import DirectionCityMap from "./components/DirectionCityMap.jsx";
+import DirectionCityMap from "./components/DirectionCityMap/DirectionCityMap.jsx";
 import "leaflet/dist/leaflet.css";
 import "./App.css";
 

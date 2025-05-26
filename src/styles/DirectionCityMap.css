@@ -456,3 +456,11 @@
         font-size: 0.85rem;
     }
 }
+
+.leaflet-routing-container {
+    padding: 10px 10px;
+    background-color: #ffffff;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    overflow-y: scroll;
+}
