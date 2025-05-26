@@ -1,0 +1,134 @@
+/* General page styling */
+body {
+  font-family: "Inter", "Poppins", "Roboto", sans-serif !important;
+  background-color: #f9f9f9;
+  margin: 0;
+  padding: 0;
+}
+
+.App {
+  max-width: auto !important;
+  margin: 0px auto;
+  /* padding: 20px; */
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+}
+
+h1 {
+  text-align: center;
+  color: #333;
+  margin-bottom: 24px;
+}
+
+/* Input field */
+input[type="text"] {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 16px;
+  transition: border-color 0.2s ease;
+}
+
+input[type="text"]:focus {
+  border-color: #3b82f6;
+  outline: none;
+}
+
+/* Search button */
+button[type="submit"] {
+  margin-top: 12px;
+  padding: 10px 20px;
+  background-color: #3b82f6;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+button[type="submit"]:hover {
+  background-color: #2563eb;
+}
+
+/* Autocomplete dropdown */
+ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+ul li {
+  background-color: white;
+  padding: 10px 14px;
+  border-bottom: 1px solid #eee;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+ul li:hover {
+  background-color: #f3f4f6;
+}
+
+/* Ensure the autocomplete dropdown stays on top */
+.relative {
+  position: relative;
+}
+
+.absolute {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  z-index: 50;
+}
+
+.navbar {
+  background-color: #fff;
+  /* match app bg */
+  padding: 12px 20px;
+  display: flex;
+  justify-content: center;
+  border-radius: 12px 12px 0 0;
+  /* rounded top corners like app */
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  /* subtle shadow */
+  margin-bottom: 20px;
+}
+
+.nav-list {
+  list-style: none;
+  display: flex;
+  gap: 40px;
+  margin: 0;
+  padding: 0;
+}
+
+.nav-item {
+  color: #555;
+  /* subtle gray text */
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 1.1rem;
+  padding: 8px 16px;
+  border-radius: 8px;
+  user-select: none;
+  transition: all 0.3s ease;
+  border: 2px solid transparent;
+}
+
+.nav-item:hover {
+  color: #3b82f6;
+  border-color: #3b82f6;
+  background-color: #f0f9ff;
+  /* very light blue bg on hover */
+}
+
+.nav-item.active {
+  color: white;
+  background-color: #3b82f6;
+  border-color: #3b82f6;
+  font-weight: 700;
+}
