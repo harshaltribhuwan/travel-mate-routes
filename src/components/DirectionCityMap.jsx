@@ -1,5 +1,12 @@
 import React, { useState, useEffect, useRef } from "react";
-import { MapContainer, TileLayer, Marker, Popup, useMap, ZoomControl } from "react-leaflet";
+import {
+  MapContainer,
+  TileLayer,
+  Marker,
+  Popup,
+  useMap,
+  ZoomControl,
+} from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import "leaflet-routing-machine/dist/leaflet-routing-machine.css";
@@ -158,8 +165,14 @@ export default function DirectionCityMap() {
   const [alternatives, setAlternatives] = useState([]);
   const [tracking, setTracking] = useState(false);
   const [currentLocation, setCurrentLocation] = useState(null);
-  const [savedRoutes, setSavedRoutes] = useState([]);
-  const [savedHistory, setSavedHistory] = useState([]);
+  const [savedRoutes, setSavedRoutes] = useState(() => {
+    const saved = localStorage.getItem("savedRoutes");
+    return saved ? JSON.parse(saved) : [];
+  });
+  const [savedHistory, setSavedHistory] = useState(() => {
+    const saved = localStorage.getItem("savedHistory");
+    return saved ? JSON.parse(saved) : [];
+  });
   const [showSidebar, setShowSidebar] = useState(true);
   const [showSavedRoutes, setShowSavedRoutes] = useState(false);
   const [showHistory, setShowHistory] = useState(false);
@@ -168,18 +181,6 @@ export default function DirectionCityMap() {
   const mapRef = useRef(null);
   const watchIdRef = useRef(null);
   const debounceTimerRef = useRef(null);
-
-  // Load saved routes from localStorage
-  useEffect(() => {
-    const saved = localStorage.getItem("savedRoutes");
-    if (saved) setSavedRoutes(JSON.parse(saved));
-  }, []);
-
-  // Load saved history from localStorage
-  useEffect(() => {
-    const saved = localStorage.getItem("savedHistory");
-    if (saved) setSavedHistory(JSON.parse(saved));
-  }, []);
 
   // Save routes to localStorage
   useEffect(() => {
@@ -609,39 +610,42 @@ export default function DirectionCityMap() {
               Saved Routes{" "}
               {showSavedRoutes ? <MdExpandLess /> : <MdExpandMore />}
             </h3>
-            {showSavedRoutes &&
-              (savedRoutes.length > 0 ? (
-                <ul>
-                  {savedRoutes.map((route, idx) => (
-                    <li key={idx}>
-                      <button
-                        onClick={() => loadRoute(route)}
-                        className="load-route"
-                        aria-label={`Load route from ${
-                          route.waypoints[0].city
-                        } to ${
-                          route.waypoints[route.waypoints.length - 1].city
-                        }`}
-                        title="Load Route"
-                      >
-                        {route.waypoints[0].city} to{" "}
-                        {route.waypoints[route.waypoints.length - 1].city} (
-                        {formatDistance(route.distance)})
-                      </button>
-                      <button
-                        onClick={() => deleteRoute(idx)}
-                        className="delete-route"
-                        aria-label="Delete route"
-                        title="Delete"
-                      >
-                        <MdClose />
-                      </button>
-                    </li>
-                  ))}
-                </ul>
-              ) : (
-                <p className="empty-message">No saved routes</p>
-              ))}
+            {showSavedRoutes && (
+              <>
+                {savedRoutes.length > 0 ? (
+                  <ul>
+                    {savedRoutes.map((route, idx) => (
+                      <li key={idx}>
+                        <button
+                          onClick={() => loadRoute(route)}
+                          className="load-route"
+                          aria-label={`Load route from ${
+                            route.waypoints[0].city
+                          } to ${
+                            route.waypoints[route.waypoints.length - 1].city
+                          }`}
+                          title="Load Route"
+                        >
+                          {route.waypoints[0].city} to{" "}
+                          {route.waypoints[route.waypoints.length - 1].city} (
+                          {formatDistance(route.distance)})
+                        </button>
+                        <button
+                          onClick={() => deleteRoute(idx)}
+                          className="delete-route"
+                          aria-label="Delete route"
+                          title="Delete"
+                        >
+                          <MdClose />
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <p className="empty-message">No saved routes</p>
+                )}
+              </>
+            )}
           </div>
           <div className="search-history">
             <h3
@@ -650,33 +654,36 @@ export default function DirectionCityMap() {
             >
               Search History {showHistory ? <MdExpandLess /> : <MdExpandMore />}
             </h3>
-            {showHistory &&
-              (savedHistory.length > 0 ? (
-                <ul>
-                  {savedHistory.map((item, idx) => (
-                    <li key={item.id}>
-                      <button
-                        onClick={() => loadHistoryItem(item)}
-                        className="load-history"
-                        aria-label={`Load search: ${item.query}`}
-                        title="Load Search"
-                      >
-                        {item.query}
-                      </button>
-                      <button
-                        onClick={() => deleteHistoryItem(idx)}
-                        className="delete-history"
-                        aria-label="Delete search"
-                        title="Delete"
-                      >
-                        <MdClose />
-                      </button>
-                    </li>
-                  ))}
-                </ul>
-              ) : (
-                <p className="empty-message">No recent searches</p>
-              ))}
+            {showHistory && (
+              <>
+                {savedHistory.length > 0 ? (
+                  <ul>
+                    {savedHistory.map((item, idx) => (
+                      <li key={item.id}>
+                        <button
+                          onClick={() => loadHistoryItem(item)}
+                          className="load-history"
+                          aria-label={`Load search: ${item.query}`}
+                          title="Load Search"
+                        >
+                          {item.query}
+                        </button>
+                        <button
+                          onClick={() => deleteHistoryItem(idx)}
+                          className="delete-history"
+                          aria-label="Delete search"
+                          title="Delete"
+                        >
+                          <MdClose />
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <p className="empty-message">No recent searches</p>
+                )}
+              </>
+            )}
           </div>
         </div>
       </div>
