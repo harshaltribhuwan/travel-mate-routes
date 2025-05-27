@@ -8,8 +8,8 @@ function Routing({ waypoints, setDistance, setDuration, setAlternatives }) {
   const controlRef = useRef(null);
 
   // State for showing/hiding route instructions
-  const [showPrimary, setShowPrimary] = useState(true);
-  const [showAlt, setShowAlt] = useState(true);
+  const [showPrimary, setShowPrimary] = useState(false);
+  const [showAlt, setShowAlt] = useState(false);
   const [hasAltRoute, setHasAltRoute] = useState(false);
 
 

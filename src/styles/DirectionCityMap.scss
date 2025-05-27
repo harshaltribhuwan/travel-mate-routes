@@ -1170,8 +1170,16 @@ $radii: (
     }
 }
 
+@media (max-width: 760px) {
+    .route-toggle-buttons {
+        display: flex;
+        flex-direction: column;
+    }
+}
+
 @media (max-width: 480px) {
     .route-toggle-buttons {
-        display: none; // Hides the route-toggle-buttons on mobile screens
+        display: flex;
+        flex-direction: column;
     }
 }
