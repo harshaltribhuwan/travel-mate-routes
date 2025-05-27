@@ -186,7 +186,7 @@ export default function DirectionCityMap() {
         setDuration={setDuration}
         setAlternatives={setAlternatives}
       />
-      <RouteInfo distance={distance} duration={duration} />
+      {/* <RouteInfo distance={distance} duration={duration} /> */}
       <MapView
         waypoints={waypoints}
         setWaypoints={setWaypoints}

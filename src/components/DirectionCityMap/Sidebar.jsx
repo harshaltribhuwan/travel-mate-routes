@@ -110,6 +110,7 @@ function Sidebar({
       mapRef.current.invalidateSize();
     }
     loadRoute(route); // Call parent loadRoute for additional logic
+    setShowSidebar(false); // Hide sidebar after loading route
   };
 
   const handleSelectAlternative = (index) => {
