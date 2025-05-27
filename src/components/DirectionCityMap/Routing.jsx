@@ -2,17 +2,15 @@ import React, { useEffect, useRef, useState } from "react";
 import { useMap } from "react-leaflet";
 import L from "leaflet";
 import "leaflet-routing-machine";
+import "../../styles/DirectionCityMap.scss";
 
 function Routing({ waypoints, setDistance, setDuration, setAlternatives }) {
   const map = useMap();
   const controlRef = useRef(null);
-
-  // State for showing/hiding route instructions
-  const [showPrimary, setShowPrimary] = useState(false);
-  const [showAlt, setShowAlt] = useState(false);
+  const [activeRoute, setActiveRoute] = useState(null); // null, "primary", or "alt"
   const [hasAltRoute, setHasAltRoute] = useState(false);
 
-  // Helper: Extract main roads from instructions (old logic)
+  // Helper: Extract main roads from instructions
   const getRouteRoads = (instructions) => {
     const roads = new Set();
     for (const instr of instructions) {
@@ -48,8 +46,7 @@ function Routing({ waypoints, setDistance, setDuration, setAlternatives }) {
       setDistance(null);
       setDuration(null);
       setAlternatives([]);
-      clearRouteInstructions("primary");
-      clearRouteInstructions("alt");
+      clearRouteInstructions();
       return;
     }
 
@@ -63,12 +60,12 @@ function Routing({ waypoints, setDistance, setDuration, setAlternatives }) {
       routeWhileDragging: true,
       showAlternatives: true,
       lineOptions: {
-        styles: [{ color: "#26A69A", opacity: 1, weight: 4 }],
+        styles: [{ color: "#1a73e8", opacity: 1, weight: 4 }],
         extendToWaypoints: true,
         missingRouteTolerance: 0,
       },
       altLineOptions: {
-        styles: [{ color: "#2ECC71", opacity: 0.6, weight: 4 }],
+        styles: [{ color: "#34a853", opacity: 0.6, weight: 4 }],
         extendToWaypoints: true,
         missingRouteTolerance: 0,
       },
@@ -98,23 +95,15 @@ function Routing({ waypoints, setDistance, setDuration, setAlternatives }) {
             }))
           );
 
-          if (showPrimary) {
+          if (activeRoute === "primary") {
             showRouteInstructions("primary", routes[0]);
+          } else if (activeRoute === "alt" && routes[1]) {
+            showRouteInstructions("alt", routes[1]);
           } else {
-            clearRouteInstructions("primary");
+            clearRouteInstructions();
           }
 
-          if (routes[1]) {
-            setHasAltRoute(true);
-            if (showAlt) {
-              showRouteInstructions("alt", routes[1]);
-            } else {
-              clearRouteInstructions("alt");
-            }
-          } else {
-            setHasAltRoute(false);
-            clearRouteInstructions("alt");
-          }
+          setHasAltRoute(!!routes[1]);
         }
       })
       .addTo(map);
@@ -126,27 +115,15 @@ function Routing({ waypoints, setDistance, setDuration, setAlternatives }) {
         map.removeControl(controlRef.current);
         controlRef.current = null;
       }
-      clearRouteInstructions("primary");
-      clearRouteInstructions("alt");
+      clearRouteInstructions();
     };
-  }, [
-    map,
-    waypoints,
-    setDistance,
-    setDuration,
-    setAlternatives,
-    showPrimary,
-    showAlt,
-  ]);
+  }, [map, waypoints, setDistance, setDuration, setAlternatives, activeRoute]);
 
-  // Show route instructions container (old + click to pan fix)
   function showRouteInstructions(type, route) {
-    let container = document.querySelector(
-      `.leaflet-routing-container-${type}`
-    );
+    let container = document.querySelector(".leaflet-routing-container");
     if (!container) {
       container = document.createElement("div");
-      container.className = `leaflet-routing-container leaflet-routing-container-${type}`;
+      container.className = "leaflet-routing-container";
       map.getContainer().appendChild(container);
     }
     container.style.display = "block";
@@ -156,7 +133,6 @@ function Routing({ waypoints, setDistance, setDuration, setAlternatives }) {
     const durationMin = Math.round(route.summary.totalTime / 60);
     const roads = getRouteRoads(route.instructions);
 
-    // Header with distance, duration, roads
     const header = document.createElement("div");
     header.className = "popup-header";
     header.innerHTML = `<h3>${
@@ -164,10 +140,8 @@ function Routing({ waypoints, setDistance, setDuration, setAlternatives }) {
     }</h3><p>${distanceKm} km, ${durationMin} min via ${roads}</p>`;
     container.appendChild(header);
 
-    // Instructions list with clickable pan-to
     const instructionsDiv = document.createElement("div");
     instructionsDiv.className = "instructions-list";
-
     route.instructions.forEach((instr) => {
       const div = document.createElement("div");
       div.className =
@@ -175,7 +149,6 @@ function Routing({ waypoints, setDistance, setDuration, setAlternatives }) {
       div.textContent = `${instr.text} (${(instr.distance / 1000).toFixed(
         1
       )} km)`;
-      div.style.cursor = "pointer";
       div.onclick = (ev) => {
         ev.stopPropagation();
         const coord = route.coordinates[instr.index];
@@ -185,84 +158,56 @@ function Routing({ waypoints, setDistance, setDuration, setAlternatives }) {
       };
       instructionsDiv.appendChild(div);
     });
-
     container.appendChild(instructionsDiv);
 
-    // Close button
     const closeBtn = document.createElement("button");
     closeBtn.className = "close-button";
     closeBtn.innerHTML =
-      '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16"><path fill="#000000" d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>';
+      '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16"><path fill="currentColor" d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>';
     closeBtn.onclick = () => {
       container.style.display = "none";
-      if (type === "primary") setShowPrimary(false);
-      else setShowAlt(false);
+      setActiveRoute(null);
     };
     container.prepend(closeBtn);
-
-    // Prevent scroll propagation in container
-    container.addEventListener("wheel", (e) => {
-      e.stopPropagation();
-      e.preventDefault();
-      container.scrollTop += e.deltaY;
-    });
   }
 
-  // Clear route instructions container
-  function clearRouteInstructions(type) {
-    const container = document.querySelector(
-      `.leaflet-routing-container-${type}`
-    );
+  function clearRouteInstructions() {
+    const container = document.querySelector(".leaflet-routing-container");
     if (container) {
       container.style.display = "none";
       container.innerHTML = "";
     }
   }
 
-  // Your old buttons to toggle routes visibility (reopen/show)
   return (
-    <>
-      <div
-        className="route-toggle-buttons"
-        style={{
-          position: "absolute",
-          top: 10,
-          right: 10,
-          zIndex: 1000,
-          background: "rgba(255, 255, 255, 0.95)",
-          padding: "8px 10px",
-          borderRadius: "8px",
-          boxShadow: "0 2px 8px rgba(0,0,0,0.15)",
-          display: "flex",
-          gap: "8px",
-        }}
+    <div className="route-toggle-buttons">
+      <button
+        onClick={() =>
+          setActiveRoute(activeRoute === "primary" ? null : "primary")
+        }
+        disabled={!waypoints || waypoints.length < 2}
+        aria-label={
+          activeRoute === "primary"
+            ? "Hide Primary Route"
+            : "Show Primary Route"
+        }
       >
+        {activeRoute === "primary" ? "Hide Route" : "Primary Route"}
+      </button>
+      {hasAltRoute && (
         <button
-          onClick={() => setShowPrimary(true)}
-          disabled={showPrimary}
-          aria-label="Show Primary Route Instructions"
-          style={{
-            cursor: showPrimary ? "not-allowed" : "pointer",
-            opacity: showPrimary ? 0.6 : 1,
-          }}
+          onClick={() => setActiveRoute(activeRoute === "alt" ? null : "alt")}
+          disabled={!waypoints || waypoints.length < 2}
+          aria-label={
+            activeRoute === "alt"
+              ? "Hide Alternative Route"
+              : "Show Alternative Route"
+          }
         >
-          View Primary Route
+          {activeRoute === "alt" ? "Hide Route" : "Alternative Route"}
         </button>
-        {hasAltRoute && (
-          <button
-            onClick={() => setShowAlt(true)}
-            disabled={showAlt}
-            aria-label="Show Alternative Route Instructions"
-            style={{
-              cursor: showAlt ? "not-allowed" : "pointer",
-              opacity: showAlt ? 0.6 : 1,
-            }}
-          >
-            View Alternative Route
-          </button>
-        )}
-      </div>
-    </>
+      )}
+    </div>
   );
 }
 

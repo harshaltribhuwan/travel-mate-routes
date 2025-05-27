@@ -377,14 +377,6 @@ $radii: (
     }
 }
 
-// .route-item,
-// .history-item {
-//     display: flex;
-//     align-items: center;
-//     gap: space(2);
-//     padding: space(2);
-//     border-bottom: 1px solid color(border-light);
-// }
 
 .alternative-button,
 .load-route,
@@ -402,9 +394,9 @@ $radii: (
     transition: all map-get($transitions, fast);
 
     &:hover {
-        // background: color(primary-subtle);
+        background: color(primary-subtle);
         // border-color: color(primary);
-        // color: color(primary);
+        color: color(primary);
     }
 }
 
@@ -424,13 +416,6 @@ $radii: (
         background: color(danger-subtle);
     }
 }
-
-// .empty-message {
-//     font-size: map-get($font-sizes, sm);
-//     color: color(text-muted);
-//     padding: space(3);
-//     text-align: center;
-// }
 
 .collapsible-header {
     font-size: map-get($font-sizes, base);
@@ -570,37 +555,9 @@ $radii: (
         flex-direction: row;
     }
 
-    // .sidebar {
-    //     position: fixed;
-    //     left: 0;
-    //     width: 360px;
-    //     height: 100vh;
-    //     transform: translateX(0);
-    //     transition: transform map-get($transitions, slow);
-
-    //     &:not(.open) {
-    //         transform: translateX(-100%);
-    //     }
-
-    //     &-open {
-    //         display: flex;
-    //     }
-
-    //     &-header {
-    //         padding: space(5) space(6);
-    //     }
-
-    //     &-close {
-    //         font-size: map-get($font-sizes, lg);
-    //         width: 40px;
-    //         height: 40px;
-    //     }
-    // }
-
     .map-container {
         flex: 1;
         height: 100vh;
-        // margin-left: 360px;
         border-radius: 0;
 
         &.full-width {
@@ -608,42 +565,12 @@ $radii: (
         }
     }
 
-    // .input-field {
-    //     font-size: map-get($font-sizes, base);
-    //     padding: space(4) space(14) space(4) space(5);
-    // }
-
-    // .action-button {
-    //     width: 52px;
-    //     height: 52px;
-    //     font-size: map-get($font-sizes, xl);
-    // }
-
     .route-info {
         font-size: map-get($font-sizes, lg);
     }
 }
 
 @media (max-width: 480px) {
-    // .sidebar {
-    //     width: 90%;
-    //     max-width: 320px;
-
-    //     &-content {
-    //         padding: space(5);
-    //     }
-    // }
-
-    // .input-field {
-    //     font-size: map-get($font-sizes, sm);
-    //     padding: space(3) space(12) space(3) space(4);
-    // }
-
-    // .action-button {
-    //     width: 44px;
-    //     height: 44px;
-    //     font-size: map-get($font-sizes, base);
-    // }
 
     .route-info {
         font-size: map-get($font-sizes, sm);
@@ -651,217 +578,184 @@ $radii: (
     }
 }
 
-// Premium Leaflet Routing Styles with glassmorphism
 .leaflet-routing-container {
     pointer-events: auto;
-    background: color(glass-light);
-    backdrop-filter: blur(20px) saturate(180%);
-    border: 1px solid color(glass-border);
-    border-radius: map-get($radii, xl);
-    padding: space(5);
-    height: 300px;
-    overflow-y: scroll;
-    width: 360px;
-    box-shadow: map-get($shadows, 2xl);
+    background: color(surface);
+    border: 1px solid color(border-light);
+    border-radius: map-get($radii, md);
+    padding: space(3);
+    width: 320px;
+    box-shadow: 0 2px 4px color(shadow-sm);
     z-index: 1100;
     position: absolute;
+    top: space(14);
+    /* 24px to clear route-toggle-buttons */
+    right: space(2);
+    font-family: 'Roboto', sans-serif;
+    overflow-y: visible;
 
     &-hidden {
-        display: none !important;
-    }
-
-    &-primary {
-        top: 20px;
-        right: space(5);
-    }
-
-    &-alt {
-        top: 380px;
-        right: space(5);
+        display: none;
     }
 
     &-instruction {
-        margin: space(2) 0;
-        cursor: pointer !important;
-        user-select: none;
-        z-index: 1150;
-        padding: space(3);
-        border-radius: map-get($radii, lg);
+        margin: space(1) 0;
+        padding: space(1);
+        cursor: pointer;
+        border-radius: map-get($radii, sm);
         transition: all map-get($transitions, fast);
-        font-weight: map-get($font-weights, medium);
+        font-size: map-get($font-sizes, sm);
+        font-weight: map-get($font-weights, regular);
+        color: color(text-primary);
 
         &:hover {
-            background: color(surface-hover);
-            transform: translateX(2px);
+            background: color(primary-subtle);
         }
 
         &:active {
-            background: color(surface-pressed);
-            transform: translateX(0);
+            background: color(surface-secondary);
         }
     }
 
-    &.leaflet-routing-collapsible {
-        height: 360px !important;
-        overflow-y: scroll !important;
-    }
-
-    &,
-    h2,
-    h3,
-    a,
-    span {
-        color: color(text-primary);
-    }
-
     h2 {
-        font-size: map-get($font-sizes, lg);
-        font-weight: map-get($font-weights, bold);
-        margin: 0 0 space(4) 0;
-        letter-spacing: -0.01em;
+        font-size: map-get($font-sizes, base);
+        font-weight: map-get($font-weights, medium);
+        color: color(text-primary);
+        margin: 0 0 space(1);
     }
 
     h3 {
-        font-size: map-get($font-sizes, base);
-        font-weight: map-get($font-weights, semibold);
-        margin: space(3) 0;
-        letter-spacing: -0.005em;
+        font-size: map-get($font-sizes, sm);
+        font-weight: map-get($font-weights, medium);
+        color: color(text-primary);
+        margin: space(1) 0;
     }
 
     .leaflet-routing-instruction-text {
-        pointer-events: auto;
-        cursor: pointer !important;
+        cursor: pointer;
         color: color(text-primary);
-        font-weight: map-get($font-weights, medium);
         font-size: map-get($font-sizes, sm);
+        font-weight: map-get($font-weights, regular);
         transition: color map-get($transitions, fast);
 
         &:hover {
             color: color(primary);
         }
     }
-
-    .leaflet-routing-route {
-        color: color(accent) !important;
-        cursor: pointer;
-        font-weight: map-get($font-weights, semibold);
-        transition: color map-get($transitions, fast);
-
-        &:hover {
-            color: color(accent-light) !important;
-        }
-    }
-
-    .leaflet-routing-alt {
-        color: color(success) !important;
-        cursor: pointer;
-        font-weight: map-get($font-weights, semibold);
-        transition: color map-get($transitions, fast);
-
-        &:hover {
-            color: color(success-light) !important;
-        }
-    }
-
-    // Enhanced scrollbar
-    &::-webkit-scrollbar {
-        width: 6px;
-    }
-
-    &::-webkit-scrollbar-track {
-        background: color(surface-secondary);
-        border-radius: map-get($radii, full);
-    }
-
-    &::-webkit-scrollbar-thumb {
-        background: linear-gradient(180deg, color(text-tertiary) 0%, color(text-muted) 100%);
-        border-radius: map-get($radii, full);
-
-        &:hover {
-            background: linear-gradient(180deg, color(primary-light) 0%, color(primary) 100%);
-        }
-    }
 }
 
 .instructions-list {
     pointer-events: auto;
-    height: 280px;
+    height: auto;
+    max-height: 300px;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
 
     &::-webkit-scrollbar {
         width: 4px;
     }
 
-    &::-webkit-scrollbar-track {
-        background: color(surface-secondary);
-        border-radius: map-get($radii, full);
-    }
-
     &::-webkit-scrollbar-thumb {
         background: color(text-muted);
         border-radius: map-get($radii, full);
-
-        &:hover {
-            background: color(primary-light);
-        }
     }
 }
 
 .popup-header {
-    margin-bottom: space(5);
-    padding-bottom: space(4);
-    border-bottom: 2px solid color(border-light);
+    margin-bottom: space(1);
+    padding-bottom: space(1);
+    border-bottom: 1px solid color(border-light);
 
     h3 {
         margin: 0;
-        font-size: map-get($font-sizes, lg);
-        font-weight: map-get($font-weights, bold);
+        font-size: map-get($font-sizes, sm);
+        font-weight: map-get($font-weights, medium);
         color: color(text-primary);
-        letter-spacing: -0.01em;
-        line-height: map-get($line-heights, tight);
     }
 
     p {
-        margin: space(2) 0 0;
-        font-size: map-get($font-sizes, sm);
+        margin: space(1) 0 0;
+        font-size: map-get($font-sizes, xs);
         color: color(text-secondary);
-        font-weight: map-get($font-weights, medium);
-        line-height: map-get($line-heights, relaxed);
+        font-weight: map-get($font-weights, regular);
     }
 }
 
 .close-button {
     position: absolute;
-    top: space(3);
-    right: space(3);
-    background: color(surface);
-    border: 1px solid color(border);
-    border-radius: map-get($radii, lg);
+    top: space(1);
+    right: space(1);
+    background: transparent;
+    border: none;
+    border-radius: map-get($radii, full);
     cursor: pointer;
-    padding: space(2);
-    z-index: 1200;
-    color: color(text-secondary);
-    transition: all map-get($transitions, normal);
-    width: 32px;
-    height: 32px;
+    width: 36px;
+    height: 36px;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: map-get($font-sizes, base);
-    font-weight: map-get($font-weights, semibold);
+    color: color(text-secondary);
+    font-size: map-get($font-sizes, sm);
+    transition: all map-get($transitions, fast);
+    z-index: 1200;
 
     &:hover {
-        transform: scale(1.05);
+        background: color(primary-subtle);
+        color: color(primary);
     }
 
     &:active {
-        transform: scale(0.95);
-        background: color(danger);
-        color: color(surface);
+        background: color(surface-secondary);
     }
 
     &:focus {
         outline: none;
-        box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.15);
+        box-shadow: 0 0 0 3px rgba(26, 115, 232, 0.1);
+    }
+
+    svg {
+        width: 16px;
+        height: 16px;
+    }
+}
+
+@media (max-width: 480px) {
+    .leaflet-routing-container {
+        width: 100%;
+        padding: space(2);
+        border-radius: map-get($radii, sm);
+        top: space(5);
+        /* 20px */
+        right: 0;
+        left: 0;
+        margin: 0 space(2);
+    }
+
+    .close-button {
+        width: 44px;
+        height: 44px;
+
+        svg {
+            width: 20px;
+            height: 20px;
+        }
+    }
+
+    .instructions-list {
+        max-height: 200px;
+    }
+}
+
+@media (max-width: 480px) {
+    .leaflet-routing-container {
+        width: 100%;
+        padding: space(2);
+        border-radius: map-get($radii, sm);
+    }
+
+    .close-button {
+        width: 44px;
+        height: 44px;
     }
 }
 
@@ -872,74 +766,61 @@ $radii: (
     top: space(3);
     right: space(3);
     z-index: 1000;
-    background: color(glass-light);
-    backdrop-filter: blur(16px) saturate(180%);
-    border: 1px solid color(glass-border);
-    padding: space(1.5) space(2);
-    border-radius: map-get($radii, lg);
-    box-shadow: map-get($shadows, md);
-    display: flex;
-    gap: space(1.5);
+    background: color(surface);
+    border: 1px solid color(border-light);
+    padding: space(1);
+    border-radius: map-get($radii, md);
+    display: inline-flex;
+    gap: space(2);
+    justify-content: center;
+    min-width: 100px;
 
     button {
-        padding: space(2) space(3);
+        padding: space(2);
+        height: 36px;
+        min-width: 80px;
         background: color(surface);
         color: color(text-primary);
-        border: 1px solid color(border);
+        border: 1px solid color(border-light);
         border-radius: map-get($radii, md);
         cursor: pointer;
-        font-size: map-get($font-sizes, xs);
-        font-weight: map-get($font-weights, medium);
-        transition: all map-get($transitions, normal);
-        box-shadow: map-get($shadows, xs);
-        line-height: map-get($line-heights, snug);
-        letter-spacing: -0.005em;
-        min-width: 100px;
+        font-size: map-get($font-sizes, sm);
+        font-weight: map-get($font-weights, regular);
+        transition: all map-get($transitions, fast);
+        display: flex;
+        align-items: center;
+        justify-content: center;
 
         &:hover:not(:disabled) {
-            background: color(primary);
-            color: color(surface);
+            background: color(primary-subtle);
+            color: color(primary);
             border-color: color(primary);
-            transform: translateY(-1px);
-            box-shadow: map-get($shadows, primary);
-        }
-
-        &:active:not(:disabled) {
-            transform: translateY(0);
         }
 
         &:focus {
             outline: none;
-            box-shadow: 0 0 0 3px rgba(91, 108, 245, 0.15);
+            box-shadow: 0 0 0 3px rgba(26, 115, 232, 0.1);
         }
 
         &:disabled {
-            background: color(primary);
-            color: color(surface);
-            border-color: color(primary);
+            background: color(surface-secondary);
+            color: color(text-muted);
+            border-color: color(border-light);
             cursor: not-allowed;
-            opacity: 0.8;
-            transform: none;
-            box-shadow: map-get($shadows, primary);
-
-            &:hover {
-                transform: none;
-                box-shadow: map-get($shadows, primary);
-            }
+            opacity: 0.5;
         }
-    }
-}
-
-@media (max-width: 760px) {
-    .route-toggle-buttons {
-        display: flex;
-        flex-direction: column;
     }
 }
 
 @media (max-width: 480px) {
     .route-toggle-buttons {
-        display: flex;
         flex-direction: column;
+        padding: space(1);
+        min-width: 80px;
+
+        button {
+            height: 44px;
+            width: 100%;
+        }
     }
 }
