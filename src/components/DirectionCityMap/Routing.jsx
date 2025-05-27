@@ -33,7 +33,6 @@ function Routing({
       return;
     }
 
-    // Remove existing control to prevent overlap
     if (localRouteControlRef.current) {
       map.removeControl(localRouteControlRef.current);
       console.log("Removed existing routing control");
@@ -51,10 +50,7 @@ function Routing({
           missingRouteTolerance: 0,
         },
         altLineOptions: {
-          styles: [
-            { color: "#26A69A", opacity: 0.6, weight: 4 },
-            { color: "#FF9800", opacity: 0.6, weight: 4 },
-          ],
+          styles: [{ color: "#2ECC71", opacity: 0.6, weight: 4 }],
           extendToWaypoints: true,
           missingRouteTolerance: 0,
         },
@@ -66,21 +62,12 @@ function Routing({
         }),
         createMarker: () => null,
         containerClassName: "leaflet-routing-container",
-        fitSelectedRoutes: "smart",
         show: true,
         collapsible: true,
-        autoRoute: true,
-        plan: L.Routing.plan(
-          waypoints.map((wp) => L.latLng(wp.coords[0], wp.coords[1])),
-          {
-            createMarker: () => null,
-            routeWhileDragging: true,
-          }
-        ),
       })
         .on("routesfound", (e) => {
           const routes = e.routes;
-          console.log("Routes found:", routes.length, routes); // Debug
+          console.log("Routes found:", routes.length, routes);
           if (routes[0]) {
             setDistance(routes[0].summary.totalDistance);
             setDuration(routes[0].summary.totalTime);
@@ -89,13 +76,25 @@ function Routing({
                 index: idx,
                 distance: r.summary.totalDistance,
                 duration: r.summary.totalTime,
-                coordinates: r.coordinates, // Store for switching
+                coordinates: r.coordinates,
+                instructions: r.instructions,
               }))
             );
+            control.show(); // Ensure popup is visible
           }
         })
         .on("routeselected", (e) => {
-          console.log("Route selected:", e.route); // Debug
+          const selectedRoute = e.route;
+          console.log("Route selected:", selectedRoute);
+          setDistance(selectedRoute.summary.totalDistance);
+          setDuration(selectedRoute.summary.totalTime);
+          setAlternatives((prev) =>
+            prev.map((alt, idx) => ({
+              ...alt,
+              selected: alt.coordinates === selectedRoute.coordinates,
+            }))
+          );
+          control.show(); // Ensure popup shows selected route
         })
         .on("routingerror", (err) => {
           console.error("Routing error:", err);

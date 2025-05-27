@@ -131,16 +131,10 @@ export default function DirectionCityMap() {
   };
 
   const selectAlternative = (index) => {
-    if (mapRef.current && routeControlRef.current && alternatives[index]) {
+    if (mapRef.current && routeControlRef.current) {
       try {
-        const route = alternatives[index];
-        routeControlRef.current
-          .getPlan()
-          .setWaypoints(route.coordinates.map((c) => L.latLng(c.lat, c.lng)));
-        routeControlRef.current.route();
-        setDistance(route.distance);
-        setDuration(route.duration);
-        console.log(`Switched to alternative route ${index}`, route); // Debug
+        routeControlRef.current.getPlan().setAlternative(index);
+        console.log(`Switched to alternative route ${index}`); // Debug
       } catch (err) {
         console.error("Failed to switch alternative:", err);
       }
@@ -148,7 +142,6 @@ export default function DirectionCityMap() {
       console.warn("Cannot switch alternative:", {
         map: !!mapRef.current,
         routeControl: !!routeControlRef.current,
-        alternativeExists: !!alternatives[index],
       });
     }
   };
