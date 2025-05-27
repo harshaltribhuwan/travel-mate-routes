@@ -122,7 +122,7 @@ function Sidebar({
     <>
       <div className={`sidebar ${showSidebar ? "open" : ""}`}>
         <div className="sidebar-header">
-          <h2>RouteMate</h2>
+          <h2>TravelMate Routes</h2>
           <button
             className="sidebar-close"
             onClick={() => setShowSidebar(false)}
