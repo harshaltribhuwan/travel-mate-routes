@@ -54,7 +54,6 @@ function Sidebar({
   }, [showSidebar, mapRef]);
 
   const saveRoute = () => {
-    // Validate waypoints: at least 2 unique, valid coordinates
     if (
       waypoints.length >= 2 &&
       waypoints.every((wp) => wp.coords && wp.coords.length === 2) &&
@@ -83,7 +82,6 @@ function Sidebar({
   };
 
   const handleClearRoute = () => {
-    // Reset waypoints to a single default point
     setWaypoints([
       { id: "from", city: "", coords: defaultCenter },
       { id: "to", city: "", coords: null },
@@ -96,7 +94,7 @@ function Sidebar({
       mapRef.current.setView(defaultCenter, 5);
       mapRef.current.invalidateSize();
     }
-    clearRoute(); // Call parent clearRoute for additional cleanup
+    clearRoute();
   };
 
   const handleLoadRoute = (route) => {
@@ -109,8 +107,8 @@ function Sidebar({
       mapRef.current.fitBounds(bounds, { padding: [50, 50] });
       mapRef.current.invalidateSize();
     }
-    loadRoute(route); // Call parent loadRoute for additional logic
-    setShowSidebar(false); // Hide sidebar after loading route
+    loadRoute(route);
+    setShowSidebar(false);
   };
 
   const handleSelectAlternative = (index) => {
@@ -124,7 +122,7 @@ function Sidebar({
     <>
       <div className={`sidebar ${showSidebar ? "open" : ""}`}>
         <div className="sidebar-header">
-          <h2>Travel-Mate Map</h2>
+          <h2>TravelMate Maps</h2>
           <button
             className="sidebar-close"
             onClick={() => setShowSidebar(false)}
@@ -153,7 +151,7 @@ function Sidebar({
           />
           {alternatives.length > 0 && (
             <CollapsibleSection
-              title="Alternative Routes"
+              title="Alternatives"
               isOpen={showAlternatives}
               setIsOpen={setShowAlternatives}
               items={alternatives}
@@ -191,7 +189,7 @@ function Sidebar({
             setIsOpen={setShowSavedRoutes}
             items={savedRoutes}
             renderItem={(route, idx) => (
-              <>
+              <div className="route-item">
                 <button
                   onClick={() => handleLoadRoute(route)}
                   className="load-route"
@@ -213,18 +211,18 @@ function Sidebar({
                 >
                   <MdClose />
                 </button>
-              </>
+              </div>
             )}
             itemKey="idx"
             emptyMessage="No saved routes"
           />
           <CollapsibleSection
-            title="Search History"
+            title="History"
             isOpen={showHistory}
             setIsOpen={setShowHistory}
             items={savedHistory}
             renderItem={(item, idx) => (
-              <>
+              <div className="history-item">
                 <button
                   onClick={() => loadHistoryItem(item)}
                   className="load-history"
@@ -241,7 +239,7 @@ function Sidebar({
                 >
                   <MdClose />
                 </button>
-              </>
+              </div>
             )}
             itemKey="id"
             emptyMessage="No recent searches"

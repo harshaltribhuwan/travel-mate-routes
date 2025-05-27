@@ -12,7 +12,6 @@ function Routing({ waypoints, setDistance, setDuration, setAlternatives }) {
   const [showAlt, setShowAlt] = useState(false);
   const [hasAltRoute, setHasAltRoute] = useState(false);
 
-
   // Helper: Extract main roads from instructions (old logic)
   const getRouteRoads = (instructions) => {
     const roads = new Set();
@@ -105,18 +104,17 @@ function Routing({ waypoints, setDistance, setDuration, setAlternatives }) {
             clearRouteInstructions("primary");
           }
 
-         if (routes[1]) {
-           setHasAltRoute(true);
-           if (showAlt) {
-             showRouteInstructions("alt", routes[1]);
-           } else {
-             clearRouteInstructions("alt");
-           }
-         } else {
-           setHasAltRoute(false);
-           clearRouteInstructions("alt");
-         }
-
+          if (routes[1]) {
+            setHasAltRoute(true);
+            if (showAlt) {
+              showRouteInstructions("alt", routes[1]);
+            } else {
+              clearRouteInstructions("alt");
+            }
+          } else {
+            setHasAltRoute(false);
+            clearRouteInstructions("alt");
+          }
         }
       })
       .addTo(map);
@@ -138,7 +136,7 @@ function Routing({ waypoints, setDistance, setDuration, setAlternatives }) {
     setDuration,
     setAlternatives,
     showPrimary,
-    showAlt
+    showAlt,
   ]);
 
   // Show route instructions container (old + click to pan fix)

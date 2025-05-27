@@ -1,5 +1,5 @@
 import React from "react";
-import { MdExpandMore, MdExpandLess } from "react-icons/md";
+import { MdChevronRight, MdExpandMore } from "react-icons/md";
 import "../../styles/DirectionCityMap.scss";
 
 function CollapsibleSection({
@@ -14,10 +14,10 @@ function CollapsibleSection({
   return (
     <div className={title.toLowerCase().replace(/\s/g, "-")}>
       <h3 onClick={() => setIsOpen(!isOpen)} className="collapsible-header">
-        {title} {isOpen ? <MdExpandLess /> : <MdExpandMore />}
+        {title} {isOpen ? <MdExpandMore /> : <MdChevronRight />}
       </h3>
       {isOpen && (
-        <>
+        <div className="collapsible-content">
           {items && items.length > 0 ? (
             <ul>
               {items.map((item, idx) => (
@@ -27,7 +27,7 @@ function CollapsibleSection({
           ) : (
             emptyMessage && <p className="empty-message">{emptyMessage}</p>
           )}
-        </>
+        </div>
       )}
     </div>
   );

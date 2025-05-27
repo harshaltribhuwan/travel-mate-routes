@@ -1,70 +1,21 @@
 // Premium Color Palette - Refined & Subtle
 $colors: (
-    // Primary colors - More subtle and sophisticated
-    primary: #5b6cf5,
-    primary-dark: #3e4db8,
-    primary-light: #8b96f7,
-    primary-subtle: #f0f2ff,
-
-    // Secondary & accent colors
-    secondary: #7c3aed,
-    secondary-light: #a855f7,
-    accent: #0ea5e9,
-    accent-light: #38bdf8,
-
-    // Neutral palette - Enhanced with more variety
+    primary: #1a73e8,
+    primary-light: #4285f4,
+    primary-subtle: #e8f0fe,
     surface: #ffffff,
-    surface-secondary: #fafbfc,
-    surface-elevated: #f7f8fa,
-    surface-hover: #f1f3f5,
-    surface-pressed: #e9ecef,
-    background: #fdfdfe,
-    background-subtle: #f8f9fb,
-
-    // Text colors - Better hierarchy
-    text-primary: #1a1d29,
-    text-secondary: #4a5568,
-    text-tertiary: #718096,
-    text-muted: #a0aec0,
-    text-disabled: #cbd5e0,
-
-    // Border colors - More refined
-    border: #e2e8f0,
-    border-light: #edf2f7,
-    border-subtle: #f7fafc,
-    border-focus: #cbd5e0,
-
-    // Status colors - More balanced
-    success: #059669,
-    success-light: #34d399,
-    success-subtle: #ecfdf5,
-    warning: #d97706,
-    warning-light: #fbbf24,
-    warning-subtle: #fffbeb,
-    danger: #dc2626,
-    danger-light: #f87171,
-    danger-subtle: #fef2f2,
-    info: #0ea5e9,
-    info-light: #38bdf8,
-    info-subtle: #f0f9ff,
-
-    // Enhanced shadows with better depth
-    shadow-xs: rgba(16, 24, 40, 0.02),
-    shadow-sm: rgba(16, 24, 40, 0.04),
-    shadow-md: rgba(16, 24, 40, 0.08),
-    shadow-lg: rgba(16, 24, 40, 0.12),
-    shadow-xl: rgba(16, 24, 40, 0.16),
-    shadow-2xl: rgba(16, 24, 40, 0.24),
-
-    // Overlay colors
-    overlay-light: rgba(16, 24, 40, 0.4),
-    overlay-medium: rgba(16, 24, 40, 0.6),
-    overlay-heavy: rgba(16, 24, 40, 0.8),
-
-    // Glass effect colors
-    glass-light: rgba(255, 255, 255, 0.8),
-    glass-medium: rgba(255, 255, 255, 0.6),
-    glass-border: rgba(255, 255, 255, 0.2)
+    surface-secondary: #f8f9fa,
+    text-primary: #202124,
+    text-secondary: #5f6368,
+    text-muted: #9aa0a6,
+    border: #dadce0,
+    border-light: #e8eaed,
+    success: #34a853,
+    danger: #d93025,
+    glass-light: rgba(255, 255, 255, 0.9),
+    glass-border: rgba(255, 255, 255, 0.2),
+    shadow-sm: rgba(0, 0, 0, 0.1),
+    shadow-md: rgba(0, 0, 0, 0.15)
 );
 
 @function color($name) {
@@ -195,38 +146,28 @@ $radii: (
     display: flex;
     flex-direction: column;
     min-height: 100vh;
-    background:
-        radial-gradient(circle at 25% 25%, color(primary-subtle) 0%, transparent 50%),
-        radial-gradient(circle at 75% 75%, rgba(124, 58, 237, 0.05) 0%, transparent 50%),
-        linear-gradient(135deg, color(background) 0%, color(background-subtle) 50%, color(surface-secondary) 100%);
-    font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", sans-serif;
-    font-weight: map-get($font-weights, normal);
+    background: color(surface-secondary);
+    font-family: 'Roboto', sans-serif;
+    font-weight: map-get($font-weights, regular);
     line-height: map-get($line-heights, normal);
     margin: 0 auto;
     width: 100%;
     color: color(text-primary);
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
 }
 
-// Premium Sidebar with glassmorphism
 .sidebar {
     position: fixed;
     top: 0;
     left: -100%;
-    width: 80%;
-    max-width: 360px;
+    width: 350px;
     height: 100%;
-    background:
-        linear-gradient(180deg, color(glass-light) 0%, color(glass-medium) 100%);
-    backdrop-filter: blur(20px) saturate(180%);
-    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    background: color(glass-light);
+    backdrop-filter: blur(8px);
     border-right: 1px solid color(glass-border);
-    box-shadow: map-get($shadows, 2xl);
+    box-shadow: 0 2px 8px color(shadow-md);
     z-index: 2000;
-    transition: left map-get($transitions, slow);
+    transition: left map-get($transitions, normal);
     overflow-y: auto;
-    overflow-x: hidden;
 
     &.open {
         left: 0;
@@ -236,540 +177,359 @@ $radii: (
         display: flex;
         align-items: center;
         justify-content: space-between;
-        padding: space(5) space(5);
+        padding: space(4);
         border-bottom: 1px solid color(border-light);
-        background: color(glass-light);
-        backdrop-filter: blur(10px);
-        position: sticky;
-        top: 0;
-        z-index: 10;
+        background: color(surface);
 
-        .logo {
-            font-size: map-get($font-sizes, xl);
+        h2 {
+            font-size: map-get($font-sizes, lg);
             font-weight: map-get($font-weights, bold);
-            background: linear-gradient(135deg, color(primary) 0%, color(secondary) 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            letter-spacing: -0.025em;
+            color: color(text-primary);
+            margin: 0;
         }
     }
 
     &-close {
-        width: 44px;
-        height: 44px;
-        background: color(surface);
-        border: 1px solid color(border-light);
-        border-radius: map-get($radii, xl);
+        width: 36px;
+        height: 36px;
+        background: transparent;
+        border: none;
+        border-radius: map-get($radii, full);
         cursor: pointer;
         font-size: map-get($font-sizes, lg);
         color: color(text-secondary);
         display: flex;
         align-items: center;
         justify-content: center;
-        transition: all map-get($transitions, normal);
-        box-shadow: map-get($shadows, sm);
-        font-weight: map-get($font-weights, medium);
+        transition: all map-get($transitions, fast);
 
         &:hover {
             background: color(danger);
             color: color(surface);
-            transform: scale(1.05);
-            box-shadow: map-get($shadows, danger);
-            border-color: color(danger);
-        }
-
-        &:active {
-            transform: scale(0.95);
-        }
-
-        &:focus {
-            outline: none;
-            box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.15);
         }
     }
 
     &-open {
         position: fixed;
-        top: space(5);
-        left: space(5);
-        width: 52px;
-        height: 52px;
-        background: color(glass-light);
-        backdrop-filter: blur(10px);
-        color: color(text-primary);
-        border: 1px solid color(glass-border);
-        border-radius: map-get($radii, xl);
+        top: space(3);
+        left: space(3);
+        width: 44px;
+        height: 44px;
+        background: color(surface);
+        border: 1px solid color(border-light);
+        border-radius: map-get($radii, full);
         cursor: pointer;
         font-size: map-get($font-sizes, lg);
+        color: color(text-primary);
         display: flex;
         align-items: center;
         justify-content: center;
         z-index: 1000;
-        box-shadow: map-get($shadows, lg);
-        transition: all map-get($transitions, normal);
-        font-weight: map-get($font-weights, semibold);
+        transition: all map-get($transitions, fast);
 
         &:hover {
             background: color(primary);
             color: color(surface);
-            transform: scale(1.05);
-            box-shadow: map-get($shadows, primary-lg);
-            border-color: color(primary);
-        }
-
-        &:active {
-            transform: scale(0.95);
-        }
-
-        &:focus {
-            outline: none;
-            box-shadow: 0 0 0 3px rgba(91, 108, 245, 0.15);
         }
     }
 
     &-content {
-        padding: space(6) space(5);
-
-        h2 {
-            font-size: map-get($font-sizes, 2xl);
-            font-weight: map-get($font-weights, extrabold);
-            color: color(text-primary);
-            margin: 0 0 space(8) 0;
-            background: linear-gradient(135deg, color(primary) 0%, color(secondary-light) 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            letter-spacing: -0.025em;
-            line-height: map-get($line-heights, tight);
-        }
+        padding: space(4);
 
         h3 {
-            font-size: map-get($font-sizes, lg);
-            font-weight: map-get($font-weights, semibold);
+            font-size: map-get($font-sizes, base);
+            font-weight: map-get($font-weights, medium);
             color: color(text-primary);
-            margin: space(8) 0 space(4) 0;
+            margin: space(3) 0 space(2);
             cursor: pointer;
             display: flex;
             align-items: center;
-            justify-content: space-between;
-            padding: space(3) space(4);
-            border-radius: map-get($radii, lg);
-            transition: all map-get($transitions, normal);
-            letter-spacing: -0.01em;
-
-            &:hover {
-                background: color(surface-hover);
-                color: color(primary);
-                transform: translateX(2px);
-            }
-
-            &:active {
-                transform: translateX(0);
-                background: color(surface-pressed);
-            }
+            gap: space(2);
         }
     }
 
-    // Premium scrollbar
     &::-webkit-scrollbar {
-        width: 6px;
-    }
-
-    &::-webkit-scrollbar-track {
-        background: transparent;
+        width: 4px;
     }
 
     &::-webkit-scrollbar-thumb {
-        background: linear-gradient(180deg, color(text-tertiary) 0%, color(text-muted) 100%);
+        background: color(text-muted);
         border-radius: map-get($radii, full);
-
-        &:hover {
-            background: linear-gradient(180deg, color(primary-light) 0%, color(primary) 100%);
-        }
     }
 }
 
-// Premium Search Form with enhanced focus states
 .input-group {
     position: relative;
-    display: flex;
-    align-items: center;
-    margin-bottom: space(4);
+    margin-bottom: space(3);
 }
 
 .input-field {
-    flex: 1;
-    width: 100%;
-    padding: space(4) space(14) space(4) space(5);
-    border: 2px solid color(border);
-    border-radius: map-get($radii, xl);
-    font-size: map-get($font-sizes, base);
-    font-weight: map-get($font-weights, medium);
+    width: 80%;
+    padding: space(3) space(10) space(3) space(4);
+    border: 1px solid color(border);
+    border-radius: map-get($radii, md);
+    font-size: map-get($font-sizes, sm);
+    font-weight: map-get($font-weights, regular);
     color: color(text-primary);
     background: color(surface);
     outline: none;
-    box-sizing: border-box;
-    transition: all map-get($transitions, normal);
-    box-shadow: map-get($shadows, sm);
-    line-height: map-get($line-heights, normal);
+    transition: border-color map-get($transitions, fast);
 
     &::placeholder {
         color: color(text-muted);
-        font-weight: map-get($font-weights, normal);
     }
 
     &:focus {
         border-color: color(primary);
-        box-shadow: 0 0 0 3px rgba(91, 108, 245, 0.1), map-get($shadows, md);
-        background: color(surface);
-    }
-
-    &:hover:not(:focus) {
-        border-color: color(border-focus);
-        box-shadow: map-get($shadows, base);
-    }
-
-    &:disabled {
-        background: color(surface-secondary);
-        color: color(text-disabled);
-        cursor: not-allowed;
-
-        &::placeholder {
-            color: color(text-disabled);
-        }
+        box-shadow: 0 0 0 3px rgba(26, 115, 232, 0.1);
     }
 }
 
 .inside-input-button {
     position: absolute;
     right: space(2);
-    background: color(primary);
+    top: 50%;
+    transform: translateY(-50%);
+    background: transparent;
     border: none;
     cursor: pointer;
-    font-size: map-get($font-sizes, lg);
-    color: color(surface);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: space(2.5);
-    width: 40px;
-    height: 40px;
-    border-radius: map-get($radii, lg);
-    z-index: 2;
-    transition: all map-get($transitions, normal);
-    box-shadow: map-get($shadows, sm);
-    font-weight: map-get($font-weights, semibold);
+    font-size: map-get($font-sizes, base);
+    color: color(text-secondary);
+    padding: space(2);
+    border-radius: map-get($radii, full);
+    transition: all map-get($transitions, fast);
 
     &:hover {
-        background: color(primary-dark);
-        transform: scale(1.05);
-        box-shadow: map-get($shadows, primary);
-    }
-
-    &:active {
-        transform: scale(0.95);
-    }
-
-    &:focus {
-        outline: none;
-        box-shadow: 0 0 0 3px rgba(91, 108, 245, 0.15);
-    }
-
-    &:disabled {
-        background: color(text-disabled);
-        cursor: not-allowed;
-        transform: none;
-
-        &:hover {
-            transform: none;
-            box-shadow: map-get($shadows, sm);
-        }
+        background: color(primary-subtle);
+        color: color(primary);
     }
 }
 
 .action-buttons {
     display: flex;
     gap: space(2);
-    justify-content: center;
-    margin-top: space(4);
-    flex-wrap: wrap;
+    justify-content: flex-start;
+    margin-top: space(3);
 }
 
 .action-button {
-    width: 48px;
-    height: 48px;
+    width: 40px;
+    height: 40px;
     background: color(surface);
-    color: color(text-secondary);
-    border: 1px solid color(border);
-    border-radius: map-get($radii, xl);
+    border: 1px solid color(border-light);
+    border-radius: map-get($radii, full);
     cursor: pointer;
+    font-size: map-get($font-sizes, base);
+    color: color(text-secondary);
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: map-get($font-sizes, lg);
-    position: relative;
-    transition: all map-get($transitions, normal);
-    box-shadow: map-get($shadows, sm);
-    font-weight: map-get($font-weights, medium);
+    transition: all map-get($transitions, fast);
 
     &:hover {
         background: color(primary);
         color: color(surface);
-        transform: translateY(-2px);
-        box-shadow: map-get($shadows, primary);
         border-color: color(primary);
     }
 
-    &:active {
-        transform: translateY(0);
-    }
-
-    &:focus {
-        outline: none;
-        box-shadow: 0 0 0 3px rgba(91, 108, 245, 0.15);
-    }
-
-    &.remove {
-        &:hover {
-            background: color(danger);
-            border-color: color(danger);
-            box-shadow: map-get($shadows, danger);
-        }
-
-        &:focus {
-            box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.15);
-        }
-    }
-
-    &.success {
-        &:hover {
-            background: color(success);
-            border-color: color(success);
-            box-shadow: map-get($shadows, success);
-        }
-
-        &:focus {
-            box-shadow: 0 0 0 3px rgba(5, 150, 105, 0.15);
-        }
-    }
-
-    &.warning {
-        &:hover {
-            background: color(warning);
-            border-color: color(warning);
-            box-shadow: map-get($shadows, warning);
-        }
-
-        &:focus {
-            box-shadow: 0 0 0 3px rgba(217, 119, 6, 0.15);
-        }
-    }
-
-    // Enhanced tooltip with better positioning
-    &[title]::after {
-        content: attr(title);
-        position: absolute;
-        top: calc(100% + 12px);
-        left: 50%;
-        transform: translateX(-50%);
-        background: color(text-primary);
-        color: color(surface);
-        padding: space(2) space(3);
-        border-radius: map-get($radii, lg);
-        font-size: map-get($font-sizes, xs);
-        font-weight: map-get($font-weights, semibold);
-        white-space: nowrap;
-        opacity: 0;
-        pointer-events: none;
-        transition: all map-get($transitions, normal);
-        box-shadow: map-get($shadows, lg);
-        z-index: 1000;
-        letter-spacing: 0.025em;
-    }
-
-    &:hover[title]::after {
-        opacity: 1;
-        transform: translateX(-50%) translateY(-4px);
+    &.remove:hover {
+        background: color(danger);
+        border-color: color(danger);
     }
 }
 
-// Premium Autocomplete with improved UX
 .autocomplete-dropdown {
     position: absolute;
     top: 100%;
     left: 0;
     right: 0;
     background: color(surface);
-    border: 1px solid color(border);
-    max-height: 240px;
+    border: 1px solid color(border-light);
+    border-radius: map-get($radii, md);
+    max-height: 200px;
     overflow-y: auto;
-    border-radius: map-get($radii, xl);
-    box-shadow: map-get($shadows, xl);
-    margin-top: space(2);
-    padding: space(2);
-    list-style: none;
+    margin-top: space(1);
+    padding: space(1);
+    box-shadow: 0 2px 8px color(shadow-sm);
     z-index: 1500;
-    backdrop-filter: blur(10px);
 
     &::-webkit-scrollbar {
         width: 4px;
     }
 
-    &::-webkit-scrollbar-track {
-        background: transparent;
-    }
-
     &::-webkit-scrollbar-thumb {
         background: color(text-muted);
         border-radius: map-get($radii, full);
-
-        &:hover {
-            background: color(primary-light);
-        }
     }
 }
 
 .autocomplete-item {
-    padding: space(3) space(4);
+    padding: space(2) space(3);
     cursor: pointer;
-    font-size: map-get($font-sizes, base);
-    font-weight: map-get($font-weights, medium);
+    font-size: map-get($font-sizes, sm);
     color: color(text-primary);
-    border-radius: map-get($radii, lg);
+    border-radius: map-get($radii, sm);
     transition: all map-get($transitions, fast);
-    margin-bottom: space(1);
 
-    &:hover,
-    &:focus {
-        background: linear-gradient(135deg, color(primary-subtle) 0%, rgba(91, 108, 245, 0.08) 100%);
-        color: color(primary-dark);
-        transform: translateX(4px);
-    }
-
-    &:last-child {
-        margin-bottom: 0;
-    }
-
-    &:active {
-        transform: translateX(2px);
-        background: color(primary-light);
-        color: color(surface);
+    &:hover {
+        background: color(primary-subtle);
+        color: color(primary);
     }
 }
 
-// Enhanced Lists with better visual hierarchy
-.alternatives-list,
-.distance-matrix ul,
-.saved-routes ul,
-.search-history ul {
-    list-style: none;
-    padding: 0;
-    font-size: map-get($font-sizes, base);
-    color: color(text-primary);
-
-    li {
-        padding: space(4) 0;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        border-bottom: 1px solid color(border-light);
-        transition: all map-get($transitions, normal);
-
-        &:hover {
-            background: color(surface-hover);
-            margin: 0 -#{space(4)};
-            padding-left: space(4);
-            padding-right: space(4);
-            border-radius: map-get($radii, lg);
-            transform: translateX(2px);
-        }
-
-        &:last-child {
-            border-bottom: none;
-        }
-    }
-}
+// .route-item,
+// .history-item {
+//     display: flex;
+//     align-items: center;
+//     gap: space(2);
+//     padding: space(2);
+//     border-bottom: 1px solid color(border-light);
+// }
 
 .alternative-button,
 .load-route,
 .load-history {
-    padding: space(4) space(5);
-    background: color(surface);
-    color: color(text-primary);
-    border: 1px solid color(border);
-    border-radius: map-get($radii, xl);
-    cursor: pointer;
-    font-size: map-get($font-sizes, sm);
-    font-weight: map-get($font-weights, semibold);
-    text-align: left;
-    transition: all map-get($transitions, normal);
-    box-shadow: map-get($shadows, sm);
-    line-height: map-get($line-heights, snug);
-
-    &:hover {
-        background: color(primary);
-        color: color(surface);
-        border-color: color(primary);
-        transform: translateY(-2px);
-        box-shadow: map-get($shadows, primary);
-    }
-
-    &:active {
-        transform: translateY(0);
-    }
-
-    &:focus {
-        outline: none;
-        box-shadow: 0 0 0 3px rgba(91, 108, 245, 0.15);
-    }
-}
-
-.alternative-button {
-    width: 100%;
-}
-
-.load-route,
-.load-history {
     flex: 1;
-    background: transparent;
+    padding: space(2) space(3);
+    background: color(surface);
+    border: 1px solid color(border-light);
+    border-radius: map-get($radii, md);
+    font-size: map-get($font-sizes, sm);
+    font-weight: map-get($font-weights, regular);
+    color: color(text-primary);
+    text-align: left;
+    cursor: pointer;
+    transition: all map-get($transitions, fast);
 
     &:hover {
-        background: color(primary);
+        // background: color(primary-subtle);
+        // border-color: color(primary);
+        // color: color(primary);
     }
 }
 
 .delete-route,
 .delete-history {
-    background: none;
+    background: transparent;
     border: none;
-    color: color(danger);
+    color: color(text-secondary);
     cursor: pointer;
-    font-size: map-get($font-sizes, lg);
+    font-size: map-get($font-sizes, sm);
     padding: space(2);
-    border-radius: map-get($radii, base);
-    transition: all map-get($transitions, normal);
+    border-radius: map-get($radii, full);
+    transition: all map-get($transitions, fast);
 
     &:hover {
-        background: color(danger-subtle);
         color: color(danger);
-        transform: scale(1.1);
+        background: color(danger-subtle);
+    }
+}
+
+// .empty-message {
+//     font-size: map-get($font-sizes, sm);
+//     color: color(text-muted);
+//     padding: space(3);
+//     text-align: center;
+// }
+
+.collapsible-header {
+    font-size: map-get($font-sizes, base);
+    font-weight: map-get($font-weights, medium);
+    color: color(text-primary);
+    margin: space(3) 0 space(2);
+    padding: space(2);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: space(2);
+    border-radius: map-get($radii, sm);
+    transition: all map-get($transitions, fast);
+
+    &:hover {
+        background: color(primary-subtle);
+        color: color(primary);
     }
 
-    &:active {
-        background: color(danger);
-        color: color(surface);
-        transform: scale(1.05);
+    svg {
+        transition: transform map-get($transitions, fast);
+    }
+}
+
+.collapsible-content {
+    overflow: hidden;
+    animation: fadeIn map-get($transitions, normal);
+
+    ul {
+        list-style: none;
+        padding: space(2);
+        margin: 0;
+    }
+
+    li {
+        margin: 0;
+    }
+}
+
+.route-item,
+.history-item {
+    display: flex;
+    align-items: center;
+    gap: space(2);
+    padding: space(1);
+    border-bottom: 1px solid color(border-light);
+    transition: background map-get($transitions, fast);
+
+    &:hover {
+        background: color(surface-secondary);
     }
 }
 
 .empty-message {
     font-size: map-get($font-sizes, sm);
     color: color(text-muted);
-    padding: space(12) 0;
+    padding: space(2);
     text-align: center;
     font-style: italic;
-    font-weight: map-get($font-weights, medium);
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-4px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@media (max-width: 480px) {
+    .sidebar {
+        width: 100%;
+        max-width: none;
+    }
+
+    .action-buttons {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .action-button {
+        width: 100%;
+        height: 44px;
+        border-radius: map-get($radii, md);
+    }
+}
+
+@media (min-width: 768px) {
+    .sidebar {
+        width: 320px;
+    }
+
+    .map-container {
+        margin-left: 320px;
+    }
 }
 
 // Premium Route Info with glassmorphism
@@ -810,37 +570,37 @@ $radii: (
         flex-direction: row;
     }
 
-    .sidebar {
-        position: fixed;
-        left: 0;
-        width: 360px;
-        height: 100vh;
-        transform: translateX(0);
-        transition: transform map-get($transitions, slow);
+    // .sidebar {
+    //     position: fixed;
+    //     left: 0;
+    //     width: 360px;
+    //     height: 100vh;
+    //     transform: translateX(0);
+    //     transition: transform map-get($transitions, slow);
 
-        &:not(.open) {
-            transform: translateX(-100%);
-        }
+    //     &:not(.open) {
+    //         transform: translateX(-100%);
+    //     }
 
-        &-open {
-            display: flex;
-        }
+    //     &-open {
+    //         display: flex;
+    //     }
 
-        &-header {
-            padding: space(5) space(6);
-        }
+    //     &-header {
+    //         padding: space(5) space(6);
+    //     }
 
-        &-close {
-            font-size: map-get($font-sizes, lg);
-            width: 40px;
-            height: 40px;
-        }
-    }
+    //     &-close {
+    //         font-size: map-get($font-sizes, lg);
+    //         width: 40px;
+    //         height: 40px;
+    //     }
+    // }
 
     .map-container {
         flex: 1;
         height: 100vh;
-        margin-left: 360px;
+        // margin-left: 360px;
         border-radius: 0;
 
         &.full-width {
@@ -848,16 +608,16 @@ $radii: (
         }
     }
 
-    .input-field {
-        font-size: map-get($font-sizes, base);
-        padding: space(4) space(14) space(4) space(5);
-    }
+    // .input-field {
+    //     font-size: map-get($font-sizes, base);
+    //     padding: space(4) space(14) space(4) space(5);
+    // }
 
-    .action-button {
-        width: 52px;
-        height: 52px;
-        font-size: map-get($font-sizes, xl);
-    }
+    // .action-button {
+    //     width: 52px;
+    //     height: 52px;
+    //     font-size: map-get($font-sizes, xl);
+    // }
 
     .route-info {
         font-size: map-get($font-sizes, lg);
@@ -865,25 +625,25 @@ $radii: (
 }
 
 @media (max-width: 480px) {
-    .sidebar {
-        width: 90%;
-        max-width: 320px;
+    // .sidebar {
+    //     width: 90%;
+    //     max-width: 320px;
 
-        &-content {
-            padding: space(5);
-        }
-    }
+    //     &-content {
+    //         padding: space(5);
+    //     }
+    // }
 
-    .input-field {
-        font-size: map-get($font-sizes, sm);
-        padding: space(3) space(12) space(3) space(4);
-    }
+    // .input-field {
+    //     font-size: map-get($font-sizes, sm);
+    //     padding: space(3) space(12) space(3) space(4);
+    // }
 
-    .action-button {
-        width: 44px;
-        height: 44px;
-        font-size: map-get($font-sizes, base);
-    }
+    // .action-button {
+    //     width: 44px;
+    //     height: 44px;
+    //     font-size: map-get($font-sizes, base);
+    // }
 
     .route-info {
         font-size: map-get($font-sizes, sm);

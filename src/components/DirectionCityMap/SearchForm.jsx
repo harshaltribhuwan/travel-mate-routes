@@ -33,7 +33,6 @@ function SearchForm({
         )}&limit=5&addressdetails=1`
       );
       const data = await res.json();
-      console.log("Suggestions fetched:", data); // Debug
       setSuggestions(data.map((p) => ({ ...p, inputType: type })));
     } catch (error) {
       console.error("Error fetching suggestions:", error);
@@ -71,16 +70,13 @@ function SearchForm({
     const lat = parseFloat(place.lat);
     const lon = parseFloat(place.lon);
     const type = place.inputType;
-    console.log("Suggestion clicked:", { place, lat, lon, type }); // Debug
-    setWaypoints((prev) => {
-      const newWaypoints = prev.map((wp) =>
+    setWaypoints((prev) =>
+      prev.map((wp) =>
         wp.id === type
           ? { ...wp, city: place.display_name, coords: [lat, lon] }
           : wp
-      );
-      console.log("Updated waypoints:", newWaypoints); // Debug
-      return newWaypoints;
-    });
+      )
+    );
     setSavedHistory((prev) => {
       const newHistory = [
         {
@@ -144,18 +140,14 @@ function SearchForm({
   };
 
   return (
-    <form onSubmit={(e) => e.preventDefault()} className="search-form">
+    <div className="search-form">
       {waypoints.map((wp, idx) => (
         <div key={wp.id} className="input-group">
           <input
             id={`${wp.id}-input`}
             type="text"
             placeholder={
-              wp.id === "from"
-                ? "Starting point"
-                : wp.id === "to"
-                ? "Destination"
-                : `Stop ${idx}`
+              wp.id === "from" ? "From" : wp.id === "to" ? "To" : `Stop ${idx}`
             }
             className="input-field"
             value={wp.city}
@@ -171,7 +163,6 @@ function SearchForm({
                 : "stop"
             }`}
           />
-
           {wp.id === "from" && (
             <button
               type="button"
@@ -183,7 +174,6 @@ function SearchForm({
               <MdMyLocation />
             </button>
           )}
-
           {wp.id !== "from" && wp.id !== "to" && (
             <button
               type="button"
@@ -195,7 +185,6 @@ function SearchForm({
               <MdClose />
             </button>
           )}
-
           {activeInput === wp.id && suggestions.length > 0 && (
             <ul className="autocomplete-dropdown">
               {suggestions
@@ -210,7 +199,7 @@ function SearchForm({
                     role="option"
                     aria-selected={false}
                   >
-                    {place.display_name} ({place.class || "Place"})
+                    {place.display_name}
                   </li>
                 ))}
             </ul>
@@ -255,7 +244,7 @@ function SearchForm({
           <MdClear />
         </button>
       </div>
-    </form>
+    </div>
   );
 }
 
