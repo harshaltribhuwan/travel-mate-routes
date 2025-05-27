@@ -264,7 +264,7 @@ $radii: (
 }
 
 .input-field {
-    width: 80%;
+    width: 85%;
     padding: space(3) space(10) space(3) space(4);
     border: 1px solid color(border);
     border-radius: map-get($radii, md);
@@ -589,14 +589,11 @@ $radii: (
     z-index: 1100;
     position: absolute;
     top: space(14);
-    /* 24px to clear route-toggle-buttons */
+    /* 56px to clear route-toggle-buttons */
     right: space(2);
+    /* 8px */
     font-family: 'Roboto', sans-serif;
     overflow-y: visible;
-
-    &-hidden {
-        display: none;
-    }
 
     &-instruction {
         margin: space(1) 0;
@@ -721,14 +718,23 @@ $radii: (
 
 @media (max-width: 480px) {
     .leaflet-routing-container {
-        width: 100%;
         padding: space(2);
         border-radius: map-get($radii, sm);
-        top: space(5);
-        /* 20px */
-        right: 0;
-        left: 0;
-        margin: 0 space(2);
+        top: 115px;
+        left: space(2);
+        right: space(2);
+        margin: 0 auto;
+        z-index: 1100;
+        display: block;
+        overflow: hidden;
+    }
+
+    .instructions-list {
+        max-height: 200px;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+        width: 100%;
+        box-sizing: border-box;
     }
 
     .close-button {
@@ -739,23 +745,6 @@ $radii: (
             width: 20px;
             height: 20px;
         }
-    }
-
-    .instructions-list {
-        max-height: 200px;
-    }
-}
-
-@media (max-width: 480px) {
-    .leaflet-routing-container {
-        width: 100%;
-        padding: space(2);
-        border-radius: map-get($radii, sm);
-    }
-
-    .close-button {
-        width: 44px;
-        height: 44px;
     }
 }
 
