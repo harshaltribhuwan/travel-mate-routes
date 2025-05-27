@@ -27,7 +27,7 @@ export default function DirectionCityMap() {
     const saved = localStorage.getItem("savedHistory");
     return saved ? JSON.parse(saved) : [];
   });
-  const [showSidebar, setShowSidebar] = useState(true);
+  const [showSidebar, setShowSidebar] = useState(false);
   const [showSavedRoutes, setShowSavedRoutes] = useState(false);
   const [showHistory, setShowHistory] = useState(false);
   const [showAlternatives, setShowAlternatives] = useState(false);

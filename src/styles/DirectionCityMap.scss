@@ -1,95 +1,228 @@
-// Premium Color Palette
+// Premium Color Palette - Refined & Subtle
 $colors: (
-    primary: #6366f1,
-    primary-dark: #4f46e5,
-    primary-light: #818cf8,
-    secondary: #8b5cf6,
-    accent: #06b6d4,
+    // Primary colors - More subtle and sophisticated
+    primary: #5b6cf5,
+    primary-dark: #3e4db8,
+    primary-light: #8b96f7,
+    primary-subtle: #f0f2ff,
+
+    // Secondary & accent colors
+    secondary: #7c3aed,
+    secondary-light: #a855f7,
+    accent: #0ea5e9,
+    accent-light: #38bdf8,
+
+    // Neutral palette - Enhanced with more variety
     surface: #ffffff,
-    surface-secondary: #f8fafc,
-    surface-elevated: #f1f5f9,
-    background: #f8fafc,
-    text-primary: #1e293b,
-    text-secondary: #64748b,
-    text-muted: #94a3b8,
+    surface-secondary: #fafbfc,
+    surface-elevated: #f7f8fa,
+    surface-hover: #f1f3f5,
+    surface-pressed: #e9ecef,
+    background: #fdfdfe,
+    background-subtle: #f8f9fb,
+
+    // Text colors - Better hierarchy
+    text-primary: #1a1d29,
+    text-secondary: #4a5568,
+    text-tertiary: #718096,
+    text-muted: #a0aec0,
+    text-disabled: #cbd5e0,
+
+    // Border colors - More refined
     border: #e2e8f0,
-    border-light: #f1f5f9,
-    success: #10b981,
-    warning: #f59e0b,
-    danger: #ef4444,
-    shadow-light: rgba(15, 23, 42, 0.04),
-    shadow-medium: rgba(15, 23, 42, 0.08),
-    shadow-heavy: rgba(15, 23, 42, 0.12),
-    overlay: rgba(15, 23, 42, 0.6)
+    border-light: #edf2f7,
+    border-subtle: #f7fafc,
+    border-focus: #cbd5e0,
+
+    // Status colors - More balanced
+    success: #059669,
+    success-light: #34d399,
+    success-subtle: #ecfdf5,
+    warning: #d97706,
+    warning-light: #fbbf24,
+    warning-subtle: #fffbeb,
+    danger: #dc2626,
+    danger-light: #f87171,
+    danger-subtle: #fef2f2,
+    info: #0ea5e9,
+    info-light: #38bdf8,
+    info-subtle: #f0f9ff,
+
+    // Enhanced shadows with better depth
+    shadow-xs: rgba(16, 24, 40, 0.02),
+    shadow-sm: rgba(16, 24, 40, 0.04),
+    shadow-md: rgba(16, 24, 40, 0.08),
+    shadow-lg: rgba(16, 24, 40, 0.12),
+    shadow-xl: rgba(16, 24, 40, 0.16),
+    shadow-2xl: rgba(16, 24, 40, 0.24),
+
+    // Overlay colors
+    overlay-light: rgba(16, 24, 40, 0.4),
+    overlay-medium: rgba(16, 24, 40, 0.6),
+    overlay-heavy: rgba(16, 24, 40, 0.8),
+
+    // Glass effect colors
+    glass-light: rgba(255, 255, 255, 0.8),
+    glass-medium: rgba(255, 255, 255, 0.6),
+    glass-border: rgba(255, 255, 255, 0.2)
 );
 
 @function color($name) {
     @return map-get($colors, $name);
 }
 
-// Premium spacing and sizing
+// Enhanced spacing system
 $spacing: (
-    xs: 4px,
-    sm: 8px,
-    md: 12px,
-    lg: 16px,
-    xl: 20px,
-    2xl: 24px,
-    3xl: 32px,
-    4xl: 40px
+    0: 0,
+    px: 1px,
+    0.5: 2px,
+    1: 4px,
+    1.5: 6px,
+    2: 8px,
+    2.5: 10px,
+    3: 12px,
+    3.5: 14px,
+    4: 16px,
+    5: 20px,
+    6: 24px,
+    7: 28px,
+    8: 32px,
+    9: 36px,
+    10: 40px,
+    12: 48px,
+    14: 56px,
+    16: 64px,
+    20: 80px,
+    24: 96px,
+    28: 112px,
+    32: 128px
 );
 
 @function space($size) {
     @return map-get($spacing, $size);
 }
 
-// Premium typography
+// Premium typography system
 $font-weights: (
+    thin: 100,
+    extralight: 200,
+    light: 300,
     normal: 400,
     medium: 500,
     semibold: 600,
-    bold: 700
+    bold: 700,
+    extrabold: 800,
+    black: 900
 );
 
-// Premium transitions
+$font-sizes: (
+    xs: 0.75rem,
+    sm: 0.875rem,
+    base: 1rem,
+    lg: 1.125rem,
+    xl: 1.25rem,
+    2xl: 1.5rem,
+    3xl: 1.875rem,
+    4xl: 2.25rem,
+    5xl: 3rem,
+    6xl: 3.75rem
+);
+
+$line-heights: (
+    tight: 1.25,
+    snug: 1.375,
+    normal: 1.5,
+    relaxed: 1.625,
+    loose: 2
+);
+
+// Premium transitions & animations
 $transitions: (
-    fast: 0.15s cubic-bezier(0.4, 0, 0.2, 1),
-    normal: 0.2s cubic-bezier(0.4, 0, 0.2, 1),
-    slow: 0.3s cubic-bezier(0.4, 0, 0.2, 1)
+    none: none,
+    all: all 150ms cubic-bezier(0.4, 0, 0.2, 1),
+    fast: 100ms cubic-bezier(0.4, 0, 0.2, 1),
+    normal: 200ms cubic-bezier(0.4, 0, 0.2, 1),
+    slow: 300ms cubic-bezier(0.4, 0, 0.2, 1),
+    slower: 500ms cubic-bezier(0.4, 0, 0.2, 1),
+    bounce: 300ms cubic-bezier(0.68, -0.55, 0.265, 1.55),
+    elastic: 400ms cubic-bezier(0.175, 0.885, 0.32, 1.275)
 );
 
-// Premium shadows
+$easings: (
+    linear: linear,
+    ease-in: cubic-bezier(0.4, 0, 1, 1),
+    ease-out: cubic-bezier(0, 0, 0.2, 1),
+    ease-in-out: cubic-bezier(0.4, 0, 0.2, 1),
+    bounce: cubic-bezier(0.68, -0.55, 0.265, 1.55),
+    elastic: cubic-bezier(0.175, 0.885, 0.32, 1.275)
+);
+
+// Enhanced shadow system
 $shadows: (
-    sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05),
-    md: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
-    lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1),
-    xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1),
-    inner: inset 0 2px 4px 0 rgba(0, 0, 0, 0.06)
+    none: none,
+    xs: 0 1px 2px 0 color(shadow-xs),
+    sm: 0 1px 3px 0 color(shadow-sm),
+    base: 0 1px 3px 0 color(shadow-sm),
+    md: 0 4px 6px -1px color(shadow-md),
+    lg: 0 10px 15px -3px color(shadow-lg),
+    xl: 0 20px 25px -5px color(shadow-xl),
+    2xl: 0 25px 50px -12px color(shadow-2xl),
+    inner: inset 0 2px 4px 0 color(shadow-sm),
+
+    // Colored shadows for interactive elements
+    primary: 0 4px 14px 0 rgba(91, 108, 245, 0.15),
+    primary-lg: 0 8px 25px 0 rgba(91, 108, 245, 0.2),
+    success: 0 4px 14px 0 rgba(5, 150, 105, 0.15),
+    danger: 0 4px 14px 0 rgba(220, 38, 38, 0.15),
+    warning: 0 4px 14px 0 rgba(217, 119, 6, 0.15)
 );
 
-/* Main container */
+// Border radius system
+$radii: (
+    none: 0,
+    sm: 0.125rem,
+    base: 0.25rem,
+    md: 0.375rem,
+    lg: 0.5rem,
+    xl: 0.75rem,
+    2xl: 1rem,
+    3xl: 1.5rem,
+    full: 9999px
+);
+
+// Main container with enhanced gradient
 .container {
     display: flex;
     flex-direction: column;
     min-height: 100vh;
-    background: linear-gradient(135deg, color(background) 0%, color(surface-secondary) 100%);
-    font-family: "Inter", "Poppins", "Roboto", sans-serif !important;
+    background:
+        radial-gradient(circle at 25% 25%, color(primary-subtle) 0%, transparent 50%),
+        radial-gradient(circle at 75% 75%, rgba(124, 58, 237, 0.05) 0%, transparent 50%),
+        linear-gradient(135deg, color(background) 0%, color(background-subtle) 50%, color(surface-secondary) 100%);
+    font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", sans-serif;
+    font-weight: map-get($font-weights, normal);
+    line-height: map-get($line-heights, normal);
     margin: 0 auto;
     width: 100%;
+    color: color(text-primary);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
 }
 
-/* Premium Sidebar */
+// Premium Sidebar with glassmorphism
 .sidebar {
     position: fixed;
     top: 0;
     left: -100%;
     width: 80%;
-    max-width: 320px;
+    max-width: 360px;
     height: 100%;
-    background: linear-gradient(180deg, color(surface) 0%, color(surface-secondary) 100%);
-    backdrop-filter: blur(20px);
-    border-right: 1px solid color(border-light);
-    box-shadow: map-get($shadows, xl);
+    background:
+        linear-gradient(180deg, color(glass-light) 0%, color(glass-medium) 100%);
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    border-right: 1px solid color(glass-border);
+    box-shadow: map-get($shadows, 2xl);
     z-index: 2000;
     transition: left map-get($transitions, slow);
     overflow-y: auto;
@@ -103,284 +236,142 @@ $shadows: (
         display: flex;
         align-items: center;
         justify-content: space-between;
-        padding: space(xl) space(lg);
+        padding: space(5) space(5);
         border-bottom: 1px solid color(border-light);
-        background: color(surface);
+        background: color(glass-light);
+        backdrop-filter: blur(10px);
         position: sticky;
         top: 0;
         z-index: 10;
+
+        .logo {
+            font-size: map-get($font-sizes, xl);
+            font-weight: map-get($font-weights, bold);
+            background: linear-gradient(135deg, color(primary) 0%, color(secondary) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: -0.025em;
+        }
     }
 
     &-close {
-        width: 40px;
-        height: 40px;
-        background: color(surface-elevated);
-        border: 1px solid color(border);
-        border-radius: 12px;
+        width: 44px;
+        height: 44px;
+        background: color(surface);
+        border: 1px solid color(border-light);
+        border-radius: map-get($radii, xl);
         cursor: pointer;
-        font-size: 1.25rem;
+        font-size: map-get($font-sizes, lg);
         color: color(text-secondary);
         display: flex;
         align-items: center;
         justify-content: center;
         transition: all map-get($transitions, normal);
         box-shadow: map-get($shadows, sm);
+        font-weight: map-get($font-weights, medium);
 
         &:hover {
             background: color(danger);
             color: color(surface);
             transform: scale(1.05);
-            box-shadow: map-get($shadows, md);
+            box-shadow: map-get($shadows, danger);
+            border-color: color(danger);
         }
 
         &:active {
             transform: scale(0.95);
+        }
+
+        &:focus {
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.15);
         }
     }
 
     &-open {
         position: fixed;
-        top: space(lg);
-        left: space(lg);
-        width: 48px;
-        height: 48px;
-        background: color(surface);
-        color: color(primary);
-        border: 1px solid color(border);
-        border-radius: 12px;
+        top: space(5);
+        left: space(5);
+        width: 52px;
+        height: 52px;
+        background: color(glass-light);
+        backdrop-filter: blur(10px);
+        color: color(text-primary);
+        border: 1px solid color(glass-border);
+        border-radius: map-get($radii, xl);
         cursor: pointer;
-        font-size: 1.5rem;
+        font-size: map-get($font-sizes, lg);
         display: flex;
         align-items: center;
         justify-content: center;
         z-index: 1000;
         box-shadow: map-get($shadows, lg);
-        backdrop-filter: blur(10px);
         transition: all map-get($transitions, normal);
+        font-weight: map-get($font-weights, semibold);
 
         &:hover {
             background: color(primary);
             color: color(surface);
             transform: scale(1.05);
-            box-shadow: map-get($shadows, xl);
+            box-shadow: map-get($shadows, primary-lg);
+            border-color: color(primary);
         }
 
         &:active {
             transform: scale(0.95);
         }
+
+        &:focus {
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(91, 108, 245, 0.15);
+        }
     }
 
     &-content {
-        padding: space(xl) space(lg);
+        padding: space(6) space(5);
 
         h2 {
-            font-size: 1.375rem;
-            font-weight: map-get($font-weights, bold);
+            font-size: map-get($font-sizes, 2xl);
+            font-weight: map-get($font-weights, extrabold);
             color: color(text-primary);
-            margin: 0 0 space(xl) 0;
-            background: linear-gradient(135deg, color(primary) 0%, color(secondary) 100%);
+            margin: 0 0 space(8) 0;
+            background: linear-gradient(135deg, color(primary) 0%, color(secondary-light) 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
+            letter-spacing: -0.025em;
+            line-height: map-get($line-heights, tight);
         }
 
         h3 {
-            font-size: 1.125rem;
+            font-size: map-get($font-sizes, lg);
             font-weight: map-get($font-weights, semibold);
             color: color(text-primary);
-            margin: space(2xl) 0 space(md) 0;
+            margin: space(8) 0 space(4) 0;
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: space(sm) space(md);
-            border-radius: 8px;
+            padding: space(3) space(4);
+            border-radius: map-get($radii, lg);
             transition: all map-get($transitions, normal);
+            letter-spacing: -0.01em;
 
             &:hover {
-                background: color(surface-elevated);
+                background: color(surface-hover);
                 color: color(primary);
+                transform: translateX(2px);
+            }
+
+            &:active {
+                transform: translateX(0);
+                background: color(surface-pressed);
             }
         }
     }
 
     // Premium scrollbar
-    &::-webkit-scrollbar {
-        width: 8px;
-    }
-
-    &::-webkit-scrollbar-track {
-        background: transparent;
-    }
-
-    &::-webkit-scrollbar-thumb {
-        background: linear-gradient(180deg, color(primary-light) 0%, color(primary) 100%);
-        border-radius: 12px;
-        border: 2px solid transparent;
-        background-clip: content-box;
-
-        &:hover {
-            background: linear-gradient(180deg, color(primary) 0%, color(primary-dark) 100%);
-            background-clip: content-box;
-        }
-    }
-}
-
-/* Premium Search Form */
-.input-group {
-    position: relative;
-    display: flex;
-    align-items: center;
-    margin-bottom: space(md);
-}
-
-.input-field {
-    flex: 1;
-    width: 100%;
-    padding: space(md) space(4xl) space(md) space(lg);
-    border: 2px solid color(border);
-    border-radius: 12px;
-    font-size: 0.95rem;
-    font-weight: map-get($font-weights, medium);
-    color: color(text-primary);
-    background: color(surface);
-    outline: none;
-    box-sizing: border-box;
-    transition: all map-get($transitions, normal);
-    box-shadow: map-get($shadows, sm);
-
-    &::placeholder {
-        color: color(text-muted);
-        font-weight: map-get($font-weights, normal);
-    }
-
-    &:focus {
-        border-color: color(primary);
-        box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1), map-get($shadows, md);
-        background: color(surface);
-    }
-
-    &:hover:not(:focus) {
-        border-color: color(primary-light);
-    }
-}
-
-.inside-input-button {
-    position: absolute;
-    right: space(sm);
-    background: color(primary);
-    border: none;
-    cursor: pointer;
-    font-size: 1.125rem;
-    color: color(surface);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: space(sm);
-    width: 36px;
-    height: 36px;
-    border-radius: 8px;
-    z-index: 2;
-    transition: all map-get($transitions, normal);
-    box-shadow: map-get($shadows, sm);
-
-    &:hover {
-        background: color(primary-dark);
-        transform: scale(1.05);
-        box-shadow: map-get($shadows, md);
-    }
-
-    &:active {
-        transform: scale(0.95);
-    }
-}
-
-.action-buttons {
-    display: flex;
-    gap: space(sm);
-    justify-content: center;
-    margin-top: space(md);
-}
-
-.action-button {
-    width: 44px;
-    height: 44px;
-    background: color(surface-elevated);
-    color: color(text-secondary);
-    border: 1px solid color(border);
-    border-radius: 12px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.25rem;
-    position: relative;
-    transition: all map-get($transitions, normal);
-    box-shadow: map-get($shadows, sm);
-
-    &:hover {
-        background: color(primary);
-        color: color(surface);
-        transform: translateY(-2px);
-        box-shadow: map-get($shadows, lg);
-    }
-
-    &:active {
-        transform: translateY(0);
-    }
-
-    &.remove {
-        &:hover {
-            background: color(danger);
-            border-color: color(danger);
-        }
-    }
-
-    // Premium tooltip
-    &[title]::after {
-        content: attr(title);
-        position: absolute;
-        top: calc(100% + 8px);
-        left: 50%;
-        transform: translateX(-50%);
-        background: color(text-primary);
-        color: color(surface);
-        padding: space(sm) space(md);
-        border-radius: 8px;
-        font-size: 0.75rem;
-        font-weight: map-get($font-weights, medium);
-        white-space: nowrap;
-        opacity: 0;
-        pointer-events: none;
-        transition: all map-get($transitions, normal);
-        box-shadow: map-get($shadows, lg);
-        z-index: 1000;
-    }
-
-    &:hover[title]::after {
-        opacity: 1;
-        transform: translateX(-50%) translateY(-4px);
-    }
-}
-
-/* Premium Autocomplete */
-.autocomplete-dropdown {
-    position: absolute;
-    top: 100%;
-    left: 0;
-    right: 0;
-    background: color(surface);
-    border: 1px solid color(border);
-    max-height: 200px;
-    overflow-y: auto;
-    border-radius: 12px;
-    box-shadow: map-get($shadows, xl);
-    margin-top: space(sm);
-    padding: space(sm);
-    list-style: none;
-    z-index: 1500;
-    backdrop-filter: blur(10px);
-
     &::-webkit-scrollbar {
         width: 6px;
     }
@@ -390,49 +381,295 @@ $shadows: (
     }
 
     &::-webkit-scrollbar-thumb {
-        background: color(primary-light);
-        border-radius: 6px;
+        background: linear-gradient(180deg, color(text-tertiary) 0%, color(text-muted) 100%);
+        border-radius: map-get($radii, full);
 
         &:hover {
-            background: color(primary);
+            background: linear-gradient(180deg, color(primary-light) 0%, color(primary) 100%);
+        }
+    }
+}
+
+// Premium Search Form with enhanced focus states
+.input-group {
+    position: relative;
+    display: flex;
+    align-items: center;
+    margin-bottom: space(4);
+}
+
+.input-field {
+    flex: 1;
+    width: 100%;
+    padding: space(4) space(14) space(4) space(5);
+    border: 2px solid color(border);
+    border-radius: map-get($radii, xl);
+    font-size: map-get($font-sizes, base);
+    font-weight: map-get($font-weights, medium);
+    color: color(text-primary);
+    background: color(surface);
+    outline: none;
+    box-sizing: border-box;
+    transition: all map-get($transitions, normal);
+    box-shadow: map-get($shadows, sm);
+    line-height: map-get($line-heights, normal);
+
+    &::placeholder {
+        color: color(text-muted);
+        font-weight: map-get($font-weights, normal);
+    }
+
+    &:focus {
+        border-color: color(primary);
+        box-shadow: 0 0 0 3px rgba(91, 108, 245, 0.1), map-get($shadows, md);
+        background: color(surface);
+    }
+
+    &:hover:not(:focus) {
+        border-color: color(border-focus);
+        box-shadow: map-get($shadows, base);
+    }
+
+    &:disabled {
+        background: color(surface-secondary);
+        color: color(text-disabled);
+        cursor: not-allowed;
+
+        &::placeholder {
+            color: color(text-disabled);
+        }
+    }
+}
+
+.inside-input-button {
+    position: absolute;
+    right: space(2);
+    background: color(primary);
+    border: none;
+    cursor: pointer;
+    font-size: map-get($font-sizes, lg);
+    color: color(surface);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: space(2.5);
+    width: 40px;
+    height: 40px;
+    border-radius: map-get($radii, lg);
+    z-index: 2;
+    transition: all map-get($transitions, normal);
+    box-shadow: map-get($shadows, sm);
+    font-weight: map-get($font-weights, semibold);
+
+    &:hover {
+        background: color(primary-dark);
+        transform: scale(1.05);
+        box-shadow: map-get($shadows, primary);
+    }
+
+    &:active {
+        transform: scale(0.95);
+    }
+
+    &:focus {
+        outline: none;
+        box-shadow: 0 0 0 3px rgba(91, 108, 245, 0.15);
+    }
+
+    &:disabled {
+        background: color(text-disabled);
+        cursor: not-allowed;
+        transform: none;
+
+        &:hover {
+            transform: none;
+            box-shadow: map-get($shadows, sm);
+        }
+    }
+}
+
+.action-buttons {
+    display: flex;
+    gap: space(2);
+    justify-content: center;
+    margin-top: space(4);
+    flex-wrap: wrap;
+}
+
+.action-button {
+    width: 48px;
+    height: 48px;
+    background: color(surface);
+    color: color(text-secondary);
+    border: 1px solid color(border);
+    border-radius: map-get($radii, xl);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: map-get($font-sizes, lg);
+    position: relative;
+    transition: all map-get($transitions, normal);
+    box-shadow: map-get($shadows, sm);
+    font-weight: map-get($font-weights, medium);
+
+    &:hover {
+        background: color(primary);
+        color: color(surface);
+        transform: translateY(-2px);
+        box-shadow: map-get($shadows, primary);
+        border-color: color(primary);
+    }
+
+    &:active {
+        transform: translateY(0);
+    }
+
+    &:focus {
+        outline: none;
+        box-shadow: 0 0 0 3px rgba(91, 108, 245, 0.15);
+    }
+
+    &.remove {
+        &:hover {
+            background: color(danger);
+            border-color: color(danger);
+            box-shadow: map-get($shadows, danger);
+        }
+
+        &:focus {
+            box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.15);
+        }
+    }
+
+    &.success {
+        &:hover {
+            background: color(success);
+            border-color: color(success);
+            box-shadow: map-get($shadows, success);
+        }
+
+        &:focus {
+            box-shadow: 0 0 0 3px rgba(5, 150, 105, 0.15);
+        }
+    }
+
+    &.warning {
+        &:hover {
+            background: color(warning);
+            border-color: color(warning);
+            box-shadow: map-get($shadows, warning);
+        }
+
+        &:focus {
+            box-shadow: 0 0 0 3px rgba(217, 119, 6, 0.15);
+        }
+    }
+
+    // Enhanced tooltip with better positioning
+    &[title]::after {
+        content: attr(title);
+        position: absolute;
+        top: calc(100% + 12px);
+        left: 50%;
+        transform: translateX(-50%);
+        background: color(text-primary);
+        color: color(surface);
+        padding: space(2) space(3);
+        border-radius: map-get($radii, lg);
+        font-size: map-get($font-sizes, xs);
+        font-weight: map-get($font-weights, semibold);
+        white-space: nowrap;
+        opacity: 0;
+        pointer-events: none;
+        transition: all map-get($transitions, normal);
+        box-shadow: map-get($shadows, lg);
+        z-index: 1000;
+        letter-spacing: 0.025em;
+    }
+
+    &:hover[title]::after {
+        opacity: 1;
+        transform: translateX(-50%) translateY(-4px);
+    }
+}
+
+// Premium Autocomplete with improved UX
+.autocomplete-dropdown {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: color(surface);
+    border: 1px solid color(border);
+    max-height: 240px;
+    overflow-y: auto;
+    border-radius: map-get($radii, xl);
+    box-shadow: map-get($shadows, xl);
+    margin-top: space(2);
+    padding: space(2);
+    list-style: none;
+    z-index: 1500;
+    backdrop-filter: blur(10px);
+
+    &::-webkit-scrollbar {
+        width: 4px;
+    }
+
+    &::-webkit-scrollbar-track {
+        background: transparent;
+    }
+
+    &::-webkit-scrollbar-thumb {
+        background: color(text-muted);
+        border-radius: map-get($radii, full);
+
+        &:hover {
+            background: color(primary-light);
         }
     }
 }
 
 .autocomplete-item {
-    padding: space(md) space(lg);
+    padding: space(3) space(4);
     cursor: pointer;
-    font-size: 0.95rem;
+    font-size: map-get($font-sizes, base);
     font-weight: map-get($font-weights, medium);
     color: color(text-primary);
-    border-radius: 8px;
+    border-radius: map-get($radii, lg);
     transition: all map-get($transitions, fast);
-    margin-bottom: 2px;
+    margin-bottom: space(1);
 
     &:hover,
     &:focus {
-        background: linear-gradient(135deg, color(primary-light) 0%, color(primary) 100%);
-        color: color(surface);
+        background: linear-gradient(135deg, color(primary-subtle) 0%, rgba(91, 108, 245, 0.08) 100%);
+        color: color(primary-dark);
         transform: translateX(4px);
     }
 
     &:last-child {
         margin-bottom: 0;
     }
+
+    &:active {
+        transform: translateX(2px);
+        background: color(primary-light);
+        color: color(surface);
+    }
 }
 
-/* Premium Lists */
+// Enhanced Lists with better visual hierarchy
 .alternatives-list,
 .distance-matrix ul,
 .saved-routes ul,
 .search-history ul {
     list-style: none;
     padding: 0;
-    font-size: 0.95rem;
+    font-size: map-get($font-sizes, base);
     color: color(text-primary);
 
     li {
-        padding: space(md) 0;
+        padding: space(4) 0;
         display: flex;
         align-items: center;
         justify-content: space-between;
@@ -440,11 +677,12 @@ $shadows: (
         transition: all map-get($transitions, normal);
 
         &:hover {
-            background: color(surface-elevated);
-            margin: 0 -#{space(md)};
-            padding-left: space(md);
-            padding-right: space(md);
-            border-radius: 8px;
+            background: color(surface-hover);
+            margin: 0 -#{space(4)};
+            padding-left: space(4);
+            padding-right: space(4);
+            border-radius: map-get($radii, lg);
+            transform: translateX(2px);
         }
 
         &:last-child {
@@ -456,28 +694,34 @@ $shadows: (
 .alternative-button,
 .load-route,
 .load-history {
-    padding: space(md) space(lg);
-    background: color(surface-elevated);
+    padding: space(4) space(5);
+    background: color(surface);
     color: color(text-primary);
     border: 1px solid color(border);
-    border-radius: 10px;
+    border-radius: map-get($radii, xl);
     cursor: pointer;
-    font-size: 0.9rem;
-    font-weight: map-get($font-weights, medium);
+    font-size: map-get($font-sizes, sm);
+    font-weight: map-get($font-weights, semibold);
     text-align: left;
     transition: all map-get($transitions, normal);
     box-shadow: map-get($shadows, sm);
+    line-height: map-get($line-heights, snug);
 
     &:hover {
         background: color(primary);
         color: color(surface);
         border-color: color(primary);
-        transform: translateY(-1px);
-        box-shadow: map-get($shadows, md);
+        transform: translateY(-2px);
+        box-shadow: map-get($shadows, primary);
     }
 
     &:active {
         transform: translateY(0);
+    }
+
+    &:focus {
+        outline: none;
+        box-shadow: 0 0 0 3px rgba(91, 108, 245, 0.15);
     }
 }
 
@@ -489,6 +733,10 @@ $shadows: (
 .load-history {
     flex: 1;
     background: transparent;
+
+    &:hover {
+        background: color(primary);
+    }
 }
 
 .delete-route,
@@ -497,58 +745,66 @@ $shadows: (
     border: none;
     color: color(danger);
     cursor: pointer;
-    font-size: 1.125rem;
-    padding: space(sm);
-    border-radius: 6px;
+    font-size: map-get($font-sizes, lg);
+    padding: space(2);
+    border-radius: map-get($radii, base);
     transition: all map-get($transitions, normal);
 
     &:hover {
+        background: color(danger-subtle);
+        color: color(danger);
+        transform: scale(1.1);
+    }
+
+    &:active {
         background: color(danger);
         color: color(surface);
-        transform: scale(1.1);
+        transform: scale(1.05);
     }
 }
 
 .empty-message {
-    font-size: 0.9rem;
+    font-size: map-get($font-sizes, sm);
     color: color(text-muted);
-    padding: space(xl) 0;
+    padding: space(12) 0;
     text-align: center;
     font-style: italic;
+    font-weight: map-get($font-weights, medium);
 }
 
-/* Premium Route Info */
+// Premium Route Info with glassmorphism
 .route-info {
     position: absolute;
-    top: space(lg);
+    top: space(5); // less margin from bottom
     left: 50%;
     transform: translateX(-50%);
-    background: color(surface);
-    backdrop-filter: blur(10px);
-    border: 1px solid color(border);
-    padding: space(md) space(xl);
-    border-radius: 12px;
-    font-size: 0.95rem;
-    font-weight: map-get($font-weights, semibold);
+    background: color(glass-light);
+    backdrop-filter: blur(16px) saturate(160%);
+    border: 1px solid color(glass-border);
+    padding: space(2) space(4); // reduced padding
+    border-radius: map-get($radii, md); // smaller border radius
+    font-size: map-get($font-sizes, xs); // smaller text
+    font-weight: map-get($font-weights, medium); // lighter font weight
     color: color(text-primary);
-    box-shadow: map-get($shadows, lg);
+    box-shadow: map-get($shadows, lg); // smaller shadow
     z-index: 1000;
+    letter-spacing: -0.01em;
 }
 
-/* Map Container */
+// Map Container with refined styling
 .map-container {
     width: 100%;
     height: 100vh;
     z-index: 1;
     overflow: hidden;
-    border-radius: 0 0 16px 16px;
+    border-radius: 0 0 space(4) space(4);
 
     &.full-width {
         width: 100%;
     }
 }
 
-/* Responsive Design */
+// Responsive Design with better breakpoints
 @media (min-width: 768px) {
     .container {
         flex-direction: row;
@@ -557,7 +813,7 @@ $shadows: (
     .sidebar {
         position: fixed;
         left: 0;
-        width: 320px;
+        width: 360px;
         height: 100vh;
         transform: translateX(0);
         transition: transform map-get($transitions, slow);
@@ -571,20 +827,20 @@ $shadows: (
         }
 
         &-header {
-            padding: space(lg) space(xl);
+            padding: space(5) space(6);
         }
 
         &-close {
-            font-size: 1.2rem;
-            width: 36px;
-            height: 36px;
+            font-size: map-get($font-sizes, lg);
+            width: 40px;
+            height: 40px;
         }
     }
 
     .map-container {
         flex: 1;
         height: 100vh;
-        margin-left: 320px;
+        margin-left: 360px;
         border-radius: 0;
 
         &.full-width {
@@ -593,92 +849,100 @@ $shadows: (
     }
 
     .input-field {
-        font-size: 1rem;
-        padding: space(lg) space(4xl) space(lg) space(xl);
+        font-size: map-get($font-sizes, base);
+        padding: space(4) space(14) space(4) space(5);
     }
 
     .action-button {
-        width: 48px;
-        height: 48px;
-        font-size: 1.375rem;
+        width: 52px;
+        height: 52px;
+        font-size: map-get($font-sizes, xl);
     }
 
     .route-info {
-        font-size: 1rem;
+        font-size: map-get($font-sizes, lg);
     }
 }
 
 @media (max-width: 480px) {
     .sidebar {
         width: 90%;
-        max-width: 300px;
+        max-width: 320px;
 
         &-content {
-            padding: space(lg);
+            padding: space(5);
         }
     }
 
     .input-field {
-        font-size: 0.9rem;
-        padding: space(sm) space(3xl) space(sm) space(md);
+        font-size: map-get($font-sizes, sm);
+        padding: space(3) space(12) space(3) space(4);
     }
 
     .action-button {
-        width: 40px;
-        height: 40px;
-        font-size: 1.125rem;
+        width: 44px;
+        height: 44px;
+        font-size: map-get($font-sizes, base);
     }
 
     .route-info {
-        font-size: 0.875rem;
-        padding: space(sm) space(lg);
+        font-size: map-get($font-sizes, sm);
+        padding: space(3) space(5);
     }
 }
 
-/* Premium Leaflet Routing Styles */
+// Premium Leaflet Routing Styles with glassmorphism
 .leaflet-routing-container {
-    background: color(surface);
-    border: 1px solid color(border);
-    border-radius: 12px;
-    padding: space(lg);
-    height: 280px;
+    pointer-events: auto;
+    background: color(glass-light);
+    backdrop-filter: blur(20px) saturate(180%);
+    border: 1px solid color(glass-border);
+    border-radius: map-get($radii, xl);
+    padding: space(5);
+    height: 300px;
     overflow-y: scroll;
-    width: 320px;
-    box-shadow: map-get($shadows, xl);
+    width: 360px;
+    box-shadow: map-get($shadows, 2xl);
     z-index: 1100;
     position: absolute;
-    backdrop-filter: blur(10px);
 
     &-hidden {
         display: none !important;
     }
 
     &-primary {
-        top: 40px;
-        right: space(lg);
+        top: 20px;
+        right: space(5);
     }
 
     &-alt {
-        top: 360px;
-        right: space(lg);
+        top: 380px;
+        right: space(5);
     }
 
     &-instruction {
-        margin: space(sm) 0;
+        margin: space(2) 0;
         cursor: pointer !important;
         user-select: none;
         z-index: 1150;
-        padding: space(sm);
-        border-radius: 6px;
+        padding: space(3);
+        border-radius: map-get($radii, lg);
         transition: all map-get($transitions, fast);
+        font-weight: map-get($font-weights, medium);
 
         &:hover {
-            background: color(surface-elevated);
+            background: color(surface-hover);
+            transform: translateX(2px);
+        }
+
+        &:active {
+            background: color(surface-pressed);
+            transform: translateX(0);
         }
     }
 
     &.leaflet-routing-collapsible {
-        height: 320px !important;
+        height: 360px !important;
         overflow-y: scroll !important;
     }
 
@@ -690,10 +954,27 @@ $shadows: (
         color: color(text-primary);
     }
 
+    h2 {
+        font-size: map-get($font-sizes, lg);
+        font-weight: map-get($font-weights, bold);
+        margin: 0 0 space(4) 0;
+        letter-spacing: -0.01em;
+    }
+
+    h3 {
+        font-size: map-get($font-sizes, base);
+        font-weight: map-get($font-weights, semibold);
+        margin: space(3) 0;
+        letter-spacing: -0.005em;
+    }
+
     .leaflet-routing-instruction-text {
+        pointer-events: auto;
         cursor: pointer !important;
         color: color(text-primary);
         font-weight: map-get($font-weights, medium);
+        font-size: map-get($font-sizes, sm);
+        transition: color map-get($transitions, fast);
 
         &:hover {
             color: color(primary);
@@ -704,114 +985,193 @@ $shadows: (
         color: color(accent) !important;
         cursor: pointer;
         font-weight: map-get($font-weights, semibold);
+        transition: color map-get($transitions, fast);
+
+        &:hover {
+            color: color(accent-light) !important;
+        }
     }
 
     .leaflet-routing-alt {
         color: color(success) !important;
         cursor: pointer;
         font-weight: map-get($font-weights, semibold);
-    }
-
-    &::-webkit-scrollbar {
-        width: 8px;
-    }
-
-    &::-webkit-scrollbar-track {
-        background: color(surface-elevated);
-        border-radius: 8px;
-    }
-
-    &::-webkit-scrollbar-thumb {
-        background: linear-gradient(180deg, color(primary-light) 0%, color(primary) 100%);
-        border-radius: 8px;
+        transition: color map-get($transitions, fast);
 
         &:hover {
-            background: linear-gradient(180deg, color(primary) 0%, color(primary-dark) 100%);
+            color: color(success-light) !important;
         }
     }
-}
 
-.instructions-list {
-    height: 250px;
-
+    // Enhanced scrollbar
     &::-webkit-scrollbar {
         width: 6px;
     }
 
     &::-webkit-scrollbar-track {
-        background: color(surface-elevated);
-        border-radius: 6px;
+        background: color(surface-secondary);
+        border-radius: map-get($radii, full);
     }
 
     &::-webkit-scrollbar-thumb {
-        background: color(primary-light);
-        border-radius: 6px;
+        background: linear-gradient(180deg, color(text-tertiary) 0%, color(text-muted) 100%);
+        border-radius: map-get($radii, full);
 
         &:hover {
-            background: color(primary);
+            background: linear-gradient(180deg, color(primary-light) 0%, color(primary) 100%);
+        }
+    }
+}
+
+.instructions-list {
+    pointer-events: auto;
+    height: 280px;
+
+    &::-webkit-scrollbar {
+        width: 4px;
+    }
+
+    &::-webkit-scrollbar-track {
+        background: color(surface-secondary);
+        border-radius: map-get($radii, full);
+    }
+
+    &::-webkit-scrollbar-thumb {
+        background: color(text-muted);
+        border-radius: map-get($radii, full);
+
+        &:hover {
+            background: color(primary-light);
         }
     }
 }
 
 .popup-header {
-    margin-bottom: space(lg);
-    padding-bottom: space(md);
-    border-bottom: 1px solid color(border-light);
+    margin-bottom: space(5);
+    padding-bottom: space(4);
+    border-bottom: 2px solid color(border-light);
 
     h3 {
         margin: 0;
-        font-size: 1.125rem;
+        font-size: map-get($font-sizes, lg);
         font-weight: map-get($font-weights, bold);
         color: color(text-primary);
+        letter-spacing: -0.01em;
+        line-height: map-get($line-heights, tight);
     }
 
     p {
-        margin: space(sm) 0 0;
-        font-size: 0.875rem;
+        margin: space(2) 0 0;
+        font-size: map-get($font-sizes, sm);
         color: color(text-secondary);
+        font-weight: map-get($font-weights, medium);
+        line-height: map-get($line-heights, relaxed);
     }
 }
 
 .close-button {
     position: absolute;
-    top: space(sm);
-    right: space(sm);
-    background: transparent;
-    // background: color(surface-elevated);
+    top: space(3);
+    right: space(3);
+    background: color(surface);
     border: 1px solid color(border);
-    border-radius: 8px;
+    border-radius: map-get($radii, lg);
     cursor: pointer;
-    padding: space(sm);
+    padding: space(2);
     z-index: 1200;
     color: color(text-secondary);
     transition: all map-get($transitions, normal);
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: map-get($font-sizes, base);
+    font-weight: map-get($font-weights, semibold);
 
     &:hover {
-        color: color(danger);
+        transform: scale(1.05);
+    }
+
+    &:active {
+        transform: scale(0.95);
+        background: color(danger);
+        color: color(surface);
+    }
+
+    &:focus {
+        outline: none;
+        box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.15);
     }
 }
 
-.reopen-button {
-    position: absolute;
-    top: space(lg);
-    left: space(lg);
-    background: color(surface);
-    border: 1px solid color(border);
-    border-radius: 12px;
-    padding: space(sm) space(lg);
-    cursor: pointer;
-    z-index: 1100;
-    font-size: 0.875rem;
-    font-weight: map-get($font-weights, semibold);
-    color: color(text-primary);
-    box-shadow: map-get($shadows, lg);
-    backdrop-filter: blur(10px);
-    transition: all map-get($transitions, normal);
+// Route Toggle Buttons - Following your premium styling system
 
-    &:hover {
-        background: color(primary);
-        color: color(surface);
-        transform: translateY(-2px);
-        box-shadow: map-get($shadows, xl);
+.route-toggle-buttons {
+    position: absolute;
+    top: space(3);
+    right: space(3);
+    z-index: 1000;
+    background: color(glass-light);
+    backdrop-filter: blur(16px) saturate(180%);
+    border: 1px solid color(glass-border);
+    padding: space(1.5) space(2);
+    border-radius: map-get($radii, lg);
+    box-shadow: map-get($shadows, md);
+    display: flex;
+    gap: space(1.5);
+
+    button {
+        padding: space(2) space(3);
+        background: color(surface);
+        color: color(text-primary);
+        border: 1px solid color(border);
+        border-radius: map-get($radii, md);
+        cursor: pointer;
+        font-size: map-get($font-sizes, xs);
+        font-weight: map-get($font-weights, medium);
+        transition: all map-get($transitions, normal);
+        box-shadow: map-get($shadows, xs);
+        line-height: map-get($line-heights, snug);
+        letter-spacing: -0.005em;
+        min-width: 100px;
+
+        &:hover:not(:disabled) {
+            background: color(primary);
+            color: color(surface);
+            border-color: color(primary);
+            transform: translateY(-1px);
+            box-shadow: map-get($shadows, primary);
+        }
+
+        &:active:not(:disabled) {
+            transform: translateY(0);
+        }
+
+        &:focus {
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(91, 108, 245, 0.15);
+        }
+
+        &:disabled {
+            background: color(primary);
+            color: color(surface);
+            border-color: color(primary);
+            cursor: not-allowed;
+            opacity: 0.8;
+            transform: none;
+            box-shadow: map-get($shadows, primary);
+
+            &:hover {
+                transform: none;
+                box-shadow: map-get($shadows, primary);
+            }
+        }
+    }
+}
+
+@media (max-width: 480px) {
+    .route-toggle-buttons {
+        display: none; // Hides the route-toggle-buttons on mobile screens
     }
 }
