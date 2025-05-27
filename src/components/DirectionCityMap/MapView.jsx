@@ -40,7 +40,10 @@ function MapView({
         zoom={6}
         style={{ height: "100%", width: "100%" }}
         scrollWheelZoom={true}
-        whenCreated={(map) => (mapRef.current = map)}
+        whenCreated={(map) => {
+          mapRef.current = map;
+          map.invalidateSize();
+        }}
         zoomControl={false}
         key={waypoints.map((wp) => wp.coords?.join(",") || wp.id).join("-")}
       >

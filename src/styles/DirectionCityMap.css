@@ -462,15 +462,56 @@
     border: 1px solid #ddd;
     border-radius: 4px;
     padding: 10px;
-    max-height: 300px;
-    overflow-y: auto;
+    height: 250px;
+    overflow-y: scroll;
     width: 300px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    z-index: 1000;
+    z-index: 1100;
+    position: absolute;
+    scrollbar-width: thin;
+    scrollbar-color: gray #f1f1f1;
+}
+
+.leaflet-routing-container-hidden {
+    display: none !important;
+}
+
+.leaflet-routing-container-primary {
+    top: 50px;
+    right: 10px;
+}
+
+.leaflet-routing-container-alt {
+    top: 340px;
+    right: 10px;
 }
 
 .leaflet-routing-instruction {
     margin: 5px 0;
+    cursor: pointer;
+    user-select: none;
+    z-index: 1150;
+}
+
+.instructions-list {
+    height: 230px;
+    scrollbar-width: thin;
+    scrollbar-color: gray #f1f1f1;
+}
+
+.popup-header {
+    margin-bottom: 10px;
+}
+
+.popup-header h3 {
+    margin: 0;
+    font-size: 16px;
+}
+
+.popup-header p {
+    margin: 5px 0 0;
+    font-size: 14px;
+    color: #555555;
 }
 
 .leaflet-routing-container,
@@ -491,34 +532,71 @@
 }
 
 .leaflet-routing-container .leaflet-routing-route {
-    color: #000000 !important;
+    color: #26A69A !important;
     cursor: pointer;
 }
 
 .leaflet-routing-container .leaflet-routing-alt {
-    color: #000000!important;
+    color: #2ECC71 !important;
     cursor: pointer;
 }
 
-.leaflet-routing-container::-webkit-scrollbar {
+.leaflet-routing-container::-webkit-scrollbar,
+.instructions-list::-webkit-scrollbar {
     width: 8px;
 }
 
-.leaflet-routing-container::-webkit-scrollbar-track {
+.leaflet-routing-container::-webkit-scrollbar-track,
+.instructions-list::-webkit-scrollbar-track {
     background: #f1f1f1;
     border-radius: 4px;
 }
 
-.leaflet-routing-container::-webkit-scrollbar-thumb {
+.leaflet-routing-container::-webkit-scrollbar-thumb,
+.instructions-list::-webkit-scrollbar-thumb {
     background: gray;
     border-radius: 4px;
 }
 
-.leaflet-routing-container::-webkit-scrollbar-thumb:hover {
+.leaflet-routing-container::-webkit-scrollbar-thumb:hover,
+.instructions-list::-webkit-scrollbar-thumb:hover {
     background: gray;
 }
 
 .leaflet-routing-container.leaflet-routing-collapsible {
-    max-height: 300px !important;
-    overflow-y: auto !important;
+    height: 300px !important;
+    overflow-y: scroll !important;
+}
+
+.close-button {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 2px;
+    z-index: 1200;
+}
+
+.close-button:hover {
+    opacity: 0.7;
+}
+
+.reopen-button {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    background-color: #ffffff;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 5px 10px;
+    cursor: pointer;
+    z-index: 1100;
+    font-size: 14px;
+    color: #000000;
+}
+
+.reopen-button:hover {
+    background-color: #f1f1f1;
 }
