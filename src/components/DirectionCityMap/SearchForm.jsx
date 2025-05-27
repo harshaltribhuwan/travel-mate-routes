@@ -171,28 +171,31 @@ function SearchForm({
                 : "stop"
             }`}
           />
+
           {wp.id === "from" && (
             <button
               type="button"
               onClick={useMyLocation}
-              className="action-button"
+              className="inside-input-button"
               aria-label="Use my current location"
               title="Use My Location"
             >
               <MdMyLocation />
             </button>
           )}
+
           {wp.id !== "from" && wp.id !== "to" && (
             <button
               type="button"
               onClick={() => removeWaypoint(wp.id)}
-              className="action-button remove"
+              className="inside-input-button"
               aria-label="Remove stop"
               title="Remove Stop"
             >
               <MdClose />
             </button>
           )}
+
           {activeInput === wp.id && suggestions.length > 0 && (
             <ul className="autocomplete-dropdown">
               {suggestions

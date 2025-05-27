@@ -1,5 +1,6 @@
 import React, { useEffect } from "react";
 import { MdClose, MdMenu } from "react-icons/md";
+import L from "leaflet";
 import SearchForm from "./SearchForm";
 import CollapsibleSection from "./CollapsibleSection";
 import { formatDistance, formatDuration } from "../../utils/utils";
@@ -53,16 +54,69 @@ function Sidebar({
   }, [showSidebar, mapRef]);
 
   const saveRoute = () => {
-    if (waypoints.every((wp) => wp.coords)) {
+    // Validate waypoints: at least 2 unique, valid coordinates
+    if (
+      waypoints.length >= 2 &&
+      waypoints.every((wp) => wp.coords && wp.coords.length === 2) &&
+      !waypoints.every(
+        (wp, i) =>
+          i > 0 &&
+          wp.coords[0] === waypoints[0].coords[0] &&
+          wp.coords[1] === waypoints[0].coords[1]
+      )
+    ) {
       setSavedRoutes((prev) => [
         ...prev,
-        { waypoints, distance, duration, timestamp: new Date().toISOString() },
+        {
+          waypoints,
+          distance,
+          duration,
+          alternatives,
+          timestamp: new Date().toISOString(),
+        },
       ]);
     }
   };
 
   const deleteRoute = (index) => {
     setSavedRoutes((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  const handleClearRoute = () => {
+    // Reset waypoints to a single default point
+    setWaypoints([
+      { id: "from", city: "", coords: defaultCenter },
+      { id: "to", city: "", coords: null },
+    ]);
+    setDistance(null);
+    setDuration(null);
+    setAlternatives([]);
+    setTracking(false);
+    if (mapRef.current) {
+      mapRef.current.setView(defaultCenter, 5);
+      mapRef.current.invalidateSize();
+    }
+    clearRoute(); // Call parent clearRoute for additional cleanup
+  };
+
+  const handleLoadRoute = (route) => {
+    setWaypoints(route.waypoints);
+    setDistance(route.distance);
+    setDuration(route.duration);
+    setAlternatives(route.alternatives || []);
+    if (mapRef.current) {
+      const bounds = L.latLngBounds(route.waypoints.map((wp) => wp.coords));
+      mapRef.current.fitBounds(bounds, { padding: [50, 50] });
+      mapRef.current.invalidateSize();
+    }
+    loadRoute(route); // Call parent loadRoute for additional logic
+  };
+
+  const handleSelectAlternative = (index) => {
+    selectAlternative(index);
+    if (mapRef.current) {
+      mapRef.current.invalidateSize();
+    }
   };
 
   return (
@@ -94,7 +148,7 @@ function Sidebar({
             addWaypoint={addWaypoint}
             removeWaypoint={removeWaypoint}
             saveRoute={saveRoute}
-            clearRoute={clearRoute}
+            clearRoute={handleClearRoute}
           />
           {alternatives.length > 0 && (
             <CollapsibleSection
@@ -104,7 +158,7 @@ function Sidebar({
               items={alternatives}
               renderItem={(alt) => (
                 <button
-                  onClick={() => selectAlternative(alt.index)}
+                  onClick={() => handleSelectAlternative(alt.index)}
                   className="alternative-button"
                   title={`Select Route ${alt.index + 1}`}
                 >
@@ -138,7 +192,7 @@ function Sidebar({
             renderItem={(route, idx) => (
               <>
                 <button
-                  onClick={() => loadRoute(route)}
+                  onClick={() => handleLoadRoute(route)}
                   className="load-route"
                   aria-label={`Load route from ${route.waypoints[0].city} to ${
                     route.waypoints[route.waypoints.length - 1].city
