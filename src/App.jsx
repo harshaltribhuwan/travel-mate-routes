@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import DirectionCityMap from "./components/DirectionCityMap/DirectionCityMap.jsx";
 import "leaflet/dist/leaflet.css";
-import "./App.css";
+import "./App.scss";
 
 export default function App() {
   const [activeTab, setActiveTab] = useState("map"); // "map" or "visa"

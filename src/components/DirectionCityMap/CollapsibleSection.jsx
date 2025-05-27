@@ -1,6 +1,6 @@
 import React from "react";
 import { MdExpandMore, MdExpandLess } from "react-icons/md";
-import "../../styles/DirectionCityMap.css";
+import "../../styles/DirectionCityMap.scss";
 
 function CollapsibleSection({
   title,

@@ -29,11 +29,11 @@ input[type="text"] {
   border-radius: 8px;
   font-size: 16px;
   transition: border-color 0.2s ease;
-}
 
-input[type="text"]:focus {
-  border-color: #3b82f6;
-  outline: none;
+  &:focus {
+    border-color: #3b82f6;
+    outline: none;
+  }
 }
 
 /* Search button */
@@ -47,10 +47,10 @@ button[type="submit"] {
   font-size: 16px;
   cursor: pointer;
   transition: background-color 0.2s ease;
-}
 
-button[type="submit"]:hover {
-  background-color: #2563eb;
+  &:hover {
+    background-color: #2563eb;
+  }
 }
 
 /* Autocomplete dropdown */
@@ -58,21 +58,21 @@ ul {
   list-style: none;
   margin: 0;
   padding: 0;
+
+  li {
+    background-color: white;
+    padding: 10px 14px;
+    border-bottom: 1px solid #eee;
+    cursor: pointer;
+    font-size: 14px;
+
+    &:hover {
+      background-color: #f3f4f6;
+    }
+  }
 }
 
-ul li {
-  background-color: white;
-  padding: 10px 14px;
-  border-bottom: 1px solid #eee;
-  cursor: pointer;
-  font-size: 14px;
-}
-
-ul li:hover {
-  background-color: #f3f4f6;
-}
-
-/* Ensure the autocomplete dropdown stays on top */
+/* Positioning utilities */
 .relative {
   position: relative;
 }
@@ -85,16 +85,14 @@ ul li:hover {
   z-index: 50;
 }
 
+/* Navigation */
 .navbar {
   background-color: #fff;
-  /* match app bg */
   padding: 12px 20px;
   display: flex;
   justify-content: center;
   border-radius: 12px 12px 0 0;
-  /* rounded top corners like app */
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-  /* subtle shadow */
   margin-bottom: 20px;
 }
 
@@ -108,7 +106,6 @@ ul li:hover {
 
 .nav-item {
   color: #555;
-  /* subtle gray text */
   cursor: pointer;
   font-weight: 600;
   font-size: 1.1rem;
@@ -117,18 +114,17 @@ ul li:hover {
   user-select: none;
   transition: all 0.3s ease;
   border: 2px solid transparent;
-}
 
-.nav-item:hover {
-  color: #3b82f6;
-  border-color: #3b82f6;
-  background-color: #f0f9ff;
-  /* very light blue bg on hover */
-}
+  &:hover {
+    color: #3b82f6;
+    border-color: #3b82f6;
+    background-color: #f0f9ff;
+  }
 
-.nav-item.active {
-  color: white;
-  background-color: #3b82f6;
-  border-color: #3b82f6;
-  font-weight: 700;
+  &.active {
+    color: white;
+    background-color: #3b82f6;
+    border-color: #3b82f6;
+    font-weight: 700;
+  }
 }

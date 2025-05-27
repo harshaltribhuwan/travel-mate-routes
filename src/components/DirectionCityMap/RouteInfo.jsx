@@ -1,6 +1,6 @@
 import React from "react";
 import { formatDistance, formatDuration } from "../../utils/utils";
-import "../../styles/DirectionCityMap.css";
+import "../../styles/DirectionCityMap.scss";
 
 function RouteInfo({ distance, duration }) {
   return (

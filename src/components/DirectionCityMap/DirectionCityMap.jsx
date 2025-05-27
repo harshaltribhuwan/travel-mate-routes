@@ -5,7 +5,7 @@ import MapView from "./MapView";
 import Sidebar from "./Sidebar";
 import RouteInfo from "./RouteInfo";
 import { defaultCenter } from "../../utils/constants";
-import "../../styles/DirectionCityMap.css";
+import "../../styles/DirectionCityMap.scss";
 
 export default function DirectionCityMap() {
   const [waypoints, setWaypoints] = useState([
