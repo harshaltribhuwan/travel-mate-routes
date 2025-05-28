@@ -150,7 +150,7 @@ function MapView({
         )}
 
         {currentLocation && (
-          <Marker position={currentLocation} icon={CustomMarkerIcon("#EF5350")}>
+          <Marker position={currentLocation} icon={CustomMarkerIcon("#d93025")}>
             <Popup>Current Location</Popup>
           </Marker>
         )}
@@ -163,10 +163,10 @@ function MapView({
                 position={wp.coords}
                 icon={
                   wp.id === "from"
-                    ? CustomMarkerIcon("#26A69A")
+                    ? CustomMarkerIcon("#1a73e8") // Google Blue "from"
                     : wp.id === "to"
-                    ? CustomMarkerIcon("#2ECC71")
-                    : CustomMarkerIcon("#666666")
+                    ? CustomMarkerIcon("#34a853", null, "to") // Google Green "to" with flag
+                    : CustomMarkerIcon("#616161") // Gray others
                 }
                 draggable={true}
                 eventHandlers={{ dragend: (e) => handleDragEnd(wp.id, e) }}
