@@ -13,22 +13,6 @@ import Routing from "./Routing";
 import { CustomMarkerIcon } from "../../utils/utils";
 import { defaultCenter } from "../../utils/constants";
 
-function SmartZoom({ locations }) {
-  const map = useMap();
-
-  useEffect(() => {
-    if (locations.length < 2) return; // only zoom if 2+ points
-
-    const bounds = locations.reduce(
-      (bounds, loc) => bounds.extend(loc),
-      L.latLngBounds(locations[0], locations[0])
-    );
-    map.fitBounds(bounds, { padding: [50, 50] });
-  }, [locations, map]);
-
-  return null;
-}
-
 function MapView({
   waypoints,
   setWaypoints,
@@ -94,7 +78,12 @@ function MapView({
         key={mapCenter.join(",") + "-" + mapZoom}
       >
         <ZoomControl position="bottomleft" />
-        <ChangeView center={mapCenter} zoom={mapZoom} />
+        <ChangeView
+          center={mapCenter}
+          zoom={mapZoom}
+          waypoints={waypoints}
+          currentLocation={currentLocation}
+        />
 
         <TileLayer
           attribution='© <a href="https://osm.org/copyright">OpenStreetMap</a> contributors'
@@ -127,8 +116,6 @@ function MapView({
               </Marker>
             )
         )}
-
-        {allLocations.length > 1 && <SmartZoom locations={allLocations} />}
 
         {waypoints.every((wp) => wp.coords) && (
           <Routing

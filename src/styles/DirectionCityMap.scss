@@ -265,7 +265,7 @@ $radii: (
 
 .input-field {
     width: 85%;
-    padding: space(3) space(8) space(3) space(4);
+    padding: space(3) space(8) space(3) space(3);
     border: 1px solid color(border);
     border-radius: map-get($radii, md);
     font-size: map-get($font-sizes, sm);

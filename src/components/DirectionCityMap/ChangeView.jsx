@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { useMap } from "react-leaflet";
 import L from "leaflet";
 
-function ChangeView({ center, zoom, waypoints }) {
+function ChangeView({ center, zoom, waypoints, currentLocation }) {
   const map = useMap();
 
   useEffect(() => {
@@ -11,11 +11,21 @@ function ChangeView({ center, zoom, waypoints }) {
       waypoints.length > 1 &&
       waypoints.every((wp) => Array.isArray(wp.coords));
 
+    const allCoords = [
+      ...waypoints
+        .filter((wp) => Array.isArray(wp.coords))
+        .map((wp) => wp.coords),
+    ];
+
+    if (Array.isArray(currentLocation)) {
+      allCoords.push(currentLocation);
+    }
+
     const MIN_ZOOM = 5;
     const MAX_ZOOM = 16;
 
-    if (hasValidWaypoints) {
-      const bounds = L.latLngBounds(waypoints.map((wp) => wp.coords));
+    if (allCoords.length > 1) {
+      const bounds = L.latLngBounds(allCoords);
       map.fitBounds(bounds, {
         padding: [60, 60],
         animate: true,
@@ -25,7 +35,7 @@ function ChangeView({ center, zoom, waypoints }) {
       const adjustedZoom = Math.min(Math.max(zoom, MIN_ZOOM), MAX_ZOOM);
       map.setView(center, adjustedZoom, { animate: true });
     }
-  }, [center, zoom, waypoints, map]);
+  }, [center, zoom, waypoints, currentLocation, map]);
 
   return null;
 }
