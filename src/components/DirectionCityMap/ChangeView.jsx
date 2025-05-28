@@ -1,17 +1,32 @@
-import React, { useEffect } from "react";
+import { useEffect } from "react";
 import { useMap } from "react-leaflet";
 import L from "leaflet";
 
 function ChangeView({ center, zoom, waypoints }) {
   const map = useMap();
+
   useEffect(() => {
-    if (waypoints?.length > 1 && waypoints?.every((wp) => wp.coords)) {
+    const hasValidWaypoints =
+      Array.isArray(waypoints) &&
+      waypoints.length > 1 &&
+      waypoints.every((wp) => Array.isArray(wp.coords));
+
+    const MIN_ZOOM = 5;
+    const MAX_ZOOM = 16;
+
+    if (hasValidWaypoints) {
       const bounds = L.latLngBounds(waypoints.map((wp) => wp.coords));
-      map.fitBounds(bounds, { padding: [50, 50] });
+      map.fitBounds(bounds, {
+        padding: [60, 60],
+        animate: true,
+        maxZoom: MAX_ZOOM,
+      });
     } else {
-      map.setView(center, zoom);
+      const adjustedZoom = Math.min(Math.max(zoom, MIN_ZOOM), MAX_ZOOM);
+      map.setView(center, adjustedZoom, { animate: true });
     }
   }, [center, zoom, waypoints, map]);
+
   return null;
 }
 
