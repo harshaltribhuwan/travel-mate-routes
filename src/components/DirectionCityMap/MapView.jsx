@@ -1,16 +1,33 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import {
   MapContainer,
   TileLayer,
   Marker,
   Popup,
   ZoomControl,
+  useMap,
 } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import ChangeView from "./ChangeView";
 import Routing from "./Routing";
 import { CustomMarkerIcon } from "../../utils/utils";
 import { defaultCenter } from "../../utils/constants";
+
+function SmartZoom({ locations }) {
+  const map = useMap();
+
+  useEffect(() => {
+    if (locations.length < 2) return; // only zoom if 2+ points
+
+    const bounds = locations.reduce(
+      (bounds, loc) => bounds.extend(loc),
+      L.latLngBounds(locations[0], locations[0])
+    );
+    map.fitBounds(bounds, { padding: [50, 50] });
+  }, [locations, map]);
+
+  return null;
+}
 
 function MapView({
   waypoints,
@@ -27,26 +44,23 @@ function MapView({
   routeControlRef,
 }) {
   const [mapCenter, setMapCenter] = useState(defaultCenter);
-  const [mapZoom, setMapZoom] = useState(5); // Zoomed-out view of India
+  const [mapZoom, setMapZoom] = useState(5);
 
+  // Geolocation to update mapCenter & zoom on mount
   useEffect(() => {
     const timeout = setTimeout(() => {
       if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(
-          (position) => {
-            const coords = [
-              position.coords.latitude,
-              position.coords.longitude,
-            ];
-            setMapCenter(coords);
-            setMapZoom(13); // Zoom in to user location
+          (pos) => {
+            setMapCenter([pos.coords.latitude, pos.coords.longitude]);
+            setMapZoom(13);
           },
           () => {
-            // Permission denied or error — stay on default center and zoom
+            // permission denied or error — keep default
           }
         );
       }
-    }, 5000); // Delay permission request by 5s
+    }, 5000);
 
     return () => clearTimeout(timeout);
   }, []);
@@ -57,6 +71,13 @@ function MapView({
       prev.map((wp) => (wp.id === id ? { ...wp, coords: [lat, lng] } : wp))
     );
   };
+
+  // Memoized array of all coords for smart zoom
+  const allLocations = useMemo(() => {
+    const coords = waypoints.filter((wp) => wp.coords).map((wp) => wp.coords);
+    if (currentLocation) coords.push(currentLocation);
+    return coords;
+  }, [waypoints, currentLocation]);
 
   return (
     <div className={`map-container ${!showSidebar ? "full-width" : ""}`}>
@@ -106,6 +127,8 @@ function MapView({
               </Marker>
             )
         )}
+
+        {allLocations.length > 1 && <SmartZoom locations={allLocations} />}
 
         {waypoints.every((wp) => wp.coords) && (
           <Routing
