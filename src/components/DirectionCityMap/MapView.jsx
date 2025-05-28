@@ -163,12 +163,12 @@ function MapView({
                 position={wp.coords}
                 icon={
                   wp.id === "from"
-                    ? CustomMarkerIcon("#1a73e8") // Google Blue "from"
+                    ? CustomMarkerIcon("#1a73e8")
                     : wp.id === "to"
-                    ? CustomMarkerIcon("#34a853", null, "to") // Google Green "to" with flag
-                    : CustomMarkerIcon("#616161") // Gray others
+                    ? CustomMarkerIcon("#34a853", "to")
+                    : CustomMarkerIcon("#616161")
                 }
-                draggable={true}
+                draggable
                 eventHandlers={{ dragend: (e) => handleDragEnd(wp.id, e) }}
               >
                 <Popup>{wp.city || wp.id}</Popup>
