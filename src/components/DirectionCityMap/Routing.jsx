@@ -130,14 +130,24 @@ function Routing({ waypoints, setDistance, setDuration, setAlternatives }) {
     container.innerHTML = "";
 
     const distanceKm = (route.summary.totalDistance / 1000).toFixed(1);
-    const durationMin = Math.round(route.summary.totalTime / 60);
     const roads = getRouteRoads(route.instructions);
+
+    const totalSeconds = route.summary.totalTime;
+
+    let durationText;
+    if (totalSeconds < 3600) {
+      const durationMin = (totalSeconds / 60).toFixed(0);
+      durationText = `${durationMin} min`;
+    } else {
+      const durationHours = (totalSeconds / 3600).toFixed(2);
+      durationText = `${durationHours} h`;
+    }
 
     const header = document.createElement("div");
     header.className = "popup-header";
     header.innerHTML = `<h3>${
       type === "primary" ? "Primary Route" : "Alternative Route"
-    }</h3><p>${distanceKm} km, ${durationMin} min via ${roads}</p>`;
+    }</h3><p>${distanceKm} km, ${durationText} via ${roads}</p>`;
     container.appendChild(header);
 
     const instructionsDiv = document.createElement("div");
