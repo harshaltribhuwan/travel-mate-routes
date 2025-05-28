@@ -119,8 +119,6 @@ $shadows: (
     xl: 0 20px 25px -5px color(shadow-xl),
     2xl: 0 25px 50px -12px color(shadow-2xl),
     inner: inset 0 2px 4px 0 color(shadow-sm),
-
-    // Colored shadows for interactive elements
     primary: 0 4px 14px 0 rgba(91, 108, 245, 0.15),
     primary-lg: 0 8px 25px 0 rgba(91, 108, 245, 0.2),
     success: 0 4px 14px 0 rgba(5, 150, 105, 0.15),
@@ -148,7 +146,7 @@ $radii: (
     min-height: 100vh;
     background: color(surface-secondary);
     font-family: 'Roboto', sans-serif;
-    font-weight: map-get($font-weights, regular);
+    font-weight: map-get($font-weights, normal);
     line-height: map-get($line-heights, normal);
     margin: 0 auto;
     width: 100%;
@@ -164,7 +162,7 @@ $radii: (
     background: color(glass-light);
     backdrop-filter: blur(8px);
     border-right: 1px solid color(glass-border);
-    box-shadow: 0 2px 8px color(shadow-md);
+    box-shadow: map-get($shadows, md);
     z-index: 2000;
     transition: left map-get($transitions, normal);
     overflow-y: auto;
@@ -269,7 +267,7 @@ $radii: (
     border: 1px solid color(border);
     border-radius: map-get($radii, md);
     font-size: map-get($font-sizes, sm);
-    font-weight: map-get($font-weights, regular);
+    font-weight: map-get($font-weights, normal);
     color: color(text-primary);
     background: color(surface);
     outline: none;
@@ -350,7 +348,7 @@ $radii: (
     overflow-y: auto;
     margin-top: space(1);
     padding: space(1);
-    box-shadow: 0 2px 8px color(shadow-sm);
+    box-shadow: map-get($shadows, sm);
     z-index: 1500;
 
     &::-webkit-scrollbar {
@@ -377,7 +375,6 @@ $radii: (
     }
 }
 
-
 .alternative-button,
 .load-route,
 .load-history {
@@ -387,7 +384,7 @@ $radii: (
     border: 1px solid color(border-light);
     border-radius: map-get($radii, md);
     font-size: map-get($font-sizes, sm);
-    font-weight: map-get($font-weights, regular);
+    font-weight: map-get($font-weights, normal);
     color: color(text-primary);
     text-align: left;
     cursor: pointer;
@@ -395,7 +392,12 @@ $radii: (
 
     &:hover {
         background: color(primary-subtle);
-        // border-color: color(primary);
+        color: color(primary);
+    }
+
+    &.selected {
+        background: color(primary-subtle);
+        font-weight: map-get($font-weights, bold);
         color: color(primary);
     }
 }
@@ -489,99 +491,39 @@ $radii: (
     }
 }
 
-@media (max-width: 480px) {
-
-    .input-field {
-        padding: space(3) space(8) space(3) space(5);
-    }
-    .sidebar {
-        width: 100%;
-        max-width: none;
-    }
-
-    .action-buttons {
-        flex-direction: column;
-        align-items: flex-start;
-    }
-
-    .action-button {
-        width: 100%;
-        height: 44px;
-        border-radius: map-get($radii, md);
-    }
-}
-
-@media (min-width: 768px) {
-    .sidebar {
-        width: 320px;
-    }
-
-    .map-container {
-        margin-left: 320px;
-    }
-}
-
-// Premium Route Info with glassmorphism
-.route-info {
-    position: absolute;
-    top: space(5); // less margin from bottom
-    left: 50%;
-    transform: translateX(-50%);
-    background: color(glass-light);
-    backdrop-filter: blur(16px) saturate(160%);
-    border: 1px solid color(glass-border);
-    padding: space(2) space(4); // reduced padding
-    border-radius: map-get($radii, md); // smaller border radius
-    font-size: map-get($font-sizes, xs); // smaller text
-    font-weight: map-get($font-weights, medium); // lighter font weight
-    color: color(text-primary);
-    box-shadow: map-get($shadows, lg); // smaller shadow
-    z-index: 1000;
-    letter-spacing: -0.01em;
-}
-
 // Map Container with refined styling
 .map-container {
     width: 100%;
     height: 100vh;
     z-index: 1;
     overflow: hidden;
-    border-radius: 0 0 space(4) space(4);
+    transition: width map-get($transitions, normal);
 
     &.full-width {
         width: 100%;
     }
 }
 
-// Responsive Design with better breakpoints
-@media (min-width: 768px) {
-    .container {
-        flex-direction: row;
-    }
-
-    .map-container {
-        flex: 1;
-        height: 100vh;
-        border-radius: 0;
-
-        &.full-width {
-            margin-left: 0;
-        }
-    }
-
-    .route-info {
-        font-size: map-get($font-sizes, lg);
-    }
+// Premium Route Info with glassmorphism
+.route-info {
+    position: absolute;
+    top: space(5);
+    left: 50%;
+    transform: translateX(-50%);
+    background: color(glass-light);
+    backdrop-filter: blur(16px) saturate(160%);
+    border: 1px solid color(glass-border);
+    padding: space(2) space(4);
+    border-radius: map-get($radii, md);
+    font-size: map-get($font-sizes, xs);
+    font-weight: map-get($font-weights, medium);
+    color: color(text-primary);
+    box-shadow: map-get($shadows, lg);
+    z-index: 1000;
+    letter-spacing: -0.01em;
 }
 
-@media (max-width: 480px) {
-
-    .route-info {
-        font-size: map-get($font-sizes, sm);
-        padding: space(3) space(5);
-    }
-}
-
+// Restored original popup styling
 .leaflet-routing-container {
     pointer-events: auto;
     background: color(surface);
@@ -589,13 +531,11 @@ $radii: (
     border-radius: map-get($radii, md);
     padding: space(3);
     width: 320px;
-    box-shadow: 0 2px 4px color(shadow-sm);
+    box-shadow: map-get($shadows, sm);
     z-index: 1100;
     position: absolute;
     top: space(14);
-    /* 56px to clear route-toggle-buttons */
     right: space(2);
-    /* 8px */
     font-family: 'Roboto', sans-serif;
     overflow-y: visible;
 
@@ -606,7 +546,7 @@ $radii: (
         border-radius: map-get($radii, sm);
         transition: all map-get($transitions, fast);
         font-size: map-get($font-sizes, sm);
-        font-weight: map-get($font-weights, regular);
+        font-weight: map-get($font-weights, normal);
         color: color(text-primary);
 
         &:hover {
@@ -636,7 +576,7 @@ $radii: (
         cursor: pointer;
         color: color(text-primary);
         font-size: map-get($font-sizes, sm);
-        font-weight: map-get($font-weights, regular);
+        font-weight: map-get($font-weights, normal);
         transition: color map-get($transitions, fast);
 
         &:hover {
@@ -678,7 +618,7 @@ $radii: (
         margin: space(1) 0 0;
         font-size: map-get($font-sizes, xs);
         color: color(text-secondary);
-        font-weight: map-get($font-weights, regular);
+        font-weight: map-get($font-weights, normal);
     }
 }
 
@@ -720,7 +660,119 @@ $radii: (
     }
 }
 
+// New styles for current step and maneuver icons
+.current-step {
+    background: color(primary-subtle);
+    font-weight: map-get($font-weights, bold);
+}
+
+.maneuver-icon {
+    font-size: map-get($font-sizes, base);
+    margin-right: space(2);
+    width: 24px;
+    text-align: center;
+    color: color(text-primary);
+}
+
+.route-toggle-buttons {
+    position: absolute;
+    top: space(3);
+    right: space(3);
+    z-index: 1000;
+    padding: space(1);
+    border-radius: map-get($radii, md);
+    display: inline-flex;
+    gap: space(2);
+    justify-content: center;
+    min-width: 100px;
+
+    button {
+        padding: space(2);
+        height: 36px;
+        min-width: 80px;
+        background: color(surface);
+        color: color(text-primary);
+        border: 1px solid color(border-light);
+        border-radius: map-get($radii, md);
+        cursor: pointer;
+        font-size: map-get($font-sizes, sm);
+        font-weight: map-get($font-weights, normal);
+        transition: all map-get($transitions, fast);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        &:hover:not(:disabled) {
+            background: color(primary-subtle);
+            color: color(primary);
+            border-color: color(primary);
+        }
+
+        &:focus {
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(26, 115, 232, 0.1);
+        }
+
+        &:disabled {
+            background: color(surface-secondary);
+            color: color(text-muted);
+            border-color: color(border-light);
+            cursor: not-allowed;
+            opacity: 0.5;
+        }
+    }
+}
+
+// Responsive Design with better breakpoints
+@media (min-width: 768px) {
+    .container {
+        flex-direction: row;
+    }
+
+    .sidebar {
+        width: 320px;
+    }
+
+    .map-container {
+        margin-left: 320px;
+        border-radius: 0;
+
+        &.full-width {
+            margin-left: 0;
+        }
+    }
+
+    .route-info {
+        font-size: map-get($font-sizes, lg);
+    }
+}
+
 @media (max-width: 480px) {
+    .sidebar {
+        width: 100%;
+        max-width: none;
+    }
+
+    .input-field {
+        padding: space(3) space(8) space(3) space(5);
+    }
+
+    .action-buttons {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .action-button {
+        width: 100%;
+        height: 44px;
+        border-radius: map-get($radii, md);
+    }
+
+    .route-info {
+        font-size: map-get($font-sizes, sm);
+        padding: space(3) space(5);
+    }
+
     .leaflet-routing-container {
         padding: space(2);
         border-radius: map-get($radii, sm);
@@ -750,64 +802,8 @@ $radii: (
             height: 20px;
         }
     }
-}
 
-// Route Toggle Buttons - Following your premium styling system
-
-.route-toggle-buttons {
-    position: absolute;
-    top: space(3);
-    right: space(3);
-    z-index: 1000;
-    border: 1px solid color(border-light);
-    padding: space(1);
-    border-radius: map-get($radii, md);
-    display: inline-flex;
-    gap: space(2);
-    justify-content: center;
-    min-width: 100px;
-
-    button {
-        padding: space(2);
-        height: 36px;
-        min-width: 80px;
-        background: color(surface);
-        color: color(text-primary);
-        border: 1px solid color(border-light);
-        border-radius: map-get($radii, md);
-        cursor: pointer;
-        font-size: map-get($font-sizes, sm);
-        font-weight: map-get($font-weights, regular);
-        transition: all map-get($transitions, fast);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-
-        &:hover:not(:disabled) {
-            background: color(primary-subtle);
-            color: color(primary);
-            border-color: color(primary);
-        }
-
-        &:focus {
-            outline: none;
-            box-shadow: 0 0 0 3px rgba(26, 115, 232, 0.1);
-        }
-
-        &:disabled {
-            background: color(surface-secondary);
-            color: color(text-muted);
-            border-color: color(border-light);
-            cursor: not-allowed;
-            opacity: 0.5;
-        }
-    }
-}
-
-@media (max-width: 480px) {
     .route-toggle-buttons {
-        // flex-direction: column;
-        padding: space(1);
         min-width: 280px;
 
         button {

@@ -52,6 +52,9 @@ function SearchForm({
         );
       }
     }
+    return () => {
+      if (debounceTimerRef.current) clearTimeout(debounceTimerRef.current);
+    };
   }, [waypoints, activeInput]);
 
   const handleInputChange = (id, e) => {

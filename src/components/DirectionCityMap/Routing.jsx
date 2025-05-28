@@ -4,13 +4,52 @@ import L from "leaflet";
 import "leaflet-routing-machine";
 import "../../styles/DirectionCityMap.scss";
 
-function Routing({ waypoints, setDistance, setDuration, setAlternatives }) {
+function Routing({
+  waypoints,
+  setDistance,
+  setDuration,
+  setAlternatives,
+  routeControlRef,
+  currentLocation,
+}) {
   const map = useMap();
   const controlRef = useRef(null);
-  const [activeRoute, setActiveRoute] = useState(null); // null, "primary", or "alt"
+  const [activeRoute, setActiveRoute] = useState(null);
   const [hasAltRoute, setHasAltRoute] = useState(false);
+  const [currentStepIndex, setCurrentStepIndex] = useState(-1);
 
-  // Helper: Extract main roads from instructions
+const getManeuverIcon = (type) => {
+  const normalizedType = type?.toLowerCase() || "";
+
+  if (normalizedType.includes("right") && normalizedType.includes("sharp"))
+    return "⇗";
+  if (normalizedType.includes("right") && normalizedType.includes("slight"))
+    return "↱";
+  if (normalizedType.includes("right")) return "→";
+
+  if (normalizedType.includes("left") && normalizedType.includes("sharp"))
+    return "⇖";
+  if (normalizedType.includes("left") && normalizedType.includes("slight"))
+    return "↰";
+  if (normalizedType.includes("left")) return "←";
+
+  if (normalizedType.includes("uturn")) return "↩";
+  if (
+    normalizedType.includes("continue") ||
+    normalizedType.includes("straight")
+  )
+    return "↑";
+  if (normalizedType.includes("roundabout")) return "↻";
+  if (normalizedType.includes("merge")) return "⇉";
+  if (normalizedType.includes("ramp")) return "↘";
+  if (normalizedType.includes("exit")) return "⤴";
+  if (normalizedType.includes("destination")) return "🏁";
+
+  return "→"; // default fallback
+};
+
+
+  // Helper: Get route roads
   const getRouteRoads = (instructions) => {
     const roads = new Set();
     for (const instr of instructions) {
@@ -30,6 +69,38 @@ function Routing({ waypoints, setDistance, setDuration, setAlternatives }) {
     return Array.from(roads).slice(0, 3).join(", ") || "Main Roads";
   };
 
+  
+  useEffect(() => {
+    if (
+      currentLocation &&
+      controlRef.current &&
+      controlRef.current._routes &&
+      controlRef.current._routes.length > 0 &&
+      waypoints.every((wp) => wp.coords)
+    ) {
+      const routeIndex = activeRoute === "alt" && controlRef.current._routes.length > 1 ? 1 : 0;
+      const currentRoute = controlRef.current._routes[routeIndex];
+      const instructions = currentRoute?.instructions || [];
+      const coordinates = currentRoute?.coordinates || [];
+      let currentStep = -1;
+      let minDistance = Infinity;
+
+      instructions.forEach((instr, idx) => {
+        const coord = coordinates[instr.index];
+        if (coord) {
+          const distance = L.latLng(currentLocation).distanceTo([coord.lat, coord.lng]);
+          if (distance < minDistance && distance < 300) { // Within 300 meters
+            minDistance = distance;
+            currentStep = idx;
+          }
+        }
+      });
+
+      setCurrentStepIndex(currentStep);
+    }
+  }, [currentLocation, activeRoute, waypoints, controlRef.current]);
+
+  // Setup routing control
   useEffect(() => {
     if (
       !map ||
@@ -50,9 +121,12 @@ function Routing({ waypoints, setDistance, setDuration, setAlternatives }) {
       return;
     }
 
+    // Avoid recreating control if it already exists
     if (controlRef.current) {
-      map.removeControl(controlRef.current);
-      controlRef.current = null;
+      controlRef.current.setWaypoints(
+        waypoints.map((wp) => L.latLng(wp.coords[0], wp.coords[1]))
+      );
+      return;
     }
 
     const control = L.Routing.control({
@@ -60,12 +134,12 @@ function Routing({ waypoints, setDistance, setDuration, setAlternatives }) {
       routeWhileDragging: true,
       showAlternatives: true,
       lineOptions: {
-        styles: [{ color: "#1a73e8", opacity: 1, weight: 4 }],
+        styles: [{ color: "#1a73e8", opacity: 1, weight: 6 }],
         extendToWaypoints: true,
         missingRouteTolerance: 0,
       },
       altLineOptions: {
-        styles: [{ color: "#34a853", opacity: 0.6, weight: 4 }],
+        styles: [{ color: "#757575", opacity: 0.6, weight: 5 }],
         extendToWaypoints: true,
         missingRouteTolerance: 0,
       },
@@ -109,6 +183,7 @@ function Routing({ waypoints, setDistance, setDuration, setAlternatives }) {
       .addTo(map);
 
     controlRef.current = control;
+    routeControlRef.current = control;
 
     return () => {
       if (controlRef.current) {
@@ -131,17 +206,10 @@ function Routing({ waypoints, setDistance, setDuration, setAlternatives }) {
 
     const distanceKm = (route.summary.totalDistance / 1000).toFixed(1);
     const roads = getRouteRoads(route.instructions);
-
     const totalSeconds = route.summary.totalTime;
-
-    let durationText;
-    if (totalSeconds < 3600) {
-      const durationMin = (totalSeconds / 60).toFixed(0);
-      durationText = `${durationMin} min`;
-    } else {
-      const durationHours = (totalSeconds / 3600).toFixed(2);
-      durationText = `${durationHours} h`;
-    }
+    const durationText = totalSeconds < 3600
+      ? `${Math.round(totalSeconds / 60)} min`
+      : `${(totalSeconds / 3600).toFixed(2)} h`;
 
     const header = document.createElement("div");
     header.className = "popup-header";
@@ -152,18 +220,18 @@ function Routing({ waypoints, setDistance, setDuration, setAlternatives }) {
 
     const instructionsDiv = document.createElement("div");
     instructionsDiv.className = "instructions-list";
-    route.instructions.forEach((instr) => {
+    route.instructions.forEach((instr, idx) => {
       const div = document.createElement("div");
-      div.className =
-        "leaflet-routing-instruction leaflet-routing-instruction-text";
-      div.textContent = `${instr.text} (${(instr.distance / 1000).toFixed(
-        1
-      )} km)`;
+      div.className = `leaflet-routing-instruction leaflet-routing-instruction-text ${
+        idx === currentStepIndex ? "current-step" : ""
+      }`;
+      const maneuverIcon = getManeuverIcon(instr.type);
+      div.innerHTML = `<span class="maneuver-icon">${maneuverIcon}</span> ${instr.text} (${(instr.distance / 1000).toFixed(1)} km)`;
       div.onclick = (ev) => {
         ev.stopPropagation();
         const coord = route.coordinates[instr.index];
         if (coord) {
-          map.panTo([coord.lat, coord.lng]);
+          map.panTo([coord.lat, coord.lng], { animate: true });
         }
       };
       instructionsDiv.appendChild(div);
@@ -173,12 +241,12 @@ function Routing({ waypoints, setDistance, setDuration, setAlternatives }) {
     const closeBtn = document.createElement("button");
     closeBtn.className = "close-button";
     closeBtn.innerHTML =
-      '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16"><path fill="currentColor" d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>';
+      '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16"><path fill="currentColor" d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59L13.41 12z"/></svg>';
     closeBtn.onclick = () => {
       container.style.display = "none";
       setActiveRoute(null);
     };
-    container.prepend(closeBtn);
+    container.appendChild(closeBtn);
   }
 
   function clearRouteInstructions() {

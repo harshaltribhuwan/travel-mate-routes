@@ -5,13 +5,13 @@ import {
   Marker,
   Popup,
   ZoomControl,
-  useMap,
 } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import ChangeView from "./ChangeView";
 import Routing from "./Routing";
 import { CustomMarkerIcon } from "../../utils/utils";
 import { defaultCenter } from "../../utils/constants";
+import TileLayerSwitcher from "./TileLayerSwitcher";
 
 function MapView({
   waypoints,
@@ -29,6 +29,32 @@ function MapView({
 }) {
   const [mapCenter, setMapCenter] = useState(defaultCenter);
   const [mapZoom, setMapZoom] = useState(5);
+  const [currentTileLayer, setCurrentTileLayer] = useState("OpenStreetMap");
+
+  const tileLayers = {
+    "Classic Street": {
+      name: "Classic Map",
+      url: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+      attribution:
+        '© <a href="https://osm.org/copyright">OpenStreetMap</a> contributors',
+    },
+    "Standard View": {
+      name: "CartoDB Light",
+      url: "https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png",
+      attribution: '&copy; <a href="https://carto.com/">CartoDB</a>',
+    },
+    "Satellite View": {
+      name: "Esri World Imagery",
+      url: "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
+      attribution:
+        "Tiles © Esri — Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, and others",
+    },
+    "Dark Mode": {
+      name: "CartoDB Dark",
+      url: "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png",
+      attribution: '&copy; <a href="https://carto.com/">CartoDB</a>',
+    },
+  };
 
   useEffect(() => {
     if (!navigator.geolocation) return;
@@ -80,7 +106,6 @@ function MapView({
     );
   };
 
-  // Memoized array of all coords for smart zoom
   const allLocations = useMemo(() => {
     const coords = waypoints.filter((wp) => wp.coords).map((wp) => wp.coords);
     if (currentLocation) coords.push(currentLocation);
@@ -89,6 +114,13 @@ function MapView({
 
   return (
     <div className={`map-container ${!showSidebar ? "full-width" : ""}`}>
+      {/* Layer Switcher */}
+      <TileLayerSwitcher
+        tileLayers={tileLayers}
+        currentTileLayer={currentTileLayer}
+        setCurrentTileLayer={setCurrentTileLayer}
+      />
+
       <MapContainer
         center={mapCenter}
         zoom={mapZoom}
@@ -109,10 +141,12 @@ function MapView({
           currentLocation={currentLocation}
         />
 
-        <TileLayer
-          attribution='© <a href="https://osm.org/copyright">OpenStreetMap</a> contributors'
-          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-        />
+        {tileLayers[currentTileLayer] && (
+          <TileLayer
+            attribution={tileLayers[currentTileLayer].attribution}
+            url={tileLayers[currentTileLayer].url}
+          />
+        )}
 
         {currentLocation && (
           <Marker position={currentLocation} icon={CustomMarkerIcon("#EF5350")}>
