@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import {
   MapContainer,
   TileLayer,
@@ -26,6 +26,31 @@ function MapView({
   mapRef,
   routeControlRef,
 }) {
+  const [mapCenter, setMapCenter] = useState(defaultCenter);
+  const [mapZoom, setMapZoom] = useState(5); // Zoomed-out view of India
+
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+          (position) => {
+            const coords = [
+              position.coords.latitude,
+              position.coords.longitude,
+            ];
+            setMapCenter(coords);
+            setMapZoom(13); // Zoom in to user location
+          },
+          () => {
+            // Permission denied or error — stay on default center and zoom
+          }
+        );
+      }
+    }, 5000); // Delay permission request by 5s
+
+    return () => clearTimeout(timeout);
+  }, []);
+
   const handleDragEnd = (id, e) => {
     const { lat, lng } = e.target.getLatLng();
     setWaypoints((prev) =>
@@ -36,8 +61,8 @@ function MapView({
   return (
     <div className={`map-container ${!showSidebar ? "full-width" : ""}`}>
       <MapContainer
-        center={waypoints[0].coords || defaultCenter}
-        zoom={6}
+        center={mapCenter}
+        zoom={mapZoom}
         style={{ height: "100%", width: "100%" }}
         scrollWheelZoom={true}
         whenCreated={(map) => {
@@ -45,18 +70,22 @@ function MapView({
           map.invalidateSize();
         }}
         zoomControl={false}
-        key={waypoints.map((wp) => wp.coords?.join(",") || wp.id).join("-")}
+        key={mapCenter.join(",") + "-" + mapZoom}
       >
         <ZoomControl position="bottomleft" />
-        <ChangeView
-          center={waypoints.find((wp) => wp.coords)?.coords || defaultCenter}
-          zoom={waypoints.some((wp) => wp.coords) ? 7 : 5}
-          waypoints={waypoints}
-        />
+        <ChangeView center={mapCenter} zoom={mapZoom} />
+
         <TileLayer
           attribution='© <a href="https://osm.org/copyright">OpenStreetMap</a> contributors'
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
+
+        {currentLocation && (
+          <Marker position={currentLocation} icon={CustomMarkerIcon("#EF5350")}>
+            <Popup>Current Location</Popup>
+          </Marker>
+        )}
+
         {waypoints.map(
           (wp) =>
             wp.coords && (
@@ -77,11 +106,7 @@ function MapView({
               </Marker>
             )
         )}
-        {currentLocation && (
-          <Marker position={currentLocation} icon={CustomMarkerIcon("#EF5350")}>
-            <Popup>Current Location</Popup>
-          </Marker>
-        )}
+
         {waypoints.every((wp) => wp.coords) && (
           <Routing
             waypoints={waypoints}
