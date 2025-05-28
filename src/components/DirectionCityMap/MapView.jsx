@@ -30,23 +30,47 @@ function MapView({
   const [mapCenter, setMapCenter] = useState(defaultCenter);
   const [mapZoom, setMapZoom] = useState(5);
 
-  // Geolocation to update mapCenter & zoom on mount
   useEffect(() => {
-    const timeout = setTimeout(() => {
-      if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(
-          (pos) => {
-            setMapCenter([pos.coords.latitude, pos.coords.longitude]);
-            setMapZoom(13);
-          },
-          () => {
-            // permission denied or error — keep default
-          }
-        );
-      }
-    }, 5000);
+    if (!navigator.geolocation) return;
 
-    return () => clearTimeout(timeout);
+    navigator.permissions
+      ?.query({ name: "geolocation" })
+      .then((permissionStatus) => {
+        if (permissionStatus.state === "granted") {
+          navigator.geolocation.getCurrentPosition(
+            (pos) => {
+              setMapCenter([pos.coords.latitude, pos.coords.longitude]);
+              setMapZoom(13);
+            },
+            () => {}
+          );
+        } else {
+          const timeout = setTimeout(() => {
+            navigator.geolocation.getCurrentPosition(
+              (pos) => {
+                setMapCenter([pos.coords.latitude, pos.coords.longitude]);
+                setMapZoom(13);
+              },
+              () => {}
+            );
+          }, 5000);
+
+          return () => clearTimeout(timeout);
+        }
+      })
+      .catch(() => {
+        const timeout = setTimeout(() => {
+          navigator.geolocation.getCurrentPosition(
+            (pos) => {
+              setMapCenter([pos.coords.latitude, pos.coords.longitude]);
+              setMapZoom(13);
+            },
+            () => {}
+          );
+        }, 5000);
+
+        return () => clearTimeout(timeout);
+      });
   }, []);
 
   const handleDragEnd = (id, e) => {
