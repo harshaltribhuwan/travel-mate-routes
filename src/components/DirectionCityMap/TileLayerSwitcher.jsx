@@ -15,15 +15,14 @@ function TileLayerSwitcher({
   currentTileLayer,
   setCurrentTileLayer,
 }) {
-useEffect(() => {
-  const stored = localStorage.getItem("preferredTileLayer");
-  if (stored && tileLayers[stored]) {
-    setCurrentTileLayer(stored);
-  } else {
-    setCurrentTileLayer("Classic Street"); // your new default
-  }
-}, []);
-
+  useEffect(() => {
+    const stored = localStorage.getItem("preferredTileLayer");
+    if (stored && tileLayers[stored]) {
+      setCurrentTileLayer(stored);
+    } else {
+      setCurrentTileLayer("Classic Street");
+    }
+  }, []);
 
   const handleSelect = (key) => {
     setCurrentTileLayer(key);
@@ -40,6 +39,7 @@ useEffect(() => {
           title={tileLayers[key].name}
           type="button"
           aria-pressed={currentTileLayer === key}
+          data-title={tileLayers[key].name}
         >
           <span className="icon">{iconMap[key]}</span>
         </button>
