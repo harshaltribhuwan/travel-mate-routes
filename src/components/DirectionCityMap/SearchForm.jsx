@@ -1,6 +1,6 @@
 import React, { useRef, useEffect } from "react";
 import { MdMyLocation, MdAdd, MdSave, MdClear, MdClose } from "react-icons/md";
-import "./SeachForm.scss";
+import "./SearchForm.scss";
 import { defaultCenter } from "../../utils/constants";
 
 function SearchForm({
