@@ -3,19 +3,26 @@
 .sidebar {
     position: fixed;
     top: 0;
-    left: -100%;
+    left: 0;
+    /* Let Framer Motion handle the slide */
     width: 350px;
     height: 100%;
     background: color(glass-light);
-    backdrop-filter: blur(8px);
+    backdrop-filter: blur(6px);
+    /* Reduced blur for better performance */
     border-right: 1px solid color(glass-border);
-    box-shadow: map-get($shadows, md);
+    box-shadow: map-get($shadows, sm);
+    /* Lighter shadow for smoothness */
     z-index: 2000;
-    transition: left map-get($transitions, normal);
     overflow-y: auto;
+    scrollbar-gutter: stable;
+    will-change: transform;
+    /* Optimize for animation */
+    transition: none;
+    /* Remove CSS transition to avoid conflict */
 
     &.open {
-        left: 0;
+        /* No left property; Framer Motion handles transform */
     }
 
     &-header {
@@ -37,7 +44,8 @@
             background: linear-gradient(90deg, color(primary), color(success));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            text-shadow: 0 1px 2px rgba(26, 115, 232, 0.3);
+            text-shadow: 0 1px 2px rgba(26, 115, 232, 0.2);
+            /* Softer shadow */
 
             &::after {
                 content: "";
@@ -64,11 +72,12 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        transition: all map-get($transitions, fast);
+        transition: background 0.2s ease, color 0.2s ease;
+        /* Limited to background and color */
 
         &:hover {
-            background: color(danger);
-            color: color(surface);
+            background: color(danger-subtle);
+            color: color(danger);
         }
     }
 
@@ -88,7 +97,8 @@
         align-items: center;
         justify-content: center;
         z-index: 1000;
-        transition: all map-get($transitions, fast);
+        transition: background 0.2s ease, color 0.2s ease;
+        /* Limited to background and color */
 
         &:hover {
             background: color(primary);
@@ -134,7 +144,7 @@
     color: color(text-primary);
     text-align: left;
     cursor: pointer;
-    transition: all map-get($transitions, fast);
+    transition: background 0.2s ease, color 0.2s ease;
 
     &:hover {
         background: color(primary-subtle);
@@ -157,7 +167,7 @@
     font-size: map-get($font-sizes, sm);
     padding: space(2);
     border-radius: map-get($radii, full);
-    transition: all map-get($transitions, fast);
+    transition: background 0.2s ease, color 0.2s ease;
 
     &:hover {
         color: color(danger);
@@ -172,19 +182,17 @@
     gap: space(2);
     padding: space(1);
     border-bottom: 1px solid color(border-light);
-    transition: background map-get($transitions, fast);
+    transition: background 0.2s ease;
 
     &:hover {
         background: color(surface-secondary);
     }
 }
 
-
 @media (min-width: 768px) {
     .sidebar {
         width: 320px;
     }
-
 }
 
 @media (max-width: 480px) {

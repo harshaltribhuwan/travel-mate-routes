@@ -1,11 +1,12 @@
 import React, { useEffect } from "react";
 import { MdClose, MdMenu } from "react-icons/md";
 import L from "leaflet";
+import { motion, AnimatePresence } from "framer-motion";
 import SearchForm from "./SearchForm";
 import CollapsibleSection from "./CollapsibleSection";
 import { formatDistance, formatDuration } from "../../utils/utils";
 import { defaultCenter } from "../../utils/constants";
-import "./Sidebar.scss"
+import "./Sidebar.scss";
 
 function Sidebar({
   waypoints,
@@ -118,145 +119,254 @@ function Sidebar({
     }
   };
 
+  // Animation variants for the sidebar
+  const sidebarVariants = {
+    open: {
+      x: 0,
+      transition: {
+        type: "tween",
+        ease: "easeOut",
+        duration: 0.35,
+      },
+    },
+    closed: {
+      x: "-100%",
+      transition: {
+        type: "tween",
+        ease: "easeIn",
+        duration: 0.25,
+      },
+    },
+  };
+
+  // Animation variants for the header
+  const headerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: { duration: 0.3, ease: "easeOut", delay: 0.15 },
+    },
+  };
+
+  // Animation variants for buttons
+  const buttonVariants = {
+    rest: { scale: 1, opacity: 1 },
+    hover: { scale: 1.05, opacity: 0.85 },
+    tap: { scale: 0.95 },
+  };
+
+  // Animation variants for content items
+  const contentVariants = {
+    hidden: { opacity: 0, y: 10 },
+    visible: (i) => ({
+      opacity: 1,
+      y: 0,
+      transition: { duration: 0.3, ease: "easeOut", delay: i * 0.1 },
+    }),
+  };
+
   return (
     <>
-      <div className={`sidebar ${showSidebar ? "open" : ""}`}>
-        <div className="sidebar-header">
-          <h2>TravelMate Routes</h2>
-          <button
-            className="sidebar-close"
-            onClick={() => setShowSidebar(false)}
-            aria-label="Close sidebar"
-            title="Close"
+      <AnimatePresence>
+        {showSidebar && (
+          <motion.div
+            className={`sidebar ${showSidebar ? "open" : ""}`}
+            initial="closed"
+            animate="open"
+            exit="closed"
+            variants={sidebarVariants}
           >
-            <MdClose />
-          </button>
-        </div>
-        <div className="sidebar-content">
-          <SearchForm
-            setShowSidebar={setShowSidebar}
-            waypoints={waypoints}
-            setWaypoints={setWaypoints}
-            suggestions={suggestions}
-            setSuggestions={setSuggestions}
-            activeInput={activeInput}
-            setActiveInput={setActiveInput}
-            tracking={tracking}
-            setTracking={setTracking}
-            savedHistory={savedHistory}
-            setSavedHistory={setSavedHistory}
-            addWaypoint={addWaypoint}
-            removeWaypoint={removeWaypoint}
-            saveRoute={saveRoute}
-            clearRoute={handleClearRoute}
-          />
-          {alternatives.length > 0 && (
-            <CollapsibleSection
-              title="Alternatives"
-              isOpen={showAlternatives}
-              setIsOpen={setShowAlternatives}
-              items={alternatives}
-              renderItem={(alt) => (
-                <button
-                  onClick={() => handleSelectAlternative(alt.index)}
-                  className="alternative-button"
-                  title={`Select Route ${alt.index + 1}`}
+            <motion.div
+              className="sidebar-header"
+              initial="hidden"
+              animate="visible"
+              variants={headerVariants}
+            >
+              <h2>TravelMate Routes</h2>
+              <motion.button
+                className="sidebar-close"
+                onClick={() => setShowSidebar(false)}
+                aria-label="Close sidebar"
+                title="Close"
+                variants={buttonVariants}
+                whileHover="hover"
+                whileTap="tap"
+              >
+                <MdClose />
+              </motion.button>
+            </motion.div>
+            <div className="sidebar-content">
+              <motion.div
+                custom={0}
+                initial="hidden"
+                animate="visible"
+                variants={contentVariants}
+              >
+                <SearchForm
+                  setShowSidebar={setShowSidebar}
+                  waypoints={waypoints}
+                  setWaypoints={setWaypoints}
+                  suggestions={suggestions}
+                  setSuggestions={setSuggestions}
+                  activeInput={activeInput}
+                  setActiveInput={setActiveInput}
+                  tracking={tracking}
+                  setTracking={setTracking}
+                  savedHistory={savedHistory}
+                  setSavedHistory={setSavedHistory}
+                  addWaypoint={addWaypoint}
+                  removeWaypoint={removeWaypoint}
+                  saveRoute={saveRoute}
+                  clearRoute={handleClearRoute}
+                />
+              </motion.div>
+              {alternatives.length > 0 && (
+                <motion.div
+                  custom={1}
+                  initial="hidden"
+                  animate="visible"
+                  variants={contentVariants}
                 >
-                  Route {alt.index + 1}: {formatDistance(alt.distance)},{" "}
-                  {formatDuration(alt.duration)}
-                </button>
+                  <CollapsibleSection
+                    title="Alternatives"
+                    isOpen={showAlternatives}
+                    setIsOpen={setShowAlternatives}
+                    items={alternatives}
+                    renderItem={(alt) => (
+                      <button
+                        onClick={() => handleSelectAlternative(alt.index)}
+                        className="alternative-button"
+                        title={`Select Route ${alt.index + 1}`}
+                      >
+                        Route {alt.index + 1}: {formatDistance(alt.distance)},{" "}
+                        {formatDuration(alt.duration)}
+                      </button>
+                    )}
+                    itemKey="index"
+                  />
+                </motion.div>
               )}
-              itemKey="index"
-            />
-          )}
-          {waypoints.length > 2 && Array.isArray(distance) && (
-            <CollapsibleSection
-              title="Segments"
-              isOpen={showDistanceMatrix}
-              setIsOpen={setShowDistanceMatrix}
-              items={waypoints.slice(0, -1).map((wp, i) => ({
-                id: i,
-                content: `${wp.city} to ${
-                  waypoints[i + 1].city
-                }: ${formatDistance(distance / (waypoints.length - 1))}`,
-              }))}
-              renderItem={(item) => item.content}
-              itemKey="id"
-            />
-          )}
-          <CollapsibleSection
-            title="Saved Routes"
-            isOpen={showSavedRoutes}
-            setIsOpen={setShowSavedRoutes}
-            items={savedRoutes}
-            renderItem={(route, idx) => (
-              <div className="route-item">
-                <button
-                  onClick={() => handleLoadRoute(route)}
-                  className="load-route"
-                  aria-label={`Load route from ${route.waypoints[0].city} to ${
-                    route.waypoints[route.waypoints.length - 1].city
-                  }`}
-                  title="Load Route"
+              {waypoints.length > 2 && Array.isArray(distance) && (
+                <motion.div
+                  custom={2}
+                  initial="hidden"
+                  animate="visible"
+                  variants={contentVariants}
                 >
-                  {route.waypoints[0].city} to{" "}
-                  {route.waypoints[route.waypoints.length - 1].city} (
-                  {formatDistance(route.distance)},{" "}
-                  {formatDuration(route.duration)})
-                </button>
-                <button
-                  onClick={() => deleteRoute(idx)}
-                  className="delete-route"
-                  aria-label="Delete route"
-                  title="Delete"
-                >
-                  <MdClose />
-                </button>
-              </div>
-            )}
-            itemKey="idx"
-            emptyMessage="No saved routes"
-          />
-          <CollapsibleSection
-            title="History"
-            isOpen={showHistory}
-            setIsOpen={setShowHistory}
-            items={savedHistory}
-            renderItem={(item, idx) => (
-              <div className="history-item">
-                <button
-                  onClick={() => loadHistoryItem(item)}
-                  className="load-history"
-                  aria-label={`Load search: ${item.query}`}
-                  title="Load Search"
-                >
-                  {item.query}
-                </button>
-                <button
-                  onClick={() => deleteHistoryItem(idx)}
-                  className="delete-history"
-                  aria-label="Delete search"
-                  title="Delete"
-                >
-                  <MdClose />
-                </button>
-              </div>
-            )}
-            itemKey="id"
-            emptyMessage="No recent searches"
-          />
-        </div>
-      </div>
-      {!showSidebar && (
-        <button
-          className="sidebar-open"
-          onClick={() => setShowSidebar(true)}
-          aria-label="Open sidebar"
-          title="Open Sidebar"
-        >
-          <MdMenu />
-        </button>
-      )}
+                  <CollapsibleSection
+                    title="Segments"
+                    isOpen={showDistanceMatrix}
+                    setIsOpen={setShowDistanceMatrix}
+                    items={waypoints.slice(0, -1).map((wp, i) => ({
+                      id: i,
+                      content: `${wp.city} to ${
+                        waypoints[i + 1].city
+                      }: ${formatDistance(distance / (waypoints.length - 1))}`,
+                    }))}
+                    renderItem={(item) => item.content}
+                    itemKey="id"
+                  />
+                </motion.div>
+              )}
+              <motion.div
+                custom={3}
+                initial="hidden"
+                animate="visible"
+                variants={contentVariants}
+              >
+                <CollapsibleSection
+                  title="Saved Routes"
+                  isOpen={showSavedRoutes}
+                  setIsOpen={setShowSavedRoutes}
+                  items={savedRoutes}
+                  renderItem={(route, idx) => (
+                    <div className="route-item">
+                      <button
+                        onClick={() => handleLoadRoute(route)}
+                        className="load-route"
+                        aria-label={`Load route from ${
+                          route.waypoints[0].city
+                        } to ${
+                          route.waypoints[route.waypoints.length - 1].city
+                        }`}
+                        title="Load Route"
+                      >
+                        {route.waypoints[0].city} to{" "}
+                        {route.waypoints[route.waypoints.length - 1].city} (
+                        {formatDistance(route.distance)},{" "}
+                        {formatDuration(route.duration)})
+                      </button>
+                      <button
+                        onClick={() => deleteRoute(idx)}
+                        className="delete-route"
+                        aria-label="Delete route"
+                        title="Delete"
+                      >
+                        <MdClose />
+                      </button>
+                    </div>
+                  )}
+                  itemKey="idx"
+                  emptyMessage="No saved routes"
+                />
+              </motion.div>
+              <motion.div
+                custom={4}
+                initial="hidden"
+                animate="visible"
+                variants={contentVariants}
+              >
+                <CollapsibleSection
+                  title="History"
+                  isOpen={showHistory}
+                  setIsOpen={setShowHistory}
+                  items={savedHistory}
+                  renderItem={(item, idx) => (
+                    <div className="history-item">
+                      <button
+                        onClick={() => loadHistoryItem(item)}
+                        className="load-history"
+                        aria-label={`Load search: ${item.query}`}
+                        title="Load Search"
+                      >
+                        {item.query}
+                      </button>
+                      <button
+                        onClick={() => deleteHistoryItem(idx)}
+                        className="delete-history"
+                        aria-label="Delete search"
+                        title="Delete"
+                      >
+                        <MdClose />
+                      </button>
+                    </div>
+                  )}
+                  itemKey="id"
+                  emptyMessage="No recent searches"
+                />
+              </motion.div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+      <AnimatePresence>
+        {!showSidebar && (
+          <motion.button
+            className="sidebar-open"
+            onClick={() => setShowSidebar(true)}
+            aria-label="Open sidebar"
+            title="Open Sidebar"
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.9 }}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            transition={{ duration: 0.2, ease: "easeOut" }}
+          >
+            <MdMenu />
+          </motion.button>
+        )}
+      </AnimatePresence>
     </>
   );
 }

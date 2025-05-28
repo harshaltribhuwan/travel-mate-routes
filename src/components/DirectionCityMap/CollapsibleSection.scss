@@ -1,17 +1,19 @@
 @import "../../styles/Variables.scss";
 
 .collapsible-header {
-    font-size: map-get($font-sizes, base);
-    font-weight: map-get($font-weights, medium);
-    color: color(text-primary);
-    margin: space(3) 0 space(2);
-    padding: space(2);
-    cursor: pointer;
     display: flex;
     align-items: center;
+    justify-content: space-between;
     gap: space(2);
+    font-size: map-get($font-sizes, base);
+    font-weight: 600;
+    color: color(text-primary);
+    margin: space(2);
+    padding: space(2) space(3);
+    cursor: pointer;
     border-radius: map-get($radii, sm);
-    transition: all map-get($transitions, fast);
+    background: color(surface);
+    transition: background 0.2s ease-out, color 0.2s ease-out;
 
     &:hover {
         background: color(primary-subtle);
@@ -19,41 +21,32 @@
     }
 
     svg {
-        transition: transform map-get($transitions, fast);
-    }
-}
-
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(-4px);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateY(0);
+        font-size: 1.2rem;
+        color: color(text-secondary);
     }
 }
 
 .collapsible-content {
+    padding: space(2) space(3);
+    background: color(surface-secondary);
+    border-radius: map-get($radii, md);
     overflow: hidden;
-    animation: fadeIn map-get($transitions, normal);
+}
 
-    ul {
-        list-style: none;
-        padding: space(2);
-        margin: 0;
-    }
+.collapsible-content ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
 
-    li {
-        margin: 0;
-    }
+.collapsible-content li {
+    margin-bottom: space(1);
 }
 
 .empty-message {
     font-size: map-get($font-sizes, sm);
     color: color(text-muted);
+    margin: space(2) 0;
     padding: space(2);
     text-align: center;
-    font-style: italic;
 }

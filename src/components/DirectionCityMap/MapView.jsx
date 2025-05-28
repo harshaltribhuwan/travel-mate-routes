@@ -34,24 +34,24 @@ function MapView({
 
   const tileLayers = {
     "Classic Street": {
-      name: "Classic Map",
+      name: "Classic Street",
       url: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
       attribution:
         '© <a href="https://osm.org/copyright">OpenStreetMap</a> contributors',
     },
     "Standard View": {
-      name: "CartoDB Light",
+      name: "Standard View",
       url: "https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png",
       attribution: '&copy; <a href="https://carto.com/">CartoDB</a>',
     },
     "Satellite View": {
-      name: "Esri World Imagery",
+      name: "Satellite View",
       url: "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
       attribution:
         "Tiles © Esri — Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, and others",
     },
     "Dark Mode": {
-      name: "CartoDB Dark",
+      name: "Dark Mode",
       url: "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png",
       attribution: '&copy; <a href="https://carto.com/">CartoDB</a>',
     },

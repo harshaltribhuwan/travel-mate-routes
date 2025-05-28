@@ -1,5 +1,6 @@
 import React, { useRef, useEffect } from "react";
 import { MdMyLocation, MdAdd, MdSave, MdClear, MdClose } from "react-icons/md";
+import { motion, AnimatePresence } from "framer-motion";
 import "./SearchForm.scss";
 import { defaultCenter } from "../../utils/constants";
 
@@ -146,10 +147,54 @@ function SearchForm({
     );
   };
 
+  // Animation variants for input groups
+  const inputGroupVariants = {
+    hidden: { opacity: 0, y: 10 },
+    visible: (i) => ({
+      opacity: 1,
+      y: 0,
+      transition: { duration: 0.3, ease: "easeOut", delay: i * 0.1 },
+    }),
+  };
+
+  // Animation variants for buttons
+  const buttonVariants = {
+    rest: { opacity: 1 },
+    hover: { opacity: 0.85 },
+    tap: { opacity: 0.95 },
+  };
+
+  // Animation variants for autocomplete dropdown
+  const dropdownVariants = {
+    hidden: { opacity: 0, y: -10 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: { duration: 0.2, ease: "easeOut" },
+    },
+  };
+
+  // Animation variants for autocomplete items
+  const itemVariants = {
+    hidden: { opacity: 0, x: -10 },
+    visible: (i) => ({
+      opacity: 1,
+      x: 0,
+      transition: { duration: 0.2, ease: "easeOut", delay: i * 0.05 },
+    }),
+  };
+
   return (
     <div className="search-form">
       {waypoints.map((wp, idx) => (
-        <div key={wp.id} className="input-group">
+        <motion.div
+          key={wp.id}
+          className="input-group"
+          custom={idx}
+          initial="hidden"
+          animate="visible"
+          variants={inputGroupVariants}
+        >
           <input
             id={`${wp.id}-input`}
             type="text"
@@ -171,86 +216,125 @@ function SearchForm({
             }`}
           />
           {wp.id === "from" && (
-            <button
+            <motion.button
               type="button"
               onClick={useMyLocation}
               className="inside-input-button"
               aria-label="Use my current location"
               title="Use My Location"
+              variants={buttonVariants}
+              whileHover="hover"
+              whileTap="tap"
             >
               <MdMyLocation />
-            </button>
+            </motion.button>
           )}
           {wp.id !== "from" && wp.id !== "to" && (
-            <button
+            <motion.button
               type="button"
               onClick={() => removeWaypoint(wp.id)}
               className="inside-input-button"
               aria-label="Remove stop"
               title="Remove Stop"
+              variants={buttonVariants}
+              whileHover="hover"
+              whileTap="tap"
             >
               <MdClose />
-            </button>
+            </motion.button>
           )}
-          {activeInput === wp.id && suggestions.length > 0 && (
-            <ul className="autocomplete-dropdown">
-              {suggestions
-                .filter((s) => s.inputType === wp.id)
-                .map((place, idx) => (
-                  <li
-                    key={idx}
-                    className="autocomplete-item"
-                    onMouseDown={(e) => e.preventDefault()}
-                    onClick={() => handleSuggestionClick(place)}
-                    tabIndex={0}
-                    role="option"
-                    aria-selected={false}
-                  >
-                    {place.display_name}
-                  </li>
-                ))}
-            </ul>
-          )}
-        </div>
+          <AnimatePresence>
+            {activeInput === wp.id && suggestions.length > 0 && (
+              <motion.ul
+                className="autocomplete-dropdown"
+                initial="hidden"
+                animate="visible"
+                exit="hidden"
+                variants={dropdownVariants}
+              >
+                {suggestions
+                  .filter((s) => s.inputType === wp.id)
+                  .map((place, idx) => (
+                    <motion.li
+                      key={idx}
+                      className="autocomplete-item"
+                      custom={idx}
+                      initial="hidden"
+                      animate="visible"
+                      variants={itemVariants}
+                      onMouseDown={(e) => e.preventDefault()}
+                      onClick={() => handleSuggestionClick(place)}
+                      tabIndex={0}
+                      role="option"
+                      aria-selected={false}
+                    >
+                      {place.display_name}
+                    </motion.li>
+                  ))}
+              </motion.ul>
+            )}
+          </AnimatePresence>
+        </motion.div>
       ))}
-      <div className="action-buttons">
-        <button
+      <motion.div
+        className="action-buttons"
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{
+          duration: 0.3,
+          ease: "easeOut",
+          delay: waypoints.length * 0.1,
+        }}
+      >
+        <motion.button
           type="button"
           onClick={addWaypoint}
           className="action-button"
           aria-label="Add stop"
           title="Add Stop"
+          variants={buttonVariants}
+          whileHover="hover"
+          whileTap="tap"
         >
           <MdAdd />
-        </button>
-        <button
+        </motion.button>
+        <motion.button
           type="button"
           onClick={saveRoute}
           className="action-button"
           aria-label="Save route"
           title="Save Route"
+          variants={buttonVariants}
+          whileHover="hover"
+          whileTap="tap"
         >
           <MdSave />
-        </button>
-        <button
+        </motion.button>
+        <motion.button
           type="button"
           onClick={() => setTracking(!tracking)}
           className="action-button"
           aria-label={tracking ? "Stop tracking" : "Start tracking location"}
           title={tracking ? "Stop Tracking" : "Track Location"}
+          variants={buttonVariants}
+          whileHover="hover"
+          whileTap="tap"
         >
           <MdMyLocation />
-        </button>
-        <button
+        </motion.button>
+        <motion.button
           type="button"
           onClick={clearRoute}
           className="action-button remove"
           aria-label="Clear route"
           title="Clear Route"
+          variants={buttonVariants}
+          whileHover="hover"
+          whileTap="tap"
         >
           <MdClear />
-        </button>
-      </div>
+        </motion.button>
+      </motion.div>
     </div>
   );
 }
