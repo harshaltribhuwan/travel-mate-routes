@@ -134,6 +134,7 @@ function Sidebar({
         </div>
         <div className="sidebar-content">
           <SearchForm
+            setShowSidebar={setShowSidebar}
             waypoints={waypoints}
             setWaypoints={setWaypoints}
             suggestions={suggestions}
@@ -168,7 +169,7 @@ function Sidebar({
               itemKey="index"
             />
           )}
-          {waypoints.length > 2 && distance && (
+          {waypoints.length > 2 && Array.isArray(distance) && (
             <CollapsibleSection
               title="Segments"
               isOpen={showDistanceMatrix}

@@ -18,6 +18,7 @@ function SearchForm({
   removeWaypoint,
   saveRoute,
   clearRoute,
+  setShowSidebar,
 }) {
   const debounceTimerRef = useRef(null);
 
@@ -90,6 +91,9 @@ function SearchForm({
     });
     setSuggestions([]);
     setActiveInput(null);
+    if (type === "to") {
+      setShowSidebar(false);
+    }
   };
 
   const useMyLocation = async () => {

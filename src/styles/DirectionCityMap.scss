@@ -490,6 +490,10 @@ $radii: (
 }
 
 @media (max-width: 480px) {
+
+    .input-field {
+        padding: space(3) space(8) space(3) space(5);
+    }
     .sidebar {
         width: 100%;
         max-width: none;
