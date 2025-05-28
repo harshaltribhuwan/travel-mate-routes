@@ -1,0 +1,24 @@
+@import "../../styles/Variables.scss";
+
+.map-container {
+    width: 100%;
+    height: 100vh;
+    z-index: 1;
+    overflow: hidden;
+    transition: width map-get($transitions, normal);
+
+    &.full-width {
+        width: 100%;
+    }
+}
+
+@media (min-width: 768px) {
+    .map-container {
+        margin-left: 320px;
+        border-radius: 0;
+
+        &.full-width {
+            margin-left: 0;
+        }
+    }
+}

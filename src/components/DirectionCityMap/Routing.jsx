@@ -2,7 +2,8 @@ import React, { useEffect, useRef, useState } from "react";
 import { useMap } from "react-leaflet";
 import L from "leaflet";
 import "leaflet-routing-machine";
-import "../../styles/DirectionCityMap.scss";
+// import "../../styles/DirectionCityMap.scss";
+import "./Routing.scss"
 
 function Routing({
   waypoints,

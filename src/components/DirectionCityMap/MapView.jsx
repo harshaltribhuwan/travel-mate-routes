@@ -12,6 +12,7 @@ import Routing from "./Routing";
 import { CustomMarkerIcon } from "../../utils/utils";
 import { defaultCenter } from "../../utils/constants";
 import TileLayerSwitcher from "./TileLayerSwitcher";
+import "./MapView.scss"
 
 function MapView({
   waypoints,

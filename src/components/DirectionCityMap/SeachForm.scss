@@ -1,0 +1,138 @@
+@import "../../styles/Variables.scss";
+
+.input-group {
+    position: relative;
+    margin-bottom: space(3);
+}
+
+.input-field {
+    width: 85%;
+    padding: space(3) space(8) space(3) space(3);
+    border: 1px solid color(border);
+    border-radius: map-get($radii, md);
+    font-size: map-get($font-sizes, sm);
+    font-weight: map-get($font-weights, normal);
+    color: color(text-primary);
+    background: color(surface);
+    outline: none;
+    transition: border-color map-get($transitions, fast);
+
+    &::placeholder {
+        color: color(text-muted);
+    }
+
+    &:focus {
+        border-color: color(primary);
+        box-shadow: 0 0 0 3px rgba(26, 115, 232, 0.1);
+    }
+}
+
+.inside-input-button {
+    position: absolute;
+    right: space(0);
+    top: 50%;
+    transform: translateY(-45%);
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    font-size: map-get($font-sizes, base);
+    color: color(text-secondary);
+    padding: space(2);
+    border-radius: map-get($radii, full);
+    transition: all map-get($transitions, fast);
+
+    &:hover {
+        background: color(primary-subtle);
+        color: color(primary);
+    }
+}
+
+.action-buttons {
+    display: flex;
+    gap: space(2);
+    justify-content: flex-start;
+    margin-top: space(3);
+}
+
+.action-button {
+    width: 40px;
+    height: 40px;
+    background: color(surface);
+    border: 1px solid color(border-light);
+    border-radius: map-get($radii, full);
+    cursor: pointer;
+    font-size: map-get($font-sizes, base);
+    color: color(text-secondary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all map-get($transitions, fast);
+
+    &:hover {
+        background: color(primary);
+        color: color(surface);
+        border-color: color(primary);
+    }
+
+    &.remove:hover {
+        background: color(danger);
+        border-color: color(danger);
+    }
+}
+
+.autocomplete-dropdown {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: color(surface);
+    border: 1px solid color(border-light);
+    border-radius: map-get($radii, md);
+    max-height: 200px;
+    overflow-y: auto;
+    margin-top: space(1);
+    padding: space(1);
+    box-shadow: map-get($shadows, sm);
+    z-index: 1500;
+
+    &::-webkit-scrollbar {
+        width: 4px;
+    }
+
+    &::-webkit-scrollbar-thumb {
+        background: color(text-muted);
+        border-radius: map-get($radii, full);
+    }
+}
+
+.autocomplete-item {
+    padding: space(2) space(3);
+    cursor: pointer;
+    font-size: map-get($font-sizes, sm);
+    color: color(text-primary);
+    border-radius: map-get($radii, sm);
+    transition: all map-get($transitions, fast);
+
+    &:hover {
+        background: color(primary-subtle);
+        color: color(primary);
+    }
+}
+
+@media (max-width: 480px) {
+
+    .input-field {
+        padding: space(3) space(8) space(3) space(5);
+    }
+
+    .action-buttons {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .action-button {
+        width: 100%;
+        height: 44px;
+        border-radius: map-get($radii, md);
+    }
+}

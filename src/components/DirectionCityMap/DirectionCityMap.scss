@@ -1,0 +1,22 @@
+@import "../../styles/Variables.scss";
+
+// Main container with enhanced gradient
+.container {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    background: color(surface-secondary);
+    font-family: 'Roboto', sans-serif;
+    font-weight: map-get($font-weights, normal);
+    line-height: map-get($line-heights, normal);
+    margin: 0 auto;
+    width: 100%;
+    color: color(text-primary);
+}
+
+// Responsive Design with better breakpoints
+@media (min-width: 768px) {
+    .container {
+        flex-direction: row;
+    }
+}

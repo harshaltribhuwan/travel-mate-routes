@@ -1,0 +1,47 @@
+@import "../../styles/Variables.scss";
+
+.collapsible-header {
+    font-size: map-get($font-sizes, base);
+    font-weight: map-get($font-weights, medium);
+    color: color(text-primary);
+    margin: space(3) 0 space(2);
+    padding: space(2);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: space(2);
+    border-radius: map-get($radii, sm);
+    transition: all map-get($transitions, fast);
+
+    &:hover {
+        background: color(primary-subtle);
+        color: color(primary);
+    }
+
+    svg {
+        transition: transform map-get($transitions, fast);
+    }
+}
+
+.collapsible-content {
+    overflow: hidden;
+    animation: fadeIn map-get($transitions, normal);
+
+    ul {
+        list-style: none;
+        padding: space(2);
+        margin: 0;
+    }
+
+    li {
+        margin: 0;
+    }
+}
+
+.empty-message {
+    font-size: map-get($font-sizes, sm);
+    color: color(text-muted);
+    padding: space(2);
+    text-align: center;
+    font-style: italic;
+}

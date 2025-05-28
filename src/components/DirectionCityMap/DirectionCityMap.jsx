@@ -3,9 +3,8 @@ import L from "leaflet";
 import "leaflet.offline";
 import MapView from "./MapView";
 import Sidebar from "./Sidebar";
-import RouteInfo from "./RouteInfo";
 import { defaultCenter } from "../../utils/constants";
-import "../../styles/DirectionCityMap.scss";
+import "./DirectionCityMap.scss";
 
 export default function DirectionCityMap() {
   const [waypoints, setWaypoints] = useState([
@@ -186,7 +185,6 @@ export default function DirectionCityMap() {
         setDuration={setDuration}
         setAlternatives={setAlternatives}
       />
-      {/* <RouteInfo distance={distance} duration={duration} /> */}
       <MapView
         waypoints={waypoints}
         setWaypoints={setWaypoints}

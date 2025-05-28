@@ -1,0 +1,274 @@
+@import "../../styles/Variables.scss";
+
+.route-info {
+    position: absolute;
+    top: space(5);
+    left: 50%;
+    transform: translateX(-50%);
+    background: color(glass-light);
+    backdrop-filter: blur(16px) saturate(160%);
+    border: 1px solid color(glass-border);
+    padding: space(2) space(4);
+    border-radius: map-get($radii, md);
+    font-size: map-get($font-sizes, xs);
+    font-weight: map-get($font-weights, medium);
+    color: color(text-primary);
+    box-shadow: map-get($shadows, lg);
+    z-index: 1000;
+    letter-spacing: -0.01em;
+}
+
+// Restored original popup styling
+.leaflet-routing-container {
+    pointer-events: auto;
+    background: color(surface);
+    border: 1px solid color(border-light);
+    border-radius: map-get($radii, md);
+    padding: space(3);
+    width: 320px;
+    box-shadow: map-get($shadows, sm);
+    z-index: 1100;
+    position: absolute;
+    top: space(14);
+    right: space(2);
+    font-family: 'Roboto', sans-serif;
+    overflow-y: visible;
+
+    &-instruction {
+        margin: space(1) 0;
+        padding: space(1);
+        cursor: pointer;
+        border-radius: map-get($radii, sm);
+        transition: all map-get($transitions, fast);
+        font-size: map-get($font-sizes, sm);
+        font-weight: map-get($font-weights, normal);
+        color: color(text-primary);
+
+        &:hover {
+            background: color(primary-subtle);
+        }
+
+        &:active {
+            background: color(surface-secondary);
+        }
+    }
+
+    h2 {
+        font-size: map-get($font-sizes, base);
+        font-weight: map-get($font-weights, medium);
+        color: color(text-primary);
+        margin: 0 0 space(1);
+    }
+
+    h3 {
+        font-size: map-get($font-sizes, sm);
+        font-weight: map-get($font-weights, medium);
+        color: color(text-primary);
+        margin: space(1) 0;
+    }
+
+    .leaflet-routing-instruction-text {
+        cursor: pointer;
+        color: color(text-primary);
+        font-size: map-get($font-sizes, sm);
+        font-weight: map-get($font-weights, normal);
+        transition: color map-get($transitions, fast);
+
+        &:hover {
+            color: color(primary);
+        }
+    }
+}
+
+.instructions-list {
+    pointer-events: auto;
+    height: auto;
+    max-height: 300px;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+
+    &::-webkit-scrollbar {
+        width: 4px;
+    }
+
+    &::-webkit-scrollbar-thumb {
+        background: color(text-muted);
+        border-radius: map-get($radii, full);
+    }
+}
+
+.popup-header {
+    margin-bottom: space(1);
+    padding-bottom: space(1);
+    border-bottom: 1px solid color(border-light);
+
+    h3 {
+        margin: 0;
+        font-size: map-get($font-sizes, sm);
+        font-weight: map-get($font-weights, medium);
+        color: color(text-primary);
+    }
+
+    p {
+        margin: space(1) 0 0;
+        font-size: map-get($font-sizes, xs);
+        color: color(text-secondary);
+        font-weight: map-get($font-weights, normal);
+    }
+}
+
+.close-button {
+    position: absolute;
+    top: space(1);
+    right: space(1);
+    background: transparent;
+    border: none;
+    border-radius: map-get($radii, full);
+    cursor: pointer;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: color(text-secondary);
+    font-size: map-get($font-sizes, sm);
+    transition: all map-get($transitions, fast);
+    z-index: 1200;
+
+    &:hover {
+        background: color(primary-subtle);
+        color: color(primary);
+    }
+
+    &:active {
+        background: color(surface-secondary);
+    }
+
+    &:focus {
+        outline: none;
+        box-shadow: 0 0 0 3px rgba(26, 115, 232, 0.1);
+    }
+
+    svg {
+        width: 16px;
+        height: 16px;
+    }
+}
+
+// New styles for current step and maneuver icons
+.current-step {
+    background: color(primary-subtle);
+    font-weight: map-get($font-weights, bold);
+}
+
+.maneuver-icon {
+    font-size: map-get($font-sizes, base);
+    margin-right: space(2);
+    width: 24px;
+    text-align: center;
+    color: color(text-primary);
+}
+
+.route-toggle-buttons {
+    position: absolute;
+    top: space(3);
+    right: space(3);
+    z-index: 1000;
+    padding: space(1);
+    border-radius: map-get($radii, md);
+    display: inline-flex;
+    gap: space(2);
+    justify-content: center;
+    min-width: 100px;
+
+    button {
+        padding: space(2);
+        height: 36px;
+        min-width: 80px;
+        background: color(surface);
+        color: color(text-primary);
+        border: 1px solid color(border-light);
+        border-radius: map-get($radii, md);
+        cursor: pointer;
+        font-size: map-get($font-sizes, sm);
+        font-weight: map-get($font-weights, normal);
+        transition: all map-get($transitions, fast);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        &:hover:not(:disabled) {
+            background: color(primary-subtle);
+            color: color(primary);
+            border-color: color(primary);
+        }
+
+        &:focus {
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(26, 115, 232, 0.1);
+        }
+
+        &:disabled {
+            background: color(surface-secondary);
+            color: color(text-muted);
+            border-color: color(border-light);
+            cursor: not-allowed;
+            opacity: 0.5;
+        }
+    }
+}
+
+// Responsive Design with better breakpoints
+@media (min-width: 768px) {
+
+    .route-info {
+        font-size: map-get($font-sizes, lg);
+    }
+}
+
+@media (max-width: 480px) {
+
+    .route-info {
+        font-size: map-get($font-sizes, sm);
+        padding: space(3) space(5);
+    }
+
+    .leaflet-routing-container {
+        padding: space(2);
+        border-radius: map-get($radii, sm);
+        top: 115px;
+        left: space(2);
+        right: space(2);
+        margin: 0 auto;
+        z-index: 1100;
+        display: block;
+        overflow: hidden;
+    }
+
+    .instructions-list {
+        max-height: 200px;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    .close-button {
+        width: 44px;
+        height: 44px;
+
+        svg {
+            width: 20px;
+            height: 20px;
+        }
+    }
+
+    .route-toggle-buttons {
+        min-width: 280px;
+
+        button {
+            height: 44px;
+            width: 100%;
+        }
+    }
+}

@@ -5,7 +5,6 @@ import SearchForm from "./SearchForm";
 import CollapsibleSection from "./CollapsibleSection";
 import { formatDistance, formatDuration } from "../../utils/utils";
 import { defaultCenter } from "../../utils/constants";
-import "../../styles/DirectionCityMap.scss";
 import "./Sidebar.scss"
 
 function Sidebar({

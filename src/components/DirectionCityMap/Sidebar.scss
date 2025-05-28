@@ -1,0 +1,195 @@
+@import "../../styles/Variables.scss";
+
+.sidebar {
+    position: fixed;
+    top: 0;
+    left: -100%;
+    width: 350px;
+    height: 100%;
+    background: color(glass-light);
+    backdrop-filter: blur(8px);
+    border-right: 1px solid color(glass-border);
+    box-shadow: map-get($shadows, md);
+    z-index: 2000;
+    transition: left map-get($transitions, normal);
+    overflow-y: auto;
+
+    &.open {
+        left: 0;
+    }
+
+    &-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: space(4);
+        border-bottom: 1px solid color(border-light);
+        background: color(surface);
+
+        h2 {
+            font-size: map-get($font-sizes, lg);
+            font-weight: 900;
+            margin: 0;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            position: relative;
+            padding-bottom: 6px;
+            background: linear-gradient(90deg, color(primary), color(success));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 1px 2px rgba(26, 115, 232, 0.3);
+
+            &::after {
+                content: "";
+                position: absolute;
+                bottom: 0;
+                left: 0;
+                width: 40px;
+                height: 3px;
+                background: linear-gradient(90deg, color(primary-light), color(success));
+                border-radius: 2px;
+            }
+        }
+    }
+
+    &-close {
+        width: 36px;
+        height: 36px;
+        background: transparent;
+        border: none;
+        border-radius: map-get($radii, full);
+        cursor: pointer;
+        font-size: map-get($font-sizes, lg);
+        color: color(text-secondary);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all map-get($transitions, fast);
+
+        &:hover {
+            background: color(danger);
+            color: color(surface);
+        }
+    }
+
+    &-open {
+        position: fixed;
+        top: space(3);
+        left: space(3);
+        width: 44px;
+        height: 44px;
+        background: color(surface);
+        border: 1px solid color(border-light);
+        border-radius: map-get($radii, full);
+        cursor: pointer;
+        font-size: map-get($font-sizes, lg);
+        color: color(text-primary);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+        transition: all map-get($transitions, fast);
+
+        &:hover {
+            background: color(primary);
+            color: color(surface);
+        }
+    }
+
+    &-content {
+        padding: space(4);
+
+        h3 {
+            font-size: map-get($font-sizes, base);
+            font-weight: map-get($font-weights, medium);
+            color: color(text-primary);
+            margin: space(3) 0 space(2);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: space(2);
+        }
+    }
+
+    &::-webkit-scrollbar {
+        width: 4px;
+    }
+
+    &::-webkit-scrollbar-thumb {
+        background: color(text-muted);
+        border-radius: map-get($radii, full);
+    }
+}
+
+.alternative-button,
+.load-route,
+.load-history {
+    flex: 1;
+    padding: space(2) space(3);
+    background: color(surface);
+    border: 1px solid color(border-light);
+    border-radius: map-get($radii, md);
+    font-size: map-get($font-sizes, sm);
+    font-weight: map-get($font-weights, normal);
+    color: color(text-primary);
+    text-align: left;
+    cursor: pointer;
+    transition: all map-get($transitions, fast);
+
+    &:hover {
+        background: color(primary-subtle);
+        color: color(primary);
+    }
+
+    &.selected {
+        background: color(primary-subtle);
+        font-weight: map-get($font-weights, bold);
+        color: color(primary);
+    }
+}
+
+.delete-route,
+.delete-history {
+    background: transparent;
+    border: none;
+    color: color(text-secondary);
+    cursor: pointer;
+    font-size: map-get($font-sizes, sm);
+    padding: space(2);
+    border-radius: map-get($radii, full);
+    transition: all map-get($transitions, fast);
+
+    &:hover {
+        color: color(danger);
+        background: color(danger-subtle);
+    }
+}
+
+.route-item,
+.history-item {
+    display: flex;
+    align-items: center;
+    gap: space(2);
+    padding: space(1);
+    border-bottom: 1px solid color(border-light);
+    transition: background map-get($transitions, fast);
+
+    &:hover {
+        background: color(surface-secondary);
+    }
+}
+
+
+@media (min-width: 768px) {
+    .sidebar {
+        width: 320px;
+    }
+
+}
+
+@media (max-width: 480px) {
+    .sidebar {
+        width: 100%;
+        max-width: none;
+    }
+}
