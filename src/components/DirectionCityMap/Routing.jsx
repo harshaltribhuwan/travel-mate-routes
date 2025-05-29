@@ -193,6 +193,15 @@ function Routing({
     };
   }, [map, waypoints, setDistance, setDuration, setAlternatives, activeRoute]);
 
+  const getSpokenDistance = (distanceInMeters) => {
+    if (distanceInMeters < 1000) {
+      return `${Math.round(distanceInMeters)} meters`;
+    } else {
+      const km = (distanceInMeters / 1000).toFixed(1);
+      return `${km.replace(".", " point ")} kilometers`;
+    }
+  };
+
   function showRouteInstructions(type, route) {
     let container = document.querySelector(".leaflet-routing-container");
     if (!container) {
@@ -228,9 +237,16 @@ function Routing({
 
       // Only show text, skip maneuver icon in speech (but still show icon visually)
       const maneuverIcon = getManeuverIcon(instr.type);
-      div.innerHTML = `<span class="maneuver-icon">${maneuverIcon}</span> ${
-        instr.text
-      } (${(instr.distance / 1000).toFixed(1)} km)`;
+      const distance =
+        instr.distance < 1000
+          ? `${Math.round(instr.distance)} m`
+          : `${(instr.distance / 1000).toFixed(1)} km`;
+
+      div.innerHTML = `<span class="maneuver-icon">${maneuverIcon}</span> ${instr.text} (${distance})`;
+
+      const spokenText = `${instr.text} for ${getSpokenDistance(
+        instr.distance
+      )}`;
 
       div.onclick = (ev) => {
         ev.stopPropagation();
@@ -239,7 +255,7 @@ function Routing({
           if (speech.speaking()) {
             speech.cancel();
           }
-          speech.speak({ text: instr.text }).catch(console.error);
+          speech.speak({ text: spokenText }).catch(console.error);
         }
 
         const coord = route.coordinates[instr.index];
