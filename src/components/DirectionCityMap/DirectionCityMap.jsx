@@ -75,9 +75,38 @@ export default function DirectionCityMap() {
           "unknown",
       }));
 
-      const filteredPlaces = places.filter((place) => place.name !== "Unnamed");
+      const filteredPlaces = places.filter(
+        (place) => place.name !== "Unnamed" && place.type !== "butcher"
+      );
 
-      setNearbyPlaces(filteredPlaces);
+      // Group by type
+      const grouped = filteredPlaces.reduce((acc, place) => {
+        if (!acc[place.type]) acc[place.type] = [];
+        acc[place.type].push(place);
+        return acc;
+      }, {});
+
+      const priority = [
+        "restaurant",
+        "cafe",
+        "hotel",
+        "bakery",
+        "pharmacy",
+        "chemist",
+        "jwelery",
+      ];
+
+      const sortedGroupedPlaces = [
+        ...priority.flatMap((type) => grouped[type] || []),
+        ...Object.entries(grouped)
+          .filter(([type]) => !priority.includes(type))
+          .sort(([a], [b]) => a.localeCompare(b))
+          .flatMap(([, places]) => places),
+      ];
+
+      // Now use `sortedGroupedPlaces`
+      setNearbyPlaces(sortedGroupedPlaces);
+
       lastFetchedCoordsRef.current = [lat, lng];
     } catch (err) {
       console.error(err);
