@@ -30,9 +30,6 @@ export default defineConfig({
           }
         ]
       },
-      workbox: {
-        debug: false  // <-- Add this line to silence Workbox logs
-      }
     })
   ]
 });
