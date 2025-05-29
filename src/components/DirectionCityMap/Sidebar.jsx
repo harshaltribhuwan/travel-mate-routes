@@ -44,13 +44,12 @@ function Sidebar({
   setDistance,
   setDuration,
   setAlternatives,
-
-  // NEW props for nearby places section
   nearbyPlaces,
   showNearbyPlaces,
   setShowNearbyPlaces,
 }) {
   const [selectedSaved, SetSelectedSaved] = useState(false);
+
   // Invalidate map size on sidebar open/close
   useEffect(() => {
     if (mapRef.current) {
@@ -144,6 +143,55 @@ function Sidebar({
     }
   };
 
+  const handleSelectNearbyPlace = (place) => {
+    // Ensure "to" waypoint exists in waypoints
+    const hasToWaypoint = waypoints.some((wp) => wp.id === "to");
+    let updatedWaypoints;
+
+    if (!hasToWaypoint) {
+      // Add "to" waypoint if it doesn't exist
+      updatedWaypoints = [
+        ...waypoints,
+        { id: "to", city: place.name, coords: [place.lat, place.lng] },
+      ];
+    } else {
+      // Update existing "to" waypoint
+      updatedWaypoints = waypoints.map((wp) =>
+        wp.id === "to"
+          ? { ...wp, city: place.name, coords: [place.lat, place.lng] }
+          : wp
+      );
+    }
+
+    // Update waypoints state
+    setWaypoints(updatedWaypoints);
+
+    // Update map view to focus on the selected place
+    if (mapRef.current) {
+      mapRef.current.setView([place.lat, place.lng], 14);
+      mapRef.current.invalidateSize();
+    }
+
+    // Trigger route recalculation
+    loadRoute({ waypoints: updatedWaypoints });
+
+    // Close sidebar
+    setShowSidebar(false);
+
+    // Add to search history
+    setSavedHistory((prev) => {
+      const newHistory = [
+        {
+          id: `hist${Date.now()}`,
+          query: place.name,
+          timestamp: new Date().toISOString(),
+        },
+        ...prev,
+      ].slice(0, 10);
+      return newHistory;
+    });
+  };
+
   return (
     <>
       <div className={`sidebar ${showSidebar ? "open" : ""}`}>
@@ -211,7 +259,6 @@ function Sidebar({
               itemKey="id"
             />
           )}
-
           <CollapsibleSection
             title="Saved Routes"
             isOpen={showSavedRoutes}
@@ -249,8 +296,6 @@ function Sidebar({
             itemKey="idx"
             emptyMessage="No saved routes"
           />
-
-          {/* NEW Nearby Places Collapsible */}
           <CollapsibleSection
             title="Nearby Destination"
             isOpen={showNearbyPlaces}
@@ -259,7 +304,19 @@ function Sidebar({
             itemKey="id"
             emptyMessage="No nearby places found."
             renderItem={(place) => (
-              <div className="nearby-place-item">
+              <div
+                className="nearby-place-item"
+                onClick={() => handleSelectNearbyPlace(place)}
+                role="button"
+                tabIndex={0}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === " ") {
+                    handleSelectNearbyPlace(place);
+                  }
+                }}
+                aria-label={`Select ${place.name} as destination`}
+                title={`Set ${place.name} as destination`}
+              >
                 <p className="nearby-place-text">
                   <span className="place-name">{place.name}</span>
                   <strong className="place-type"> ({place.type})</strong>
@@ -267,7 +324,6 @@ function Sidebar({
               </div>
             )}
           />
-
           <CollapsibleSection
             title="History"
             isOpen={showHistory}
