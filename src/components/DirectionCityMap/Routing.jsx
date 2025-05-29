@@ -4,6 +4,7 @@ import L from "leaflet";
 import "leaflet-routing-machine";
 import { FiVolume2, FiVolumeX } from "react-icons/fi";
 import "./Routing.scss";
+import { speech, initSpeech } from "../../utils/speech";
 
 function Routing({
   waypoints,
@@ -18,12 +19,11 @@ function Routing({
   const [activeRoute, setActiveRoute] = useState(null);
   const [hasAltRoute, setHasAltRoute] = useState(false);
   const [currentStepIndex, setCurrentStepIndex] = useState(-1);
-  const [voiceEnabled, setVoiceEnabled] = useState(false);
+  const [voiceEnabled, setVoiceEnabled] = useState(true);
 
   const toggleVoice = () => {
     setVoiceEnabled((prev) => !prev);
   };
-  const synth = window.speechSynthesis;
 
   // Helper: Get route roads
   const getRouteRoads = (instructions) => {
@@ -79,6 +79,10 @@ function Routing({
       setCurrentStepIndex(currentStep);
     }
   }, [currentLocation, activeRoute, waypoints, controlRef.current]);
+
+  useEffect(() => {
+    initSpeech();
+  }, []);
 
   useEffect(() => {
     if (
@@ -213,13 +217,14 @@ function Routing({
 
       div.onclick = (ev) => {
         ev.stopPropagation();
-        if (voiceEnabled && synth) {
-          if (synth.speaking) {
-            synth.cancel();
+
+        if (voiceEnabled && speech && speech.speak) {
+          if (speech.speaking()) {
+            speech.cancel();
           }
-          const utterThis = new SpeechSynthesisUtterance(instr.text);
-          synth.speak(utterThis);
+          speech.speak({ text: instr.text }).catch(console.error);
         }
+
         const coord = route.coordinates[instr.index];
         if (coord) {
           map.panTo([coord.lat, coord.lng], { animate: true });
