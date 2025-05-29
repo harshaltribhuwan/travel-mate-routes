@@ -6,7 +6,7 @@
     flex-direction: column;
     min-height: 100vh;
     background: color(surface-secondary);
-    font-family: 'Roboto', sans-serif;
+    font-family: "Inter", "Roboto", sans-serif !important;
     font-weight: map-get($font-weights, normal);
     line-height: map-get($line-heights, normal);
     margin: 0 auto;

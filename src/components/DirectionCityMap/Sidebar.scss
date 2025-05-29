@@ -127,6 +127,7 @@
 .alternative-button,
 .load-route,
 .load-history {
+    font-family: "Inter", "Roboto", sans-serif !important;
     flex: 1;
     padding: space(2) space(3);
     background: color(surface);
@@ -153,6 +154,7 @@
 
 .delete-route,
 .delete-history {
+    font-family: "Inter", "Roboto", sans-serif !important;
     background: transparent;
     border: none;
     color: color(text-secondary);
@@ -170,6 +172,7 @@
 
 .route-item,
 .history-item {
+    font-family: "Inter", "Roboto", sans-serif !important;
     display: flex;
     align-items: center;
     gap: space(2);

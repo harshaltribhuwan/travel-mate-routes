@@ -31,7 +31,7 @@
     position: absolute;
     top: space(14);
     right: space(2);
-    font-family: 'Roboto', sans-serif;
+    font-family: "Inter", "Roboto", sans-serif !important;
     overflow-y: visible;
 
     &-instruction {
@@ -182,6 +182,7 @@
     min-width: 100px;
 
     button {
+        font-family: "Inter", "Roboto", sans-serif !important;
         padding: space(2);
         height: 36px;
         min-width: 80px;
