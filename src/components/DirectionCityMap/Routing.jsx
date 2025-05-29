@@ -144,7 +144,7 @@ function Routing({
         missingRouteTolerance: 0,
       },
       altLineOptions: {
-        styles: [{ color: "#757575", opacity: 0.6, weight: 5 }],
+        styles: [{ color: "#757575", opacity: 0.7, weight: 5 }],
         extendToWaypoints: true,
         missingRouteTolerance: 0,
       },
