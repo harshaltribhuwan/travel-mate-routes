@@ -33,6 +33,7 @@ function SearchForm({
   const [focusedSuggestionIndex, setFocusedSuggestionIndex] = useState(-1);
   const [showDirections, setShowDirections] = useState(false);
   const [draggedId, setDraggedId] = useState(null);
+  const [isProgrammaticChange, setIsProgrammaticChange] = useState(false); // New state to track programmatic changes
 
   const fetchSuggestions = async (value, type) => {
     if (value.length < 2) {
@@ -54,7 +55,8 @@ function SearchForm({
   };
 
   useEffect(() => {
-    if (activeInput) {
+    if (activeInput && !isProgrammaticChange) {
+      // Only fetch if not a programmatic change
       const waypoint = waypoints.find((wp) => wp.id === activeInput);
       if (waypoint?.city) {
         if (debounceTimerRef.current) clearTimeout(debounceTimerRef.current);
@@ -67,10 +69,11 @@ function SearchForm({
     return () => {
       if (debounceTimerRef.current) clearTimeout(debounceTimerRef.current);
     };
-  }, [waypoints, activeInput]);
+  }, [waypoints, activeInput, isProgrammaticChange]);
 
   const handleInputChange = (id, e) => {
     const value = e.target.value;
+    setIsProgrammaticChange(false); // User typing, not programmatic
     setWaypoints((prev) =>
       prev.map((wp) => (wp.id === id ? { ...wp, city: value } : wp))
     );
@@ -87,6 +90,7 @@ function SearchForm({
     const lat = parseFloat(place.lat);
     const lon = parseFloat(place.lon);
     const type = place.inputType;
+    setIsProgrammaticChange(true); // Set to true to prevent suggestions
     setWaypoints((prev) =>
       prev.map((wp) =>
         wp.id === type
@@ -109,6 +113,7 @@ function SearchForm({
     setActiveInput(null);
     setFocusedSuggestionIndex(-1);
     if (type === "to") setShowSidebar(false);
+    setIsProgrammaticChange(false); // Reset after update
   };
 
   const handleKeyDown = (e, wpId) => {
@@ -137,6 +142,7 @@ function SearchForm({
       alert("Geolocation not supported.");
       return;
     }
+    setIsProgrammaticChange(true); // Prevent suggestions during location update
     navigator.geolocation.getCurrentPosition(
       async (pos) => {
         const lat = pos.coords.latitude;
@@ -167,14 +173,19 @@ function SearchForm({
             ].slice(0, 10);
             return newHistory;
           });
+          setSuggestions([]); // Clear suggestions after setting location
+          setActiveInput(null); // Clear active input
+          setIsProgrammaticChange(false); // Reset after update
         } catch (err) {
           console.error("Reverse geocoding failed:", err);
           alert("Failed to detect city.");
+          setIsProgrammaticChange(false);
         }
       },
       (err) => {
         alert("Failed to access location.");
         console.error(err);
+        setIsProgrammaticChange(false);
       }
     );
   };
