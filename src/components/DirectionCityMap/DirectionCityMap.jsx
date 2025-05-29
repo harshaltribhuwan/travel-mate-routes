@@ -75,9 +75,6 @@ export default function DirectionCityMap() {
           "unknown",
       }));
 
-      console.log("data",data)
-      console.log("places",places)
-
       const filteredPlaces = places.filter((place) => place.name !== "Unnamed");
 
       setNearbyPlaces(filteredPlaces);

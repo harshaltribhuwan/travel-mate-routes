@@ -28,7 +28,6 @@ function SearchForm({
   setShowSidebar,
   selectedSaved,
 }) {
-  console.log(selectedSaved);
   const debounceTimerRef = useRef(null);
   const [focusedSuggestionIndex, setFocusedSuggestionIndex] = useState(-1);
   const [showDirections, setShowDirections] = useState(false);
