@@ -26,7 +26,9 @@ function SearchForm({
   saveRoute,
   clearRoute,
   setShowSidebar,
+  selectedSaved,
 }) {
+  console.log(selectedSaved);
   const debounceTimerRef = useRef(null);
   const [focusedSuggestionIndex, setFocusedSuggestionIndex] = useState(-1);
   const [showDirections, setShowDirections] = useState(false);
@@ -176,6 +178,12 @@ function SearchForm({
     );
   };
 
+  useEffect(() => {
+    if (selectedSaved) {
+      setShowDirections(true);
+    }
+  }, [selectedSaved]);
+
   const handleShowDirections = () => {
     setShowDirections(true);
     // Add "from" waypoint if not already present
@@ -195,7 +203,7 @@ function SearchForm({
   return (
     <div className="search-form">
       {waypoints.map((wp, idx) =>
-        wp.id !== "from" || showDirections ? (
+        wp.id !== "from" || showDirections || selectedSaved ? (
           <div key={wp.id} className="input-group">
             <input
               id={`${wp.id}-input`}

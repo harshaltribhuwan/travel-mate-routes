@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { MdClose, MdMenu } from "react-icons/md";
 import L from "leaflet";
 import SearchForm from "./SearchForm";
@@ -50,6 +50,7 @@ function Sidebar({
   showNearbyPlaces,
   setShowNearbyPlaces,
 }) {
+  const [selectedSaved, SetSelectedSaved] = useState(false);
   // Invalidate map size on sidebar open/close
   useEffect(() => {
     if (mapRef.current) {
@@ -119,6 +120,7 @@ function Sidebar({
     setDistance(route.distance);
     setDuration(route.duration);
     setAlternatives(route.alternatives || []);
+    SetSelectedSaved(true);
 
     if (mapRef.current) {
       try {
@@ -173,6 +175,7 @@ function Sidebar({
             removeWaypoint={removeWaypoint}
             saveRoute={saveRoute}
             clearRoute={handleClearRoute}
+            selectedSaved={selectedSaved}
           />
           {alternatives.length > 0 && (
             <CollapsibleSection
@@ -263,7 +266,7 @@ function Sidebar({
               </>
             )}
           />
-          
+
           <CollapsibleSection
             title="History"
             isOpen={showHistory}
