@@ -1,10 +1,11 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState, lazy, Suspense } from "react";
 import L from "leaflet";
 import "leaflet.offline";
-import MapView from "./MapView";
-import Sidebar from "./Sidebar";
+const MapView = lazy(() => import("./MapView"));
+const Sidebar = lazy(() => import("./Sidebar"));
 import { defaultCenter } from "../../utils/constants";
 import "./DirectionCityMap.scss";
+import Loader from "./Loader";
 
 export default function DirectionCityMap() {
   const [waypoints, setWaypoints] = useState([
@@ -287,61 +288,65 @@ export default function DirectionCityMap() {
 
   return (
     <div className="container">
-      <Sidebar
-        waypoints={waypoints}
-        setWaypoints={setWaypoints}
-        suggestions={suggestions}
-        setSuggestions={setSuggestions}
-        activeInput={activeInput}
-        setActiveInput={setActiveInput}
-        distance={distance}
-        duration={duration}
-        alternatives={alternatives}
-        showAlternatives={showAlternatives}
-        setShowAlternatives={setShowAlternatives}
-        showDistanceMatrix={showDistanceMatrix}
-        setShowDistanceMatrix={setShowDistanceMatrix}
-        savedRoutes={savedRoutes}
-        setSavedRoutes={setSavedRoutes}
-        savedHistory={savedHistory}
-        setSavedHistory={setSavedHistory}
-        showSavedRoutes={showSavedRoutes}
-        setShowSavedRoutes={setShowSavedRoutes}
-        showHistory={showHistory}
-        setShowHistory={setShowHistory}
-        showSidebar={showSidebar}
-        setShowSidebar={setShowSidebar}
-        tracking={tracking}
-        setTracking={setTracking}
-        mapRef={mapRef}
-        addWaypoint={addWaypoint}
-        removeWaypoint={removeWaypoint}
-        clearRoute={clearRoute}
-        loadRoute={loadRoute}
-        loadHistoryItem={loadHistoryItem}
-        deleteHistoryItem={deleteHistoryItem}
-        selectAlternative={selectAlternative}
-        setDistance={setDistance}
-        setDuration={setDuration}
-        setAlternatives={setAlternatives}
-        nearbyPlaces={nearbyPlaces}
-        showNearbyPlaces={showNearbyPlaces}
-        setShowNearbyPlaces={setShowNearbyPlaces}
-      />
-      <MapView
-        waypoints={waypoints}
-        setWaypoints={setWaypoints}
-        currentLocation={currentLocation}
-        distance={distance}
-        setDistance={setDistance}
-        duration={duration}
-        setDuration={setDuration}
-        alternatives={alternatives}
-        setAlternatives={setAlternatives}
-        showSidebar={showSidebar}
-        mapRef={mapRef}
-        routeControlRef={routeControlRef}
-      />
+      <Suspense fallback={<Loader />}>
+        <Sidebar
+          waypoints={waypoints}
+          setWaypoints={setWaypoints}
+          suggestions={suggestions}
+          setSuggestions={setSuggestions}
+          activeInput={activeInput}
+          setActiveInput={setActiveInput}
+          distance={distance}
+          duration={duration}
+          alternatives={alternatives}
+          showAlternatives={showAlternatives}
+          setShowAlternatives={setShowAlternatives}
+          showDistanceMatrix={showDistanceMatrix}
+          setShowDistanceMatrix={setShowDistanceMatrix}
+          savedRoutes={savedRoutes}
+          setSavedRoutes={setSavedRoutes}
+          savedHistory={savedHistory}
+          setSavedHistory={setSavedHistory}
+          showSavedRoutes={showSavedRoutes}
+          setShowSavedRoutes={setShowSavedRoutes}
+          showHistory={showHistory}
+          setShowHistory={setShowHistory}
+          showSidebar={showSidebar}
+          setShowSidebar={setShowSidebar}
+          tracking={tracking}
+          setTracking={setTracking}
+          mapRef={mapRef}
+          addWaypoint={addWaypoint}
+          removeWaypoint={removeWaypoint}
+          clearRoute={clearRoute}
+          loadRoute={loadRoute}
+          loadHistoryItem={loadHistoryItem}
+          deleteHistoryItem={deleteHistoryItem}
+          selectAlternative={selectAlternative}
+          setDistance={setDistance}
+          setDuration={setDuration}
+          setAlternatives={setAlternatives}
+          nearbyPlaces={nearbyPlaces}
+          showNearbyPlaces={showNearbyPlaces}
+          setShowNearbyPlaces={setShowNearbyPlaces}
+        />
+      </Suspense>
+      <Suspense fallback={<Loader />}>
+        <MapView
+          waypoints={waypoints}
+          setWaypoints={setWaypoints}
+          currentLocation={currentLocation}
+          distance={distance}
+          setDistance={setDistance}
+          duration={duration}
+          setDuration={setDuration}
+          alternatives={alternatives}
+          setAlternatives={setAlternatives}
+          showSidebar={showSidebar}
+          mapRef={mapRef}
+          routeControlRef={routeControlRef}
+        />
+      </Suspense>
     </div>
   );
 }

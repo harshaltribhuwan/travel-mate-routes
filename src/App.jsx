@@ -1,12 +1,17 @@
-import React from "react";
-import DirectionCityMap from "./components/DirectionCityMap/DirectionCityMap.jsx";
+import { lazy, Suspense } from "react";
+const DirectionCityMap = lazy(() =>
+  import("./components/DirectionCityMap/DirectionCityMap.jsx")
+);
 import "leaflet/dist/leaflet.css";
 import "./App.scss";
+import Loader from "./components/DirectionCityMap/Loader.jsx";
 
 export default function App() {
   return (
-    <div className="App">
-      <DirectionCityMap />
-    </div>
+    <Suspense fallback={<Loader />}>
+      <div className="App">
+        <DirectionCityMap />
+      </div>
+    </Suspense>
   );
 }

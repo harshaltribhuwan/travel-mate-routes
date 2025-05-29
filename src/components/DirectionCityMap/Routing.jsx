@@ -5,6 +5,7 @@ import "leaflet-routing-machine";
 import { FiVolume2, FiVolumeX } from "react-icons/fi";
 import "./Routing.scss";
 import { speech, initSpeech } from "../../utils/speech";
+import Loader from "./Loader";
 
 function Routing({
   waypoints,
@@ -393,14 +394,7 @@ function Routing({
         )}
 
         {loading && (
-          <>
-            <div className="route-loader">
-              <div className="route-loader-dot"></div>
-              <div className="route-loader-dot"></div>
-              <div className="route-loader-dot"></div>
-              <div className="route-loader-dot"></div>
-            </div>
-          </>
+          <Loader />
         )}
       </div>
     </>
