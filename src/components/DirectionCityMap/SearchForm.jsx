@@ -6,6 +6,7 @@ import {
   MdClear,
   MdClose,
   MdDirections,
+  MdDragIndicator,
 } from "react-icons/md";
 import "./SearchForm.scss";
 import { defaultCenter } from "../../utils/constants";
@@ -31,6 +32,7 @@ function SearchForm({
   const debounceTimerRef = useRef(null);
   const [focusedSuggestionIndex, setFocusedSuggestionIndex] = useState(-1);
   const [showDirections, setShowDirections] = useState(false);
+  const [draggedId, setDraggedId] = useState(null);
 
   const fetchSuggestions = async (value, type) => {
     if (value.length < 2) {
@@ -185,10 +187,45 @@ function SearchForm({
 
   const handleShowDirections = () => {
     setShowDirections(true);
-    // Add "from" waypoint if not already present
     if (!waypoints.some((wp) => wp.id === "from")) {
       setWaypoints((prev) => [{ id: "from", city: "", coords: null }, ...prev]);
     }
+  };
+
+  const handleDragStart = (e, id) => {
+    e.dataTransfer.setData("text/plain", id);
+    setDraggedId(id);
+  };
+
+  const handleDragOver = (e, id) => {
+    e.preventDefault();
+  };
+
+  const handleDrop = (e, targetId) => {
+    e.preventDefault();
+    const sourceId = e.dataTransfer.getData("text/plain");
+    if (sourceId === targetId) return;
+
+    // Only allow reordering if both source and target are stops (not "from" or "to")
+    if (
+      sourceId === "from" ||
+      sourceId === "to" ||
+      targetId === "from" ||
+      targetId === "to"
+    ) {
+      setDraggedId(null);
+      return;
+    }
+
+    const reorderedWaypoints = Array.from(waypoints);
+    const sourceIndex = waypoints.findIndex((wp) => wp.id === sourceId);
+    const targetIndex = waypoints.findIndex((wp) => wp.id === targetId);
+
+    // Reorder only stops
+    const [movedWaypoint] = reorderedWaypoints.splice(sourceIndex, 1);
+    reorderedWaypoints.splice(targetIndex, 0, movedWaypoint);
+    setWaypoints(reorderedWaypoints);
+    setDraggedId(null);
   };
 
   const toWaypoint = waypoints.find((wp) => wp.id === "to");
@@ -201,85 +238,111 @@ function SearchForm({
 
   return (
     <div className="search-form">
-      {waypoints.map((wp, idx) =>
-        wp.id !== "from" || showDirections || selectedSaved ? (
-          <div key={wp.id} className="input-group">
-            <input
-              id={`${wp.id}-input`}
-              type="text"
-              placeholder={
-                wp.id === "from"
-                  ? "From"
-                  : wp.id === "to"
-                  ? "Destination"
-                  : `Stop ${idx}`
+      <div className="waypoints-container">
+        {waypoints.map((wp, idx) =>
+          wp.id !== "from" || showDirections || selectedSaved ? (
+            <div
+              key={wp.id}
+              className={`input-group ${draggedId === wp.id ? "dragging" : ""}`}
+              draggable={wp.id !== "from" && wp.id !== "to"}
+              onDragStart={
+                wp.id !== "from" && wp.id !== "to"
+                  ? (e) => handleDragStart(e, wp.id)
+                  : undefined
               }
-              className="input-field"
-              value={wp.city}
-              onChange={(e) => handleInputChange(wp.id, e)}
-              onKeyDown={(e) => handleKeyDown(e, wp.id)}
-              autoComplete="off"
-              onFocus={() => setActiveInput(wp.id)}
-              onBlur={() => setTimeout(() => setSuggestions([]), 150)}
-              aria-label={`Enter ${
-                wp.id === "from"
-                  ? "starting location"
-                  : wp.id === "to"
-                  ? "destination"
-                  : "stop"
-              }`}
-            />
-            {wp.id === "from" && (
-              <button
-                type="button"
-                onClick={useMyLocation}
-                className="inside-input-button"
-                aria-label="Use my current location"
-                title="Use My Location"
-              >
-                <MdMyLocation />
-              </button>
-            )}
-            {wp.id !== "from" && wp.id !== "to" && (
-              <button
-                type="button"
-                onClick={() => removeWaypoint(wp.id)}
-                className="inside-input-button"
-                aria-label="Remove stop"
-                title="Remove Stop"
-              >
-                <MdClose />
-              </button>
-            )}
-            {activeInput === wp.id && suggestions.length > 0 && (
-              <ul className="autocomplete-dropdown" role="listbox">
-                {suggestions
-                  .filter((s) => s.inputType === wp.id)
-                  .map((place, index) => (
-                    <li
-                      key={place.place_id || `${place.display_name}-${index}`}
-                      className={`autocomplete-item ${
-                        focusedSuggestionIndex === index ? "focused" : ""
-                      }`}
-                      onMouseDown={(e) => e.preventDefault()}
-                      onClick={() => handleSuggestionClick(place)}
-                      tabIndex={0}
-                      role="option"
-                      aria-selected={focusedSuggestionIndex === index}
-                    >
-                      {place.display_name}
-                    </li>
-                  ))}
-              </ul>
-            )}
-          </div>
-        ) : null
-      )}
+              onDragOver={
+                wp.id !== "from" && wp.id !== "to"
+                  ? (e) => handleDragOver(e, wp.id)
+                  : undefined
+              }
+              onDrop={
+                wp.id !== "from" && wp.id !== "to"
+                  ? (e) => handleDrop(e, wp.id)
+                  : undefined
+              }
+            >
+              {wp.id !== "from" && wp.id !== "to" && (
+                <div className="drag-handle" title="Drag to reorder">
+                  <MdDragIndicator />
+                </div>
+              )}
+              <input
+                id={`${wp.id}-input`}
+                type="text"
+                placeholder={
+                  wp.id === "from"
+                    ? "From"
+                    : wp.id === "to"
+                    ? "Destination"
+                    : `Stop ${idx - 1}`
+                }
+                className="input-field"
+                value={wp.city}
+                onChange={(e) => handleInputChange(wp.id, e)}
+                onKeyDown={(e) => handleKeyDown(e, wp.id)}
+                autoComplete="off"
+                onFocus={() => setActiveInput(wp.id)}
+                onBlur={() => setTimeout(() => setSuggestions([]), 150)}
+                aria-label={`Enter ${
+                  wp.id === "from"
+                    ? "starting location"
+                    : wp.id === "to"
+                    ? "destination"
+                    : "stop"
+                }`}
+              />
+              {wp.id === "from" && (
+                <button
+                  type="button"
+                  onClick={useMyLocation}
+                  className="inside-input-button"
+                  aria-label="Use my current location"
+                  title="Use My Location"
+                >
+                  <MdMyLocation />
+                </button>
+              )}
+              {wp.id !== "from" && wp.id !== "to" && (
+                <button
+                  type="button"
+                  onClick={() => removeWaypoint(wp.id)}
+                  className="inside-input-button"
+                  aria-label="Remove stop"
+                  title="Remove Stop"
+                >
+                  <MdClose />
+                </button>
+              )}
+              {activeInput === wp.id && suggestions.length > 0 && (
+                <ul className="autocomplete-dropdown" role="listbox">
+                  {suggestions
+                    .filter((s) => s.inputType === wp.id)
+                    .map((place, index) => (
+                      <li
+                        key={place.place_id || `${place.display_name}-${index}`}
+                        className={`autocomplete-item ${
+                          focusedSuggestionIndex === index ? "focused" : ""
+                        }`}
+                        onMouseDown={(e) => e.preventDefault()}
+                        onClick={() => handleSuggestionClick(place)}
+                        tabIndex={0}
+                        role="option"
+                        aria-selected={focusedSuggestionIndex === index}
+                      >
+                        {place.display_name}
+                      </li>
+                    ))}
+                </ul>
+              )}
+            </div>
+          ) : null
+        )}
+      </div>
       {hasValidTo && !showDirections && (
         <button
           type="button"
           onClick={handleShowDirections}
-          className=" directions-button"
+          className="directions-button"
           aria-label="Show directions"
           title="Show Directions"
         >

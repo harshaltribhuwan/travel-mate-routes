@@ -327,25 +327,27 @@ function Routing({
 
       {/* Route toggle buttons */}
       <div className="route-toggle-buttons">
-        <button
-          onClick={() =>
-            setActiveRoute(activeRoute === "primary" ? null : "primary")
-          }
-          disabled={!waypoints || waypoints.length < 2}
-          aria-label={
-            activeRoute === "primary"
-              ? "Hide Primary Route"
+        {waypoints && waypoints.length >= 2 && (
+          <button
+            onClick={() =>
+              setActiveRoute(activeRoute === "primary" ? null : "primary")
+            }
+            aria-label={
+              activeRoute === "primary"
+                ? "Hide Primary Route"
+                : hasAltRoute
+                ? "Show Primary Route"
+                : "View Route Details"
+            }
+          >
+            {activeRoute === "primary"
+              ? "Hide Route"
               : hasAltRoute
-              ? "Show Primary Route"
-              : "View Route Details"
-          }
-        >
-          {activeRoute === "primary"
-            ? "Hide Route"
-            : hasAltRoute
-            ? "Main Route"
-            : "View Route Details"}
-        </button>
+              ? "Main Route"
+              : "View Route Details"}
+          </button>
+        )}
+
         {hasAltRoute && (
           <button
             onClick={() => setActiveRoute(activeRoute === "alt" ? null : "alt")}

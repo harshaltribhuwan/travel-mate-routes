@@ -1,12 +1,48 @@
 @import "../../styles/Variables.scss";
 
+.search-form {
+    position: relative;
+}
+
+.waypoints-container {
+    display: flex;
+    flex-direction: column;
+    // gap: space(3);
+}
+
 .input-group {
     position: relative;
+    display: flex;
+    align-items: center;
     margin-bottom: space(3);
+
+    &.dragging {
+        opacity: 0.7;
+        background: color(primary-subtle);
+        border-radius: map-get($radii, md);
+    }
+}
+
+.drag-handle {
+    cursor: grab;
+    padding: space(2);
+    font-size: map-get($font-sizes, base);
+    color: color(text-secondary);
+    display: flex;
+    align-items: center;
+    transition: all map-get($transitions, fast);
+
+    &:hover {
+        color: color(primary);
+    }
+
+    &:active {
+        cursor: grabbing;
+    }
 }
 
 .input-field {
-    width: 85%;
+    flex: 1;
     padding: space(3) space(8) space(3) space(3);
     border: 1px solid color(border);
     border-radius: map-get($radii, md);
@@ -51,7 +87,6 @@
     display: flex;
     gap: space(2);
     justify-content: flex-start;
-    margin-top: space(3);
 }
 
 .action-button {
@@ -126,6 +161,21 @@
             font-size: map-get($font-sizes, sm);
         }
     }
+
+    .input-field {
+        padding: space(3) space(8) space(3) space(5);
+    }
+
+    .action-buttons {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .action-button {
+        width: 100%;
+        height: 44px;
+        border-radius: map-get($radii, md);
+    }
 }
 
 .autocomplete-dropdown {
@@ -164,28 +214,5 @@
     &:hover {
         background: color(primary-subtle);
         color: color(primary);
-    }
-}
-
-@media (max-width: 480px) {
-    .input-field {
-        padding: space(3) space(8) space(3) space(5);
-    }
-
-    .action-buttons {
-        flex-direction: column;
-        align-items: flex-start;
-    }
-
-    .action-button {
-        width: 100%;
-        height: 44px;
-        border-radius: map-get($radii, md);
-    }
-
-    .directions-button {
-        width: 100%;
-        justify-content: center;
-        padding: space(3) space(4);
     }
 }
