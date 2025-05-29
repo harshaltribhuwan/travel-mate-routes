@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect } from "react";
 import {
   MapContainer,
   TileLayer,
@@ -18,11 +18,8 @@ function MapView({
   waypoints,
   setWaypoints,
   currentLocation,
-  distance,
   setDistance,
-  duration,
   setDuration,
-  alternatives,
   setAlternatives,
   showSidebar,
   mapRef,
@@ -107,7 +104,7 @@ function MapView({
           return () => clearTimeout(timeout);
         });
     }
-  }, []);
+  }, [waypoints]);
 
   useEffect(() => {
     // Update map center and zoom based on waypoints
@@ -141,12 +138,6 @@ function MapView({
       prev.map((wp) => (wp.id === id ? { ...wp, coords: [lat, lng] } : wp))
     );
   };
-
-  const allLocations = useMemo(() => {
-    const coords = waypoints.filter((wp) => wp.coords).map((wp) => wp.coords);
-    if (currentLocation) coords.push(currentLocation);
-    return coords;
-  }, [waypoints, currentLocation]);
 
   const hasValidRoute = waypoints.every((wp) =>
     wp.id === "from" || wp.id === "to"

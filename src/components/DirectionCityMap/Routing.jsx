@@ -96,14 +96,6 @@ function Routing({
     voiceEnabledRef.current = voiceEnabled;
   }, [voiceEnabled]);
 
-  const dotStyle = {
-    width: "10px",
-    height: "10px",
-    borderRadius: "50%",
-    backgroundColor: "#4285f4",
-    animation: "bounce 0.6s infinite alternate",
-  };
-
   useEffect(() => {
     if (
       !map ||

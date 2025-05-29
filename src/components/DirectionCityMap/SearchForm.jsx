@@ -9,7 +9,6 @@ import {
   MdDragIndicator,
 } from "react-icons/md";
 import "./SearchForm.scss";
-import { defaultCenter } from "../../utils/constants";
 
 function SearchForm({
   waypoints,
@@ -20,7 +19,6 @@ function SearchForm({
   setActiveInput,
   tracking,
   setTracking,
-  savedHistory,
   setSavedHistory,
   addWaypoint,
   removeWaypoint,
@@ -208,7 +206,7 @@ function SearchForm({
     setDraggedId(id);
   };
 
-  const handleDragOver = (e, id) => {
+  const handleDragOver = (e) => {
     e.preventDefault();
   };
 

@@ -6,11 +6,6 @@ function ChangeView({ center, zoom, waypoints, currentLocation }) {
   const map = useMap();
 
   useEffect(() => {
-    const hasValidWaypoints =
-      Array.isArray(waypoints) &&
-      waypoints.length > 1 &&
-      waypoints.every((wp) => Array.isArray(wp.coords));
-
     const allCoords = [
       ...waypoints
         .filter((wp) => Array.isArray(wp.coords))
