@@ -202,6 +202,31 @@ function Routing({
     }
   };
 
+  const getSpokenInstruction = (instr) => {
+    const lowerText = instr.text.toLowerCase();
+    const dist = getSpokenDistance(instr.distance);
+
+    let connector = "for"; // default
+
+    if (
+      instr.type === "Head" ||
+      lowerText.startsWith("continue") ||
+      lowerText.includes("stay on")
+    ) {
+      connector = "for"; // moving along a road
+    } else if (
+      lowerText.startsWith("turn") ||
+      lowerText.startsWith("make") ||
+      lowerText.startsWith("keep")
+    ) {
+      connector = instr.distance > 200 ? "after" : "at"; // action after certain distance
+    } else if (instr.type === "DestinationReached") {
+      return instr.text; // final message
+    }
+
+    return `${instr.text} ${connector} ${dist}`;
+  };
+
   function showRouteInstructions(type, route) {
     let container = document.querySelector(".leaflet-routing-container");
     if (!container) {
@@ -244,9 +269,7 @@ function Routing({
 
       div.innerHTML = `<span class="maneuver-icon">${maneuverIcon}</span> ${instr.text} (${distance})`;
 
-      const spokenText = `${instr.text} for ${getSpokenDistance(
-        instr.distance
-      )}`;
+      const spokenText = getSpokenInstruction(instr);
 
       div.onclick = (ev) => {
         ev.stopPropagation();
