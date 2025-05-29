@@ -2,8 +2,8 @@ import React, { useEffect, useRef, useState } from "react";
 import { useMap } from "react-leaflet";
 import L from "leaflet";
 import "leaflet-routing-machine";
-// import "../../styles/DirectionCityMap.scss";
-import "./Routing.scss"
+import { FiVolume2, FiVolumeX } from "react-icons/fi";
+import "./Routing.scss";
 
 function Routing({
   waypoints,
@@ -18,37 +18,12 @@ function Routing({
   const [activeRoute, setActiveRoute] = useState(null);
   const [hasAltRoute, setHasAltRoute] = useState(false);
   const [currentStepIndex, setCurrentStepIndex] = useState(-1);
+  const [voiceEnabled, setVoiceEnabled] = useState(false);
 
-const getManeuverIcon = (type) => {
-  const normalizedType = type?.toLowerCase() || "";
-
-  if (normalizedType.includes("right") && normalizedType.includes("sharp"))
-    return "⇗";
-  if (normalizedType.includes("right") && normalizedType.includes("slight"))
-    return "↱";
-  if (normalizedType.includes("right")) return "→";
-
-  if (normalizedType.includes("left") && normalizedType.includes("sharp"))
-    return "⇖";
-  if (normalizedType.includes("left") && normalizedType.includes("slight"))
-    return "↰";
-  if (normalizedType.includes("left")) return "←";
-
-  if (normalizedType.includes("uturn")) return "↩";
-  if (
-    normalizedType.includes("continue") ||
-    normalizedType.includes("straight")
-  )
-    return "↑";
-  if (normalizedType.includes("roundabout")) return "↻";
-  if (normalizedType.includes("merge")) return "⇉";
-  if (normalizedType.includes("ramp")) return "↘";
-  if (normalizedType.includes("exit")) return "⤴";
-  if (normalizedType.includes("destination")) return "🏁";
-
-  return "→"; // default fallback
-};
-
+  const toggleVoice = () => {
+    setVoiceEnabled((prev) => !prev);
+  };
+  const synth = window.speechSynthesis;
 
   // Helper: Get route roads
   const getRouteRoads = (instructions) => {
@@ -70,7 +45,6 @@ const getManeuverIcon = (type) => {
     return Array.from(roads).slice(0, 3).join(", ") || "Main Roads";
   };
 
-  
   useEffect(() => {
     if (
       currentLocation &&
@@ -79,7 +53,8 @@ const getManeuverIcon = (type) => {
       controlRef.current._routes.length > 0 &&
       waypoints.every((wp) => wp.coords)
     ) {
-      const routeIndex = activeRoute === "alt" && controlRef.current._routes.length > 1 ? 1 : 0;
+      const routeIndex =
+        activeRoute === "alt" && controlRef.current._routes.length > 1 ? 1 : 0;
       const currentRoute = controlRef.current._routes[routeIndex];
       const instructions = currentRoute?.instructions || [];
       const coordinates = currentRoute?.coordinates || [];
@@ -89,8 +64,12 @@ const getManeuverIcon = (type) => {
       instructions.forEach((instr, idx) => {
         const coord = coordinates[instr.index];
         if (coord) {
-          const distance = L.latLng(currentLocation).distanceTo([coord.lat, coord.lng]);
-          if (distance < minDistance && distance < 300) { // Within 300 meters
+          const distance = L.latLng(currentLocation).distanceTo([
+            coord.lat,
+            coord.lng,
+          ]);
+          if (distance < minDistance && distance < 300) {
+            // Within 300 meters
             minDistance = distance;
             currentStep = idx;
           }
@@ -101,7 +80,6 @@ const getManeuverIcon = (type) => {
     }
   }, [currentLocation, activeRoute, waypoints, controlRef.current]);
 
-  // Setup routing control
   useEffect(() => {
     if (
       !map ||
@@ -122,7 +100,6 @@ const getManeuverIcon = (type) => {
       return;
     }
 
-    // Avoid recreating control if it already exists
     if (controlRef.current) {
       controlRef.current.setWaypoints(
         waypoints.map((wp) => L.latLng(wp.coords[0], wp.coords[1]))
@@ -208,9 +185,10 @@ const getManeuverIcon = (type) => {
     const distanceKm = (route.summary.totalDistance / 1000).toFixed(1);
     const roads = getRouteRoads(route.instructions);
     const totalSeconds = route.summary.totalTime;
-    const durationText = totalSeconds < 3600
-      ? `${Math.round(totalSeconds / 60)} min`
-      : `${(totalSeconds / 3600).toFixed(2)} h`;
+    const durationText =
+      totalSeconds < 3600
+        ? `${Math.round(totalSeconds / 60)} min`
+        : `${(totalSeconds / 3600).toFixed(2)} h`;
 
     const header = document.createElement("div");
     header.className = "popup-header";
@@ -226,10 +204,22 @@ const getManeuverIcon = (type) => {
       div.className = `leaflet-routing-instruction leaflet-routing-instruction-text ${
         idx === currentStepIndex ? "current-step" : ""
       }`;
+
+      // Only show text, skip maneuver icon in speech (but still show icon visually)
       const maneuverIcon = getManeuverIcon(instr.type);
-      div.innerHTML = `<span class="maneuver-icon">${maneuverIcon}</span> ${instr.text} (${(instr.distance / 1000).toFixed(1)} km)`;
+      div.innerHTML = `<span class="maneuver-icon">${maneuverIcon}</span> ${
+        instr.text
+      } (${(instr.distance / 1000).toFixed(1)} km)`;
+
       div.onclick = (ev) => {
         ev.stopPropagation();
+        if (voiceEnabled && synth) {
+          if (synth.speaking) {
+            synth.cancel();
+          }
+          const utterThis = new SpeechSynthesisUtterance(instr.text);
+          synth.speak(utterThis);
+        }
         const coord = route.coordinates[instr.index];
         if (coord) {
           map.panTo([coord.lat, coord.lng], { animate: true });
@@ -258,35 +248,81 @@ const getManeuverIcon = (type) => {
     }
   }
 
+  // Your original getManeuverIcon unchanged (for visual icons)
+  function getManeuverIcon(type) {
+    const normalizedType = type?.toLowerCase() || "";
+
+    if (normalizedType.includes("right") && normalizedType.includes("sharp"))
+      return "⇗";
+    if (normalizedType.includes("right") && normalizedType.includes("slight"))
+      return "↱";
+    if (normalizedType.includes("right")) return "→";
+
+    if (normalizedType.includes("left") && normalizedType.includes("sharp"))
+      return "⇖";
+    if (normalizedType.includes("left") && normalizedType.includes("slight"))
+      return "↰";
+    if (normalizedType.includes("left")) return "←";
+
+    if (normalizedType.includes("uturn")) return "↩";
+    if (
+      normalizedType.includes("continue") ||
+      normalizedType.includes("straight")
+    )
+      return "↑";
+    if (normalizedType.includes("roundabout")) return "↻";
+    if (normalizedType.includes("merge")) return "⇉";
+    if (normalizedType.includes("ramp")) return "↘";
+    if (normalizedType.includes("exit")) return "⤴";
+    if (normalizedType.includes("destination")) return "🏁";
+
+    return "→"; // default fallback
+  }
+
   return (
-    <div className="route-toggle-buttons">
+    <>
+      {/* Voice toggle */}
       <button
-        onClick={() =>
-          setActiveRoute(activeRoute === "primary" ? null : "primary")
-        }
-        disabled={!waypoints || waypoints.length < 2}
-        aria-label={
-          activeRoute === "primary"
-            ? "Hide Primary Route"
-            : "Show Primary Route"
-        }
+        className={`voice-toggle-button ${voiceEnabled ? "active" : ""}`}
+        onClick={toggleVoice}
+        aria-pressed={voiceEnabled}
+        data-title={voiceEnabled ? "Voice Directions" : "Disable Voice"}
+        type="button"
       >
-        {activeRoute === "primary" ? "Hide Route" : "Primary Route"}
+        <span className="icon">
+          {voiceEnabled ? <FiVolume2 /> : <FiVolumeX />}
+        </span>
       </button>
-      {hasAltRoute && (
+
+      {/* Route toggle buttons */}
+      <div className="route-toggle-buttons">
         <button
-          onClick={() => setActiveRoute(activeRoute === "alt" ? null : "alt")}
+          onClick={() =>
+            setActiveRoute(activeRoute === "primary" ? null : "primary")
+          }
           disabled={!waypoints || waypoints.length < 2}
           aria-label={
-            activeRoute === "alt"
-              ? "Hide Alternative Route"
-              : "Show Alternative Route"
+            activeRoute === "primary"
+              ? "Hide Primary Route"
+              : "Show Primary Route"
           }
         >
-          {activeRoute === "alt" ? "Hide Route" : "Alternative Route"}
+          {activeRoute === "primary" ? "Hide Route" : "Primary Route"}
         </button>
-      )}
-    </div>
+        {hasAltRoute && (
+          <button
+            onClick={() => setActiveRoute(activeRoute === "alt" ? null : "alt")}
+            aria-label={
+              activeRoute === "alt"
+                ? "Hide Alternative Route"
+                : "Show Alternative Route"
+            }
+          >
+            {activeRoute === "alt" ? "Hide Alt" : "Alt Route"}
+          </button>
+        )}
+      </div>
+    </>
   );
 }
 
