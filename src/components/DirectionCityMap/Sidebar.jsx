@@ -297,7 +297,7 @@ function Sidebar({
             emptyMessage="No saved routes"
           />
           <CollapsibleSection
-            title="Nearby Destination"
+            title="Nearby Places"
             isOpen={showNearbyPlaces}
             setIsOpen={setShowNearbyPlaces}
             items={nearbyPlaces}
