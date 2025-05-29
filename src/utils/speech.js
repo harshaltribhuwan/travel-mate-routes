@@ -27,14 +27,11 @@ const initSpeech = async () => {
 
         const voices = await getVoicesAsync();
 
-        console.log("Available voices:", voices.map(v => v.name));
-
         const femaleVoice = voices.find(voice =>
             voice.name === "Google US English"
         );
 
         if (femaleVoice) {
-            console.log("Using voice:", femaleVoice.name);
             speech.setVoice(femaleVoice.name);
         } else {
             console.warn("Preferred female voice not found, using default");
