@@ -91,6 +91,8 @@
         z-index: 1000;
         transition: all map-get($transitions, fast);
 
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+
         &:hover {
             background: color(primary);
             color: color(surface);
