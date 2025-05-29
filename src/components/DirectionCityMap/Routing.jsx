@@ -21,9 +21,16 @@ function Routing({
   const [currentStepIndex, setCurrentStepIndex] = useState(-1);
   const [voiceEnabled, setVoiceEnabled] = useState(true);
   const [loading, setLoading] = useState(false);
+  const voiceEnabledRef = useRef(voiceEnabled);
 
   const toggleVoice = () => {
-    setVoiceEnabled((prev) => !prev);
+    setVoiceEnabled((prev) => {
+      const newValue = !prev;
+      if (!newValue && speech && speech.cancel) {
+        speech.cancel(); // Stop voice if being turned off
+      }
+      return newValue;
+    });
   };
 
   // Helper: Get route roads
@@ -85,6 +92,10 @@ function Routing({
     initSpeech();
   }, []);
 
+  useEffect(() => {
+    voiceEnabledRef.current = voiceEnabled;
+  }, [voiceEnabled]);
+
   const dotStyle = {
     width: "10px",
     height: "10px",
@@ -93,103 +104,102 @@ function Routing({
     animation: "bounce 0.6s infinite alternate",
   };
 
-useEffect(() => {
-  if (
-    !map ||
-    !waypoints ||
-    waypoints.length < 2 ||
-    !waypoints.every(
-      (wp) => wp.coords && Array.isArray(wp.coords) && wp.coords.length === 2
-    )
-  ) {
-    if (controlRef.current) {
-      map.removeControl(controlRef.current);
-      controlRef.current = null;
-    }
-    setDistance(null);
-    setDuration(null);
-    setAlternatives([]);
-    clearRouteInstructions();
-    setLoading(false);
-    return;
-  }
-
-  setLoading(true); // Show loader before starting routing
-
-  if (controlRef.current) {
-    controlRef.current.setWaypoints(
-      waypoints.map((wp) => L.latLng(wp.coords[0], wp.coords[1]))
-    );
-    return;
-  }
-
-  const control = L.Routing.control({
-    waypoints: waypoints.map((wp) => L.latLng(wp.coords[0], wp.coords[1])),
-    routeWhileDragging: true,
-    showAlternatives: true,
-    lineOptions: {
-      styles: [{ color: "#1a73e8", opacity: 1, weight: 6 }],
-      extendToWaypoints: true,
-      missingRouteTolerance: 0,
-    },
-    altLineOptions: {
-      styles: [{ color: "#757575", opacity: 0.6, weight: 5 }],
-      extendToWaypoints: true,
-      missingRouteTolerance: 0,
-    },
-    router: L.Routing.osrmv1({
-      serviceUrl: "https://router.project-osrm.org/route/v1",
-      profile: "driving",
-      alternatives: true,
-      steps: true,
-    }),
-    createMarker: () => null,
-    containerClassName: "leaflet-routing-container-hidden",
-    show: false,
-    collapsible: false,
-  })
-    .on("routesfound", (e) => {
-      setLoading(false); // Hide loader when routes found
-      const routes = e.routes;
-      if (routes[0]) {
-        setDistance(routes[0].summary.totalDistance);
-        setDuration(routes[0].summary.totalTime);
-        setAlternatives(
-          routes.map((r, idx) => ({
-            index: idx,
-            distance: r.summary.totalDistance,
-            duration: r.summary.totalTime,
-            coordinates: r.coordinates,
-            instructions: r.instructions,
-          }))
-        );
-
-        if (activeRoute === "primary") {
-          showRouteInstructions("primary", routes[0]);
-        } else if (activeRoute === "alt" && routes[1]) {
-          showRouteInstructions("alt", routes[1]);
-        } else {
-          clearRouteInstructions();
-        }
-
-        setHasAltRoute(!!routes[1]);
+  useEffect(() => {
+    if (
+      !map ||
+      !waypoints ||
+      waypoints.length < 2 ||
+      !waypoints.every(
+        (wp) => wp.coords && Array.isArray(wp.coords) && wp.coords.length === 2
+      )
+    ) {
+      if (controlRef.current) {
+        map.removeControl(controlRef.current);
+        controlRef.current = null;
       }
-    })
-    .addTo(map);
-
-  controlRef.current = control;
-  routeControlRef.current = control;
-
-  return () => {
-    if (controlRef.current) {
-      map.removeControl(controlRef.current);
-      controlRef.current = null;
+      setDistance(null);
+      setDuration(null);
+      setAlternatives([]);
+      clearRouteInstructions();
+      setLoading(false);
+      return;
     }
-    clearRouteInstructions();
-    setLoading(false);
-  };
-}, [map, waypoints, setDistance, setDuration, setAlternatives, activeRoute]);
 
+    setLoading(true); // Show loader before starting routing
+
+    if (controlRef.current) {
+      controlRef.current.setWaypoints(
+        waypoints.map((wp) => L.latLng(wp.coords[0], wp.coords[1]))
+      );
+      return;
+    }
+
+    const control = L.Routing.control({
+      waypoints: waypoints.map((wp) => L.latLng(wp.coords[0], wp.coords[1])),
+      routeWhileDragging: true,
+      showAlternatives: true,
+      lineOptions: {
+        styles: [{ color: "#1a73e8", opacity: 1, weight: 6 }],
+        extendToWaypoints: true,
+        missingRouteTolerance: 0,
+      },
+      altLineOptions: {
+        styles: [{ color: "#757575", opacity: 0.6, weight: 5 }],
+        extendToWaypoints: true,
+        missingRouteTolerance: 0,
+      },
+      router: L.Routing.osrmv1({
+        serviceUrl: "https://router.project-osrm.org/route/v1",
+        profile: "driving",
+        alternatives: true,
+        steps: true,
+      }),
+      createMarker: () => null,
+      containerClassName: "leaflet-routing-container-hidden",
+      show: false,
+      collapsible: false,
+    })
+      .on("routesfound", (e) => {
+        setLoading(false); // Hide loader when routes found
+        const routes = e.routes;
+        if (routes[0]) {
+          setDistance(routes[0].summary.totalDistance);
+          setDuration(routes[0].summary.totalTime);
+          setAlternatives(
+            routes.map((r, idx) => ({
+              index: idx,
+              distance: r.summary.totalDistance,
+              duration: r.summary.totalTime,
+              coordinates: r.coordinates,
+              instructions: r.instructions,
+            }))
+          );
+
+          if (activeRoute === "primary") {
+            showRouteInstructions("primary", routes[0]);
+          } else if (activeRoute === "alt" && routes[1]) {
+            showRouteInstructions("alt", routes[1]);
+          } else {
+            clearRouteInstructions();
+          }
+
+          setHasAltRoute(!!routes[1]);
+        }
+      })
+      .addTo(map);
+
+    controlRef.current = control;
+    routeControlRef.current = control;
+
+    return () => {
+      if (controlRef.current) {
+        map.removeControl(controlRef.current);
+        controlRef.current = null;
+      }
+      clearRouteInstructions();
+      setLoading(false);
+    };
+  }, [map, waypoints, setDistance, setDuration, setAlternatives, activeRoute]);
 
   function showRouteInstructions(type, route) {
     let container = document.querySelector(".leaflet-routing-container");
@@ -233,7 +243,7 @@ useEffect(() => {
       div.onclick = (ev) => {
         ev.stopPropagation();
 
-        if (voiceEnabled && speech && speech.speak) {
+        if (voiceEnabledRef.current && speech && speech.speak) {
           if (speech.speaking()) {
             speech.cancel();
           }
@@ -245,6 +255,7 @@ useEffect(() => {
           map.panTo([coord.lat, coord.lng], { animate: true });
         }
       };
+
       instructionsDiv.appendChild(div);
     });
     container.appendChild(instructionsDiv);
