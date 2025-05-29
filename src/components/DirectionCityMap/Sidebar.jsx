@@ -7,6 +7,11 @@ import { formatDistance, formatDuration } from "../../utils/utils";
 import { defaultCenter } from "../../utils/constants";
 import "./Sidebar.scss";
 
+function capitalizeWords(str) {
+  return str.replace(/\b\w/g, (char) => char.toUpperCase());
+}
+
+
 function Sidebar({
   waypoints,
   setWaypoints,
@@ -319,7 +324,10 @@ function Sidebar({
               >
                 <p className="nearby-place-text">
                   <span className="place-name">{place.name}</span>
-                  <strong className="place-type"> ({place.type})</strong>
+                  <strong className="place-type">
+                    {" "}
+                    ({capitalizeWords(place.type)})
+                  </strong>
                 </p>
               </div>
             )}
