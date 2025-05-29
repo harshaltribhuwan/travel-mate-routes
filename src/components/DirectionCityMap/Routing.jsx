@@ -308,11 +308,17 @@ function Routing({
           disabled={!waypoints || waypoints.length < 2}
           aria-label={
             activeRoute === "primary"
-              ? "Hide Main Route"
-              : "Show Main Route"
+              ? "Hide Primary Route"
+              : hasAltRoute
+              ? "Show Primary Route"
+              : "View Route Details"
           }
         >
-          {activeRoute === "primary" ? "Hide Route" : "Main Route"}
+          {activeRoute === "primary"
+            ? "Hide Route"
+            : hasAltRoute
+            ? "Main Route"
+            : "View Route Details"}
         </button>
         {hasAltRoute && (
           <button
