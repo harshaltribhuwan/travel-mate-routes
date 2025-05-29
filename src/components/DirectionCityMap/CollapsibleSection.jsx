@@ -6,26 +6,50 @@ function CollapsibleSection({
   title,
   isOpen,
   setIsOpen,
-  items,
+  items = [],
   renderItem,
   itemKey,
-  emptyMessage,
+  emptyMessage = "No items found.",
+  id = null,
 }) {
+  const sectionId = id || title.toLowerCase().replace(/\s+/g, "-");
+  const contentId = `${sectionId}-content`;
+
+  const toggleSection = () => setIsOpen(!isOpen);
+
+  const handleKeyDown = (e) => {
+    if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      toggleSection();
+    }
+  };
+
   return (
-    <div className={title.toLowerCase().replace(/\s/g, "-")}>
-      <h3 onClick={() => setIsOpen(!isOpen)} className="collapsible-header">
+    <div className={`collapsible-section ${sectionId}`}>
+      <h3
+        className="collapsible-header"
+        onClick={toggleSection}
+        onKeyDown={handleKeyDown}
+        role="button"
+        tabIndex={0}
+        aria-expanded={isOpen}
+        aria-controls={contentId}
+      >
         {title} {isOpen ? <MdExpandMore /> : <MdChevronRight />}
       </h3>
+
       {isOpen && (
-        <div className="collapsible-content">
-          {items && items.length > 0 ? (
+        <div className="collapsible-content" id={contentId}>
+          {items.length > 0 ? (
             <ul>
               {items.map((item, idx) => (
-                <li key={item[itemKey] || idx}>{renderItem(item, idx)}</li>
+                <li key={item[itemKey] || `${sectionId}-${idx}`}>
+                  {renderItem(item, idx)}
+                </li>
               ))}
             </ul>
           ) : (
-            emptyMessage && <p className="empty-message">{emptyMessage}</p>
+            <p className="empty-message">{emptyMessage}</p>
           )}
         </div>
       )}

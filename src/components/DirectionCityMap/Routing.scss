@@ -203,7 +203,7 @@
         &:hover:not(:disabled) {
             background: color(primary-subtle);
             color: color(primary);
-            border-color: color(primary);
+            // border-color: color(primary);
         }
 
         &:focus {
@@ -239,7 +239,7 @@
     .leaflet-routing-container {
         padding: space(2);
         border-radius: map-get($radii, sm);
-        top: 115px;
+        top: 80px;
         left: space(2);
         right: space(2);
         margin: 0 auto;

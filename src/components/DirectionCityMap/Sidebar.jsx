@@ -5,7 +5,7 @@ import SearchForm from "./SearchForm";
 import CollapsibleSection from "./CollapsibleSection";
 import { formatDistance, formatDuration } from "../../utils/utils";
 import { defaultCenter } from "../../utils/constants";
-import "./Sidebar.scss"
+import "./Sidebar.scss";
 
 function Sidebar({
   waypoints,
@@ -45,18 +45,24 @@ function Sidebar({
   setDuration,
   setAlternatives,
 }) {
+  // Use useEffect to invalidate map size only when sidebar visibility or mapRef changes
   useEffect(() => {
     if (mapRef.current) {
-      setTimeout(() => {
+      // Use requestAnimationFrame instead of setTimeout for better sync with browser repaint
+      const frame = requestAnimationFrame(() => {
         mapRef.current.invalidateSize();
-      }, 100);
+      });
+      return () => cancelAnimationFrame(frame);
     }
   }, [showSidebar, mapRef]);
 
+  // Save route only if waypoints are valid and not all at the same point
   const saveRoute = () => {
     if (
       waypoints.length >= 2 &&
-      waypoints.every((wp) => wp.coords && wp.coords.length === 2) &&
+      waypoints.every(
+        (wp) => Array.isArray(wp.coords) && wp.coords.length === 2
+      ) &&
       !waypoints.every(
         (wp, i) =>
           i > 0 &&
@@ -77,10 +83,12 @@ function Sidebar({
     }
   };
 
+  // Delete route by index safely
   const deleteRoute = (index) => {
     setSavedRoutes((prev) => prev.filter((_, i) => i !== index));
   };
 
+  // Reset waypoints and route info with fallback for map ref
   const handleClearRoute = () => {
     setWaypoints([
       { id: "from", city: "", coords: defaultCenter },
@@ -90,6 +98,7 @@ function Sidebar({
     setDuration(null);
     setAlternatives([]);
     setTracking(false);
+
     if (mapRef.current) {
       mapRef.current.setView(defaultCenter, 5);
       mapRef.current.invalidateSize();
@@ -97,20 +106,37 @@ function Sidebar({
     clearRoute();
   };
 
+  // Load a saved route and fit map bounds with padding fallback
   const handleLoadRoute = (route) => {
+    if (
+      !route ||
+      !Array.isArray(route.waypoints) ||
+      route.waypoints.length === 0
+    )
+      return;
+
     setWaypoints(route.waypoints);
     setDistance(route.distance);
     setDuration(route.duration);
     setAlternatives(route.alternatives || []);
+
     if (mapRef.current) {
-      const bounds = L.latLngBounds(route.waypoints.map((wp) => wp.coords));
-      mapRef.current.fitBounds(bounds, { padding: [50, 50] });
-      mapRef.current.invalidateSize();
+      try {
+        const bounds = L.latLngBounds(route.waypoints.map((wp) => wp.coords));
+        mapRef.current.fitBounds(bounds, { padding: [50, 50] });
+        mapRef.current.invalidateSize();
+      } catch {
+        // fallback: center on first waypoint or default center
+        const fallbackCenter = route.waypoints[0]?.coords || defaultCenter;
+        mapRef.current.setView(fallbackCenter, 10);
+      }
     }
+
     loadRoute(route);
     setShowSidebar(false);
   };
 
+  // Select alternative route and invalidate map size for UI update
   const handleSelectAlternative = (index) => {
     selectAlternative(index);
     if (mapRef.current) {
@@ -194,14 +220,18 @@ function Sidebar({
                 <button
                   onClick={() => handleLoadRoute(route)}
                   className="load-route"
-                  aria-label={`Load route from ${route.waypoints[0].city} to ${
-                    route.waypoints[route.waypoints.length - 1].city
+                  aria-label={`Load route from ${
+                    route.waypoints[0]?.city || "Unknown"
+                  } to ${
+                    route.waypoints[route.waypoints.length - 1]?.city ||
+                    "Unknown"
                   }`}
                   title="Load Route"
                 >
-                  {route.waypoints[0].city} to{" "}
-                  {route.waypoints[route.waypoints.length - 1].city} (
-                  {formatDistance(route.distance)},{" "}
+                  {route.waypoints[0]?.city || "Unknown"} to{" "}
+                  {route.waypoints[route.waypoints.length - 1]?.city ||
+                    "Unknown"}{" "}
+                  ({formatDistance(route.distance)},{" "}
                   {formatDuration(route.duration)})
                 </button>
                 <button

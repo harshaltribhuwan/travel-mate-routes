@@ -1,4 +1,4 @@
-import React, { useRef, useEffect } from "react";
+import React, { useRef, useEffect, useState } from "react";
 import { MdMyLocation, MdAdd, MdSave, MdClear, MdClose } from "react-icons/md";
 import "./SearchForm.scss";
 import { defaultCenter } from "../../utils/constants";
@@ -21,6 +21,7 @@ function SearchForm({
   setShowSidebar,
 }) {
   const debounceTimerRef = useRef(null);
+  const [focusedSuggestionIndex, setFocusedSuggestionIndex] = useState(-1);
 
   const fetchSuggestions = async (value, type) => {
     if (value.length < 2) {
@@ -63,6 +64,7 @@ function SearchForm({
       prev.map((wp) => (wp.id === id ? { ...wp, city: value } : wp))
     );
     setActiveInput(id);
+    setFocusedSuggestionIndex(-1);
     if (debounceTimerRef.current) clearTimeout(debounceTimerRef.current);
     debounceTimerRef.current = setTimeout(
       () => fetchSuggestions(value, id),
@@ -71,6 +73,7 @@ function SearchForm({
   };
 
   const handleSuggestionClick = (place) => {
+  console.log("place",place)
     const lat = parseFloat(place.lat);
     const lon = parseFloat(place.lon);
     const type = place.inputType;
@@ -94,8 +97,28 @@ function SearchForm({
     });
     setSuggestions([]);
     setActiveInput(null);
-    if (type === "to") {
-      setShowSidebar(false);
+    setFocusedSuggestionIndex(-1);
+    if (type === "to") setShowSidebar(false);
+  };
+
+  const handleKeyDown = (e, wpId) => {
+    const relevantSuggestions = suggestions.filter((s) => s.inputType === wpId);
+    if (e.key === "ArrowDown") {
+      e.preventDefault();
+      setFocusedSuggestionIndex((prev) =>
+        prev < relevantSuggestions.length - 1 ? prev + 1 : 0
+      );
+    } else if (e.key === "ArrowUp") {
+      e.preventDefault();
+      setFocusedSuggestionIndex((prev) =>
+        prev > 0 ? prev - 1 : relevantSuggestions.length - 1
+      );
+    } else if (e.key === "Enter" && focusedSuggestionIndex >= 0) {
+      e.preventDefault();
+      handleSuggestionClick(relevantSuggestions[focusedSuggestionIndex]);
+    } else if (e.key === "Escape") {
+      setSuggestions([]);
+      setActiveInput(null);
     }
   };
 
@@ -159,6 +182,7 @@ function SearchForm({
             className="input-field"
             value={wp.city}
             onChange={(e) => handleInputChange(wp.id, e)}
+            onKeyDown={(e) => handleKeyDown(e, wp.id)}
             autoComplete="off"
             onFocus={() => setActiveInput(wp.id)}
             onBlur={() => setTimeout(() => setSuggestions([]), 150)}
@@ -193,18 +217,20 @@ function SearchForm({
             </button>
           )}
           {activeInput === wp.id && suggestions.length > 0 && (
-            <ul className="autocomplete-dropdown">
+            <ul className="autocomplete-dropdown" role="listbox">
               {suggestions
                 .filter((s) => s.inputType === wp.id)
-                .map((place, idx) => (
+                .map((place, index) => (
                   <li
-                    key={idx}
-                    className="autocomplete-item"
+                    key={place.place_id || `${place.display_name}-${index}`}
+                    className={`autocomplete-item ${
+                      focusedSuggestionIndex === index ? "focused" : ""
+                    }`}
                     onMouseDown={(e) => e.preventDefault()}
                     onClick={() => handleSuggestionClick(place)}
                     tabIndex={0}
                     role="option"
-                    aria-selected={false}
+                    aria-selected={focusedSuggestionIndex === index}
                   >
                     {place.display_name}
                   </li>
