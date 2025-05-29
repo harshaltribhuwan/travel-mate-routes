@@ -12,7 +12,7 @@ import Routing from "./Routing";
 import { CustomMarkerIcon } from "../../utils/utils";
 import { defaultCenter } from "../../utils/constants";
 import TileLayerSwitcher from "./TileLayerSwitcher";
-import "./MapView.scss"
+import "./MapView.scss";
 
 function MapView({
   waypoints,
@@ -42,7 +42,7 @@ function MapView({
     "Standard View": {
       name: "Standard View",
       url: "https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png",
-      attribution: '&copy; <a href="https://carto.com/">CartoDB</a>',
+      attribution: '© <a href="https://carto.com/">CartoDB</a>',
     },
     "Satellite View": {
       name: "Satellite View",
@@ -53,25 +53,48 @@ function MapView({
     "Dark Mode": {
       name: "Dark Mode",
       url: "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png",
-      attribution: '&copy; <a href="https://carto.com/">CartoDB</a>',
+      attribution: '© <a href="https://carto.com/">CartoDB</a>',
     },
   };
 
   useEffect(() => {
     if (!navigator.geolocation) return;
 
-    navigator.permissions
-      ?.query({ name: "geolocation" })
-      .then((permissionStatus) => {
-        if (permissionStatus.state === "granted") {
-          navigator.geolocation.getCurrentPosition(
-            (pos) => {
-              setMapCenter([pos.coords.latitude, pos.coords.longitude]);
-              setMapZoom(13);
-            },
-            () => {}
-          );
-        } else {
+    // Only set initial center if no waypoints are provided
+    const toWaypoint = waypoints.find((wp) => wp.id === "to");
+    const hasValidTo =
+      toWaypoint?.coords &&
+      Array.isArray(toWaypoint.coords) &&
+      toWaypoint.coords.length === 2 &&
+      !isNaN(toWaypoint.coords[0]) &&
+      !isNaN(toWaypoint.coords[1]);
+
+    if (!hasValidTo) {
+      navigator.permissions
+        ?.query({ name: "geolocation" })
+        .then((permissionStatus) => {
+          if (permissionStatus.state === "granted") {
+            navigator.geolocation.getCurrentPosition(
+              (pos) => {
+                setMapCenter([pos.coords.latitude, pos.coords.longitude]);
+                setMapZoom(13);
+              },
+              () => {}
+            );
+          } else {
+            const timeout = setTimeout(() => {
+              navigator.geolocation.getCurrentPosition(
+                (pos) => {
+                  setMapCenter([pos.coords.latitude, pos.coords.longitude]);
+                  setMapZoom(13);
+                },
+                () => {}
+              );
+            }, 5000);
+            return () => clearTimeout(timeout);
+          }
+        })
+        .catch(() => {
           const timeout = setTimeout(() => {
             navigator.geolocation.getCurrentPosition(
               (pos) => {
@@ -81,24 +104,36 @@ function MapView({
               () => {}
             );
           }, 5000);
-
           return () => clearTimeout(timeout);
-        }
-      })
-      .catch(() => {
-        const timeout = setTimeout(() => {
-          navigator.geolocation.getCurrentPosition(
-            (pos) => {
-              setMapCenter([pos.coords.latitude, pos.coords.longitude]);
-              setMapZoom(13);
-            },
-            () => {}
-          );
-        }, 5000);
-
-        return () => clearTimeout(timeout);
-      });
+        });
+    }
   }, []);
+
+  useEffect(() => {
+    // Update map center and zoom based on waypoints
+    const toWaypoint = waypoints.find((wp) => wp.id === "to");
+    const fromWaypoint = waypoints.find((wp) => wp.id === "from");
+    const hasValidTo =
+      toWaypoint?.coords &&
+      Array.isArray(toWaypoint.coords) &&
+      toWaypoint.coords.length === 2 &&
+      !isNaN(toWaypoint.coords[0]) &&
+      !isNaN(toWaypoint.coords[1]);
+    const hasValidFrom =
+      fromWaypoint?.coords &&
+      Array.isArray(fromWaypoint.coords) &&
+      fromWaypoint.coords.length === 2 &&
+      !isNaN(fromWaypoint.coords[0]) &&
+      !isNaN(fromWaypoint.coords[1]);
+
+    if (hasValidTo) {
+      setMapCenter(toWaypoint.coords);
+      setMapZoom(13);
+    } else if (hasValidFrom) {
+      setMapCenter(fromWaypoint.coords);
+      setMapZoom(13);
+    }
+  }, [waypoints]);
 
   const handleDragEnd = (id, e) => {
     const { lat, lng } = e.target.getLatLng();
@@ -113,9 +148,18 @@ function MapView({
     return coords;
   }, [waypoints, currentLocation]);
 
+  const hasValidRoute = waypoints.every((wp) =>
+    wp.id === "from" || wp.id === "to"
+      ? wp.coords &&
+        Array.isArray(wp.coords) &&
+        wp.coords.length === 2 &&
+        !isNaN(wp.coords[0]) &&
+        !isNaN(wp.coords[1])
+      : true
+  );
+
   return (
     <div className={`map-container ${!showSidebar ? "full-width" : ""}`}>
-      {/* Layer Switcher */}
       <TileLayerSwitcher
         tileLayers={tileLayers}
         currentTileLayer={currentTileLayer}
@@ -176,13 +220,14 @@ function MapView({
             )
         )}
 
-        {waypoints.every((wp) => wp.coords) && (
+        {hasValidRoute && (
           <Routing
             waypoints={waypoints}
             setDistance={setDistance}
             setDuration={setDuration}
             setAlternatives={setAlternatives}
             routeControlRef={routeControlRef}
+            currentLocation={currentLocation}
           />
         )}
       </MapContainer>
