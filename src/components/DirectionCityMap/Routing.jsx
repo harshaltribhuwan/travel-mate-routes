@@ -197,7 +197,7 @@ function Routing({
     const header = document.createElement("div");
     header.className = "popup-header";
     header.innerHTML = `<h3>${
-      type === "primary" ? "Primary Route" : "Alternative Route"
+      type === "primary" ? "Main Route" : "Alternative Route"
     }</h3><p>${distanceKm} km, ${durationText} via ${roads}</p>`;
     container.appendChild(header);
 
@@ -308,11 +308,11 @@ function Routing({
           disabled={!waypoints || waypoints.length < 2}
           aria-label={
             activeRoute === "primary"
-              ? "Hide Primary Route"
-              : "Show Primary Route"
+              ? "Hide Main Route"
+              : "Show Main Route"
           }
         >
-          {activeRoute === "primary" ? "Hide Route" : "Primary Route"}
+          {activeRoute === "primary" ? "Hide Route" : "Main Route"}
         </button>
         {hasAltRoute && (
           <button
@@ -323,7 +323,7 @@ function Routing({
                 : "Show Alternative Route"
             }
           >
-            {activeRoute === "alt" ? "Hide Alt" : "Alt Route"}
+            {activeRoute === "alt" ? "Hide Alt" : "Alternate Route"}
           </button>
         )}
       </div>
