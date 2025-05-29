@@ -66,9 +66,21 @@ export default function DirectionCityMap() {
         name: el.tags.name || "Unnamed",
         lat: el.lat,
         lng: el.lon,
-        type: el.tags.amenity || el.tags.shop || "unknown",
+        type:
+          el.tags.amenity ||
+          el.tags.shop ||
+          el.tags.tourism ||
+          el.tags.leisure ||
+          el.tags.historic ||
+          "unknown",
       }));
-      setNearbyPlaces(places);
+
+      console.log("data",data)
+      console.log("places",places)
+
+      const filteredPlaces = places.filter((place) => place.name !== "Unnamed");
+
+      setNearbyPlaces(filteredPlaces);
       lastFetchedCoordsRef.current = [lat, lng];
     } catch (err) {
       console.error(err);
