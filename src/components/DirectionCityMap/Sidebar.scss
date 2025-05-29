@@ -124,9 +124,7 @@
     }
 }
 
-.alternative-button,
-.load-route,
-.load-history {
+.alternative-button {
     font-family: "Inter", "Roboto", sans-serif !important;
     flex: 1;
     padding: space(2) space(3);
@@ -152,6 +150,34 @@
     }
 }
 
+.load-route,
+.load-history {
+    font-family: "Inter", "Roboto", sans-serif !important;
+    flex: 1;
+    padding: space(3);
+    margin-bottom: space(2);
+    background: color(surface);
+    border: 1px solid color(border-light);
+    border-radius: map-get($radii, md);
+    font-size: 0.7rem;
+    font-weight: map-get($font-weights, medium);
+    color: color(text-primary);
+    text-align: left;
+    box-shadow: 0 1px 3px color(shadow-sm);
+    transition: all map-get($transitions, fast);
+
+    &:hover {
+        background: color(surface-secondary);
+        cursor: pointer;
+    }
+
+    &.selected {
+        background: color(primary-subtle);
+        font-weight: map-get($font-weights, bold);
+        color: color(primary);
+    }
+}
+
 .delete-route,
 .delete-history {
     font-family: "Inter", "Roboto", sans-serif !important;
@@ -166,7 +192,6 @@
 
     &:hover {
         color: color(danger);
-        background: color(danger-subtle);
     }
 }
 
@@ -175,14 +200,18 @@
     font-family: "Inter", "Roboto", sans-serif !important;
     display: flex;
     align-items: center;
-    gap: space(2);
-    padding: space(1);
-    border-bottom: 1px solid color(border-light);
+    justify-content: space-between;
+    // padding: space(3);
+    // margin-bottom: space(2);
+    // border: 1px solid color(border-light);
+    // border-radius: map-get($radii, md);
+    background: color(surface);
+    // box-shadow: 0 1px 3px color(shadow-sm);
     transition: background map-get($transitions, fast);
 
-    &:hover {
-        background: color(surface-secondary);
-    }
+    // &:hover {
+    //     background: color(surface-secondary);
+    // }
 }
 
 
@@ -197,5 +226,36 @@
     .sidebar {
         width: 100%;
         max-width: none;
+    }
+}
+
+.nearby-place-item {
+    padding: space(3);
+    margin-bottom: space(2);
+        background: color(surface);
+    border: 1px solid color(border-light);
+    border-radius: map-get($radii, md);
+    box-shadow: 0 1px 3px color(shadow-sm);
+    transition: background map-get($transitions, fast);
+
+    &:hover {
+    background: color(surface-secondary);
+        cursor: pointer;
+    }
+
+    .nearby-place-text {
+        font-family: "Inter", sans-serif;
+        font-size: map-get($font-sizes, xs);
+        margin: 0;
+
+        .place-name {
+            font-weight: 500;
+            color: color(text-primary);
+        }
+
+        .place-type {
+            color: color(success); 
+            font-size: 90%;
+        }
     }
 }

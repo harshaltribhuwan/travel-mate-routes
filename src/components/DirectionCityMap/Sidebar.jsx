@@ -259,11 +259,12 @@ function Sidebar({
             itemKey="id"
             emptyMessage="No nearby places found."
             renderItem={(place) => (
-              <>
-                <p style={{ fontSize: "12px" }}>
-                  {place.name} <strong>({place.type})</strong>
+              <div className="nearby-place-item">
+                <p className="nearby-place-text">
+                  <span className="place-name">{place.name}</span>
+                  <strong className="place-type"> ({place.type})</strong>
                 </p>
-              </>
+              </div>
             )}
           />
 
