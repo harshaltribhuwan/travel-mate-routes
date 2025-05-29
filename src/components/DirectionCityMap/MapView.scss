@@ -23,7 +23,7 @@
     }
 }
 
-.leaflet-control-zoom {
+.leaflet-control-zoom { 
     background: transparent;
     box-shadow: map-get($shadows, md);
     border-radius: map-get($radii, 2xl);
@@ -32,13 +32,14 @@
     flex-direction: column;
     gap: space(0.5);
     padding: space(0.5);
+    -webkit-tap-highlight-color: transparent !important;
 
     a {
         background: color(surface);
         color: color(text-primary);
-        border-radius: 50% !important; 
+        border-radius: 50% !important;
         border: none !important;
-        width: space(7); 
+        width: space(7);
         height: space(7);
         display: flex;
         align-items: center;
@@ -53,7 +54,7 @@
             background: color(surface);
         }
 
-        &:focus {
+        &:focus-visible {
             outline: none;
             box-shadow: 0 0 0 2px color(primary-subtle);
         }
