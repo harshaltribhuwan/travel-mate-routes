@@ -8,7 +8,6 @@ import "./DirectionCityMap.scss";
 
 export default function DirectionCityMap() {
   const [waypoints, setWaypoints] = useState([
-    { id: "from", city: "", coords: null },
     { id: "to", city: "", coords: null },
   ]);
   const [suggestions, setSuggestions] = useState([]);
@@ -90,7 +89,6 @@ export default function DirectionCityMap() {
       !isNaN(toWaypoint.coords[1]);
 
     if (hasValidToCoords) {
-      // Only fetch if coordinates have changed
       if (
         !lastFetchedCoordsRef.current ||
         lastFetchedCoordsRef.current[0] !== toWaypoint.coords[0] ||
@@ -102,7 +100,6 @@ export default function DirectionCityMap() {
       navigator.geolocation.getCurrentPosition(
         (position) => {
           const { latitude, longitude } = position.coords;
-          // Only fetch if geolocation coords differ from last fetched
           if (
             !lastFetchedCoordsRef.current ||
             lastFetchedCoordsRef.current[0] !== latitude ||
@@ -207,10 +204,7 @@ export default function DirectionCityMap() {
   };
 
   const clearRoute = () => {
-    setWaypoints([
-      { id: "from", city: "", coords: null },
-      { id: "to", city: "", coords: null },
-    ]);
+    setWaypoints([{ id: "to", city: "", coords: null }]);
     setDistance(null);
     setDuration(null);
     setAlternatives([]);

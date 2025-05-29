@@ -80,6 +80,54 @@
     }
 }
 
+.directions-button {
+    width: auto;
+    padding: space(2) space(4);
+    background: color(glass-light);
+    color: color(primary-light);
+    border: 1px solid color(glass-border);
+    border-radius: map-get($radii, md);
+    font-size: map-get($font-sizes, sm);
+    font-weight: map-get($font-weights, medium);
+    display: flex;
+    align-items: center;
+    gap: space(2);
+    cursor: pointer;
+    box-shadow: 0 1px 4px color(shadow-sm);
+    transition: all map-get($transitions, fast) ease-out;
+    backdrop-filter: blur(4px);
+    text-transform: none;
+
+    &:hover {
+        background: color(surface);
+        color: color(primary);
+        box-shadow: 0 2px 6px color(shadow-md);
+        transform: translateY(-1px);
+    }
+
+    &:active {
+        transform: translateY(0);
+        box-shadow: 0 1px 2px color(shadow-sm);
+    }
+
+    svg {
+        font-size: map-get($font-sizes, base);
+    }
+}
+
+@media (max-width: 480px) {
+    .directions-button {
+        width: 100%;
+        padding: space(2) space(3);
+        font-size: map-get($font-sizes, xs);
+        justify-content: center;
+
+        svg {
+            font-size: map-get($font-sizes, sm);
+        }
+    }
+}
+
 .autocomplete-dropdown {
     position: absolute;
     top: 100%;
@@ -120,7 +168,6 @@
 }
 
 @media (max-width: 480px) {
-
     .input-field {
         padding: space(3) space(8) space(3) space(5);
     }
@@ -134,5 +181,11 @@
         width: 100%;
         height: 44px;
         border-radius: map-get($radii, md);
+    }
+
+    .directions-button {
+        width: 100%;
+        justify-content: center;
+        padding: space(3) space(4);
     }
 }
