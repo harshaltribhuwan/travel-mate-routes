@@ -44,11 +44,15 @@ function Sidebar({
   setDistance,
   setDuration,
   setAlternatives,
+
+  // NEW props for nearby places section
+  nearbyPlaces,
+  showNearbyPlaces,
+  setShowNearbyPlaces,
 }) {
-  // Use useEffect to invalidate map size only when sidebar visibility or mapRef changes
+  // Invalidate map size on sidebar open/close
   useEffect(() => {
     if (mapRef.current) {
-      // Use requestAnimationFrame instead of setTimeout for better sync with browser repaint
       const frame = requestAnimationFrame(() => {
         mapRef.current.invalidateSize();
       });
@@ -56,7 +60,6 @@ function Sidebar({
     }
   }, [showSidebar, mapRef]);
 
-  // Save route only if waypoints are valid and not all at the same point
   const saveRoute = () => {
     if (
       waypoints.length >= 2 &&
@@ -83,12 +86,10 @@ function Sidebar({
     }
   };
 
-  // Delete route by index safely
   const deleteRoute = (index) => {
     setSavedRoutes((prev) => prev.filter((_, i) => i !== index));
   };
 
-  // Reset waypoints and route info with fallback for map ref
   const handleClearRoute = () => {
     setWaypoints([
       { id: "from", city: "", coords: defaultCenter },
@@ -106,7 +107,6 @@ function Sidebar({
     clearRoute();
   };
 
-  // Load a saved route and fit map bounds with padding fallback
   const handleLoadRoute = (route) => {
     if (
       !route ||
@@ -126,7 +126,6 @@ function Sidebar({
         mapRef.current.fitBounds(bounds, { padding: [50, 50] });
         mapRef.current.invalidateSize();
       } catch {
-        // fallback: center on first waypoint or default center
         const fallbackCenter = route.waypoints[0]?.coords || defaultCenter;
         mapRef.current.setView(fallbackCenter, 10);
       }
@@ -136,7 +135,6 @@ function Sidebar({
     setShowSidebar(false);
   };
 
-  // Select alternative route and invalidate map size for UI update
   const handleSelectAlternative = (index) => {
     selectAlternative(index);
     if (mapRef.current) {
@@ -210,13 +208,14 @@ function Sidebar({
               itemKey="id"
             />
           )}
+
           <CollapsibleSection
             title="Saved Routes"
             isOpen={showSavedRoutes}
             setIsOpen={setShowSavedRoutes}
             items={savedRoutes}
             renderItem={(route, idx) => (
-              <div className="route-item">
+              <div className="route-item" key={idx}>
                 <button
                   onClick={() => handleLoadRoute(route)}
                   className="load-route"
@@ -247,13 +246,31 @@ function Sidebar({
             itemKey="idx"
             emptyMessage="No saved routes"
           />
+
+          {/* NEW Nearby Places Collapsible */}
+          <CollapsibleSection
+            title="Nearby Destination"
+            isOpen={showNearbyPlaces}
+            setIsOpen={setShowNearbyPlaces}
+            items={nearbyPlaces}
+            itemKey="id"
+            emptyMessage="No nearby places found."
+            renderItem={(place) => (
+              <>
+                <p style={{ fontSize: "12px" }}>
+                  {place.name} <strong>({place.type})</strong>
+                </p>
+              </>
+            )}
+          />
+          
           <CollapsibleSection
             title="History"
             isOpen={showHistory}
             setIsOpen={setShowHistory}
             items={savedHistory}
             renderItem={(item, idx) => (
-              <div className="history-item">
+              <div className="history-item" key={item.id || idx}>
                 <button
                   onClick={() => loadHistoryItem(item)}
                   className="load-history"

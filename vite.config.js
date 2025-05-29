@@ -29,6 +29,9 @@ export default defineConfig({
             type: 'image/png'
           }
         ]
+      },
+      workbox: {
+        debug: false  // <-- Add this line to silence Workbox logs
       }
     })
   ]

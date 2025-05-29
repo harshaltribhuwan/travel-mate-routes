@@ -18,6 +18,9 @@ export default function DirectionCityMap() {
   const [alternatives, setAlternatives] = useState([]);
   const [tracking, setTracking] = useState(false);
   const [currentLocation, setCurrentLocation] = useState(null);
+  const [nearbyPlaces, setNearbyPlaces] = useState([]); // example initial empty array
+  const [showNearbyPlaces, setShowNearbyPlaces] = useState(false);
+
   const [savedRoutes, setSavedRoutes] = useState(() => {
     const saved = localStorage.getItem("savedRoutes");
     return saved ? JSON.parse(saved) : [];
@@ -92,6 +95,73 @@ export default function DirectionCityMap() {
     if (waypoints.length <= 2) return;
     setWaypoints((prev) => prev.filter((wp) => wp.id !== id));
   };
+
+  const fetchNearbyPlaces = async (lat, lng) => {
+    if (!lat || !lng) return;
+    try {
+      const query = `
+        [out:json][timeout:25];
+        (
+          node["amenity"="cafe"](around:1000,${lat},${lng});
+          node["amenity"="restaurant"](around:1000,${lat},${lng});
+          node["amenity"="bar"](around:1000,${lat},${lng});
+          node["shop"](around:1000,${lat},${lng});
+          node["amenity"="pharmacy"](around:1000,${lat},${lng});
+        node["tourism"="attraction"](around:1000,${lat},${lng});
+        node["tourism"="hotel"](around:1000,${lat},${lng});
+        node["leisure"="park"](around:1000,${lat},${lng});
+        node["historic"](around:1000,${lat},${lng});
+        );
+        out body;
+      `;
+      const url =
+        "https://overpass-api.de/api/interpreter?data=" +
+        encodeURIComponent(query);
+
+      const response = await fetch(url);
+      if (!response.ok) throw new Error("Failed to fetch nearby places");
+      const data = await response.json();
+
+      // Map to simpler format
+      const places = data.elements.map((el) => ({
+        id: el.id,
+        name: el.tags.name || "Unnamed",
+        lat: el.lat,
+        lng: el.lon,
+        type: el.tags.amenity || el.tags.shop || "unknown",
+      }));
+
+      setNearbyPlaces(places);
+    } catch (err) {
+      console.error(err);
+      setNearbyPlaces([]);
+    }
+  };
+
+  useEffect(() => {
+    const fetchBasedOnToOrGeolocation = () => {
+      const toWaypoint = waypoints.find((wp) => wp.id === "to");
+
+      if (toWaypoint?.coords) {
+        fetchNearbyPlaces(toWaypoint.coords[0], toWaypoint.coords[1]);
+      } else if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+          (position) => {
+            const { latitude, longitude } = position.coords;
+            fetchNearbyPlaces(latitude, longitude);
+          },
+          (error) => {
+            console.warn("Geolocation failed:", error);
+          },
+          { enableHighAccuracy: true, timeout: 10000 }
+        );
+      } else {
+        console.warn("Neither 'to' waypoint nor geolocation available.");
+      }
+    };
+
+    fetchBasedOnToOrGeolocation();
+  }, [waypoints]);
 
   const clearRoute = () => {
     setWaypoints([
@@ -184,6 +254,9 @@ export default function DirectionCityMap() {
         setDistance={setDistance}
         setDuration={setDuration}
         setAlternatives={setAlternatives}
+        nearbyPlaces={nearbyPlaces}
+        showNearbyPlaces={showNearbyPlaces}
+        setShowNearbyPlaces={setShowNearbyPlaces}
       />
       <MapView
         waypoints={waypoints}
