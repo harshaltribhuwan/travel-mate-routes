@@ -371,7 +371,7 @@ function SearchForm({
                     ? "Destination"
                     : `Stop ${idx - 1}`
                 }
-                className="input-field"
+                className="input-field large-input"
                 value={wp.city}
                 onChange={(e) => handleInputChange(wp.id, e)}
                 onKeyDown={(e) => handleKeyDown(e, wp.id)}
