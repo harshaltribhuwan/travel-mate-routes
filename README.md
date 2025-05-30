@@ -59,8 +59,6 @@ Choose from 4 map styles:
 - Works offline (via leaflet.offline)
 - Smooth experience across all platforms
 
----
-
 ## 🛠️ Tech Stack
 
 | Tech             | Description                                 |
@@ -72,8 +70,6 @@ Choose from 4 map styles:
 | **LocalStorage** | Store routes and history locally            |
 | **PWA**          | Offline support and installable experience  |
 
----
-
 ## 🧩 Libraries & APIs Used
 
 ### 🔗 NPM Packages
@@ -84,15 +80,11 @@ Choose from 4 map styles:
 "leaflet.offline": "^3.1.0",
 "speak-tts": "^2.0.0"
 
----
+### 🔗 Open APIs Used
 
-## 🔗 Open APIs Used
-
-- 🔍 **Geocoding/Search**: [`https://nominatim.openstreetmap.org/search`](https://nominatim.openstreetmap.org/search)
-- 🛣️ **Routing**: [`https://router.project-osrm.org/route/v1`](https://router.project-osrm.org/route/v1)
-- 🗺️ **Map Tiles**: `https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png`
-- 🏨 **Nearby POIs**: [`https://overpass-api.de/api/interpreter`](https://overpass-api.de/api/interpreter)
-
----
+- 🔍 Geocoding/Search**: [`https://nominatim.openstreetmap.org/search`](https://nominatim.openstreetmap.org/search)
+- 🛣️ Routing: [`https://router.project-osrm.org/route/v1`](https://router.project-osrm.org/route/v1)
+- 🗺️ Map Tiles: `https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png`
+- 🏨 Nearby POIs: [`https://overpass-api.de/api/interpreter`](https://overpass-api.de/api/interpreter)
 
 ## Built with 💙 by a React.js developer with 3.4+ years of experience. If you find this project helpful, feel free to ⭐️ the repo or reach out for feedback and collaboration.
