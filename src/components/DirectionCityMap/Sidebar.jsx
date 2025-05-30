@@ -351,8 +351,6 @@ function Sidebar({
                     <p className="nearby-place-text">
                       <span className="place-name">{place.name}</span>
                       <strong className="place-type">
-                        {" "}
-                        ({capitalizeWords(place.type)})
                       </strong>
                     </p>
                   </div>
