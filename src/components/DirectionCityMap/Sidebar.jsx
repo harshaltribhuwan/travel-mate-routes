@@ -154,35 +154,25 @@ function Sidebar({
     [savedRoutes, setSavedRoutes]
   );
 
-  const handleClearRoute = useCallback(() => {
-    try {
-      setWaypoints([
-        { id: "from", city: "", coords: defaultCenter },
-        { id: "to", city: "", coords: null },
-      ]);
-      setDistance(null);
-      setDuration(null);
-      setAlternatives([]);
-      setTracking(false);
+const handleClearRoute = useCallback(() => {
+  try {
+    setWaypoints([{ id: "to", city: null, coords: [] }]);
+    setDistance(null);
+    setDuration(null);
+    setAlternatives([]);
+    setTracking(false);
+    setSelectedSaved(false);
 
-      if (mapRef.current) {
-        mapRef.current.setView(defaultCenter, 5);
-        mapRef.current.invalidateSize();
-      }
-
-      clearRoute();
-    } catch (error) {
-      console.error("Error clearing route:", error);
+    if (mapRef.current) {
+      mapRef.current.setView(defaultCenter, 5);
+      mapRef.current.invalidateSize();
     }
-  }, [
-    setWaypoints,
-    setDistance,
-    setDuration,
-    setAlternatives,
-    setTracking,
-    mapRef,
-    clearRoute,
-  ]);
+
+    clearRoute();
+  } catch (error) {
+    console.error("Error:", error);
+  }
+}, [setWaypoints, setDistance, setDuration, setAlternatives, setTracking, mapRef, clearRoute]);
 
   const handleLoadRoute = useCallback(
     (route) => {

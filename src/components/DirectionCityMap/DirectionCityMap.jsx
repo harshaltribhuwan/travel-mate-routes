@@ -297,15 +297,12 @@ export default function DirectionCityMap() {
   };
 
   const clearRoute = () => {
-    setWaypoints([
-      { id: "from", city: "", coords: null },
-      { id: "to", city: "", coords: null },
-    ]);
+    setWaypoints([{ id: "to", city: "", coords: null }]);
     setDistance(null);
     setDuration(null);
     setAlternatives([]);
     setTracking(false);
-    setNearbyPlaces([]); // Clear nearby places
+    setNearbyPlaces([]);
   };
 
   const loadRoute = (route) => {
