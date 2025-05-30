@@ -127,6 +127,7 @@ useEffect(() => {
     !isNaN(toWaypoint.coords[1]);
 
   let debounceTimer;
+
   const fetchWithDebounce = () => {
     if (
       hasValidToCoords &&
@@ -138,13 +139,7 @@ useEffect(() => {
     }
   };
 
-  if (hasValidToCoords) {
-    debounceTimer = setTimeout(fetchWithDebounce, 500);
-  } else if (
-    navigator.geolocation &&
-    (!lastGeolocationAttemptRef.current ||
-      Date.now() - lastGeolocationAttemptRef.current > 60000) // Limit to once per minute
-  ) {
+  const fetchWithGeolocation = () => {
     lastGeolocationAttemptRef.current = Date.now();
     navigator.geolocation.getCurrentPosition(
       (position) => {
@@ -159,16 +154,45 @@ useEffect(() => {
       },
       (error) => {
         console.warn("Geolocation failed:", error);
-        setNearbyPlaces([]); // Clear places if geolocation fails
+        setNearbyPlaces([]);
       },
       { enableHighAccuracy: true, timeout: 10000 }
     );
+  };
+
+  if (hasValidToCoords) {
+    debounceTimer = setTimeout(fetchWithDebounce, 500);
+  } else if (
+    navigator.geolocation &&
+    (!lastGeolocationAttemptRef.current ||
+      Date.now() - lastGeolocationAttemptRef.current > 60000)
+  ) {
+    navigator.permissions.query({ name: "geolocation" }).then((result) => {
+      if (result.state === "granted") {
+        fetchWithGeolocation();
+      } else {
+        setNearbyPlaces([]);
+      }
+
+      // Listen for permission changes
+      result.onchange = () => {
+        if (result.state === "granted") {
+          fetchWithGeolocation();
+        } else {
+          setNearbyPlaces([]);
+        }
+      };
+    });
   } else if (!hasValidToCoords) {
-    setNearbyPlaces([]); // Clear places if no valid coordinates
+    setNearbyPlaces([]);
   }
 
   return () => {
     if (debounceTimer) clearTimeout(debounceTimer);
+    // Cleanup permission change listener
+    navigator.permissions.query({ name: "geolocation" }).then((result) => {
+      result.onchange = null;
+    });
   };
 }, [waypoints, fetchNearbyPlaces]);
 
