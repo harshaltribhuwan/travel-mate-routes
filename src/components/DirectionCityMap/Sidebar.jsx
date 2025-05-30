@@ -179,6 +179,8 @@ function Sidebar({
     }
 
     setWaypoints(updatedWaypoints);
+    setSuggestions([]); // Clear suggestions immediately
+    setActiveInput(null); // Ensure no input is active
 
     if (mapRef.current) {
       mapRef.current.setView([place.lat, place.lng], 14);
@@ -350,8 +352,6 @@ function Sidebar({
                   >
                     <p className="nearby-place-text">
                       <span className="place-name">{place.name}</span>
-                      <strong className="place-type">
-                      </strong>
                     </p>
                   </div>
                 )}

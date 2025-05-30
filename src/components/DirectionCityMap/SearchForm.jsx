@@ -54,14 +54,16 @@ function SearchForm({
 
   useEffect(() => {
     if (activeInput && !isProgrammaticChange) {
-      // Only fetch if not a programmatic change
       const waypoint = waypoints.find((wp) => wp.id === activeInput);
-      if (waypoint?.city) {
+      if (waypoint?.city && waypoint.city.length >= 2) {
+        // Only fetch if city has enough characters
         if (debounceTimerRef.current) clearTimeout(debounceTimerRef.current);
         debounceTimerRef.current = setTimeout(
           () => fetchSuggestions(waypoint.city, activeInput),
           500
         );
+      } else {
+        setSuggestions([]); // Clear suggestions if input is too short
       }
     }
     return () => {
@@ -77,18 +79,22 @@ function SearchForm({
     );
     setActiveInput(id);
     setFocusedSuggestionIndex(-1);
-    if (debounceTimerRef.current) clearTimeout(debounceTimerRef.current);
-    debounceTimerRef.current = setTimeout(
-      () => fetchSuggestions(value, id),
-      500
-    );
+    if (value.length < 2) {
+      setSuggestions([]); // Clear suggestions if input is too short
+    } else {
+      if (debounceTimerRef.current) clearTimeout(debounceTimerRef.current);
+      debounceTimerRef.current = setTimeout(
+        () => fetchSuggestions(value, id),
+        500
+      );
+    }
   };
 
   const handleSuggestionClick = (place) => {
     const lat = parseFloat(place.lat);
     const lon = parseFloat(place.lon);
     const type = place.inputType;
-    setIsProgrammaticChange(true); // Set to true to prevent suggestions
+    setIsProgrammaticChange(true);
     setWaypoints((prev) =>
       prev.map((wp) =>
         wp.id === type
