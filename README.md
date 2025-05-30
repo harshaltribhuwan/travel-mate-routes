@@ -85,5 +85,6 @@ Choose from 4 map styles:
 - 🛣️ Routing: [`https://router.project-osrm.org/route/v1`](https://router.project-osrm.org/route/v1)
 - 🗺️ Map Tiles: `https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png`
 - 🏨 Nearby POIs: [`https://overpass-api.de/api/interpreter`](https://overpass-api.de/api/interpreter)
+  
 
-## Built with 💙 by a React.js developer with 3.4+ years of experience. If you find this project helpful, feel free to ⭐️ the repo or reach out for feedback and collaboration.
+### Built with 💙 by a React.js developer with 3.4+ years of experience. If you find this project helpful, feel free to ⭐️ the repo or reach out for feedback and collaboration.
