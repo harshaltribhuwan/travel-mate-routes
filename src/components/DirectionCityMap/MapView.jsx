@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback, useMemo } from "react";
 import {
   MapContainer,
   TileLayer,
@@ -29,35 +29,42 @@ function MapView({
   const [mapZoom, setMapZoom] = useState(5);
   const [currentTileLayer, setCurrentTileLayer] = useState("OpenStreetMap");
 
-  const tileLayers = {
-    "Classic Street": {
-      name: "Classic Street",
-      url: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
-      attribution:
-        '© <a href="https://osm.org/copyright">OpenStreetMap</a> contributors',
-    },
-    "Standard View": {
-      name: "Standard View",
-      url: "https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png",
-      attribution: '© <a href="https://carto.com/">CartoDB</a>',
-    },
-    "Satellite View": {
-      name: "Satellite View",
-      url: "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
-      attribution:
-        "Tiles © Esri — Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, and others",
-    },
-    "Dark Mode": {
-      name: "Dark Mode",
-      url: "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png",
-      attribution: '© <a href="https://carto.com/">CartoDB</a>',
-    },
-  };
+  // Memoize tileLayers to avoid re-creation
+  const tileLayers = useMemo(
+    () => ({
+      "Classic Street": {
+        name: "Classic Street",
+        url: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+        attribution:
+          '© <a href="https://osm.org/copyright">OpenStreetMap</a> contributors',
+      },
+      "Standard View": {
+        name: "Standard View",
+        url: "https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png",
+        attribution: '© <a href="https://carto.com/">CartoDB</a>',
+      },
+      "Satellite View": {
+        name: "Satellite View",
+        url: "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
+        attribution:
+          "Tiles © Esri — Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, and others",
+      },
+      "Dark Mode": {
+        name: "Dark Mode",
+        url: "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png",
+        attribution: '© <a href="https://carto.com/">CartoDB</a>',
+      },
+    }),
+    []
+  );
 
+  // Consolidated geolocation logic
   useEffect(() => {
-    if (!navigator.geolocation) return;
+    if (!navigator.geolocation) {
+      console.warn("Geolocation not supported");
+      return;
+    }
 
-    // Only set initial center if no waypoints are provided
     const toWaypoint = waypoints.find((wp) => wp.id === "to");
     const hasValidTo =
       toWaypoint?.coords &&
@@ -66,48 +73,42 @@ function MapView({
       !isNaN(toWaypoint.coords[0]) &&
       !isNaN(toWaypoint.coords[1]);
 
-    if (!hasValidTo) {
-      navigator.permissions
-        ?.query({ name: "geolocation" })
-        .then((permissionStatus) => {
-          if (permissionStatus.state === "granted") {
-            navigator.geolocation.getCurrentPosition(
-              (pos) => {
-                setMapCenter([pos.coords.latitude, pos.coords.longitude]);
-                setMapZoom(13);
-              },
-              () => {}
-            );
-          } else {
-            const timeout = setTimeout(() => {
-              navigator.geolocation.getCurrentPosition(
-                (pos) => {
-                  setMapCenter([pos.coords.latitude, pos.coords.longitude]);
-                  setMapZoom(13);
-                },
-                () => {}
-              );
-            }, 5000);
-            return () => clearTimeout(timeout);
-          }
-        })
-        .catch(() => {
-          const timeout = setTimeout(() => {
-            navigator.geolocation.getCurrentPosition(
-              (pos) => {
-                setMapCenter([pos.coords.latitude, pos.coords.longitude]);
-                setMapZoom(13);
-              },
-              () => {}
-            );
-          }, 5000);
+    if (hasValidTo) return; // Skip geolocation if valid "to" waypoint exists
+
+    const attemptGeolocation = () => {
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          const { latitude, longitude } = pos.coords;
+          setMapCenter([latitude, longitude]);
+          setMapZoom(13);
+        },
+        (error) => {
+          console.warn("Geolocation failed:", error);
+          // Keep defaultCenter, no further action needed
+        },
+        { enableHighAccuracy: true, timeout: 10000 }
+      );
+    };
+
+    navigator.permissions
+      ?.query({ name: "geolocation" })
+      .then((permissionStatus) => {
+        if (permissionStatus.state === "granted") {
+          attemptGeolocation();
+        } else {
+          const timeout = setTimeout(attemptGeolocation, 5000);
           return () => clearTimeout(timeout);
-        });
-    }
+        }
+      })
+      .catch((error) => {
+        console.warn("Permission query failed:", error);
+        const timeout = setTimeout(attemptGeolocation, 5000);
+        return () => clearTimeout(timeout);
+      });
   }, [waypoints]);
 
+  // Update map center/zoom only on significant waypoint changes
   useEffect(() => {
-    // Update map center and zoom based on waypoints
     const toWaypoint = waypoints.find((wp) => wp.id === "to");
     const fromWaypoint = waypoints.find((wp) => wp.id === "from");
     const hasValidTo =
@@ -123,30 +124,50 @@ function MapView({
       !isNaN(fromWaypoint.coords[0]) &&
       !isNaN(fromWaypoint.coords[1]);
 
-    if (hasValidTo) {
+    // Only update if coordinates are new to prevent blinking
+    if (
+      hasValidTo &&
+      JSON.stringify(toWaypoint.coords) !== JSON.stringify(mapCenter)
+    ) {
       setMapCenter(toWaypoint.coords);
       setMapZoom(13);
-    } else if (hasValidFrom) {
+    } else if (
+      hasValidFrom &&
+      !hasValidTo &&
+      JSON.stringify(fromWaypoint.coords) !== JSON.stringify(mapCenter)
+    ) {
       setMapCenter(fromWaypoint.coords);
       setMapZoom(13);
     }
-  }, [waypoints]);
+  }, [waypoints, mapCenter]);
 
-  const handleDragEnd = (id, e) => {
-    const { lat, lng } = e.target.getLatLng();
-    setWaypoints((prev) =>
-      prev.map((wp) => (wp.id === id ? { ...wp, coords: [lat, lng] } : wp))
-    );
-  };
+  const handleDragEnd = useCallback(
+    (id, e) => {
+      const latLng = e.target?.getLatLng();
+      if (!latLng || isNaN(latLng.lat) || isNaN(latLng.lng)) {
+        console.warn("Invalid drag coordinates for waypoint:", id);
+        return;
+      }
+      const { lat, lng } = latLng;
+      setWaypoints((prev) =>
+        prev.map((wp) => (wp.id === id ? { ...wp, coords: [lat, lng] } : wp))
+      );
+    },
+    [setWaypoints]
+  );
 
-  const hasValidRoute = waypoints.every((wp) =>
-    wp.id === "from" || wp.id === "to"
-      ? wp.coords &&
-        Array.isArray(wp.coords) &&
-        wp.coords.length === 2 &&
-        !isNaN(wp.coords[0]) &&
-        !isNaN(wp.coords[1])
-      : true
+  const hasValidRoute = useMemo(
+    () =>
+      waypoints.every((wp) =>
+        wp.id === "from" || wp.id === "to"
+          ? wp.coords &&
+            Array.isArray(wp.coords) &&
+            wp.coords.length === 2 &&
+            !isNaN(wp.coords[0]) &&
+            !isNaN(wp.coords[1])
+          : true
+      ),
+    [waypoints]
   );
 
   return (
@@ -167,7 +188,6 @@ function MapView({
           map.invalidateSize();
         }}
         zoomControl={false}
-        key={mapCenter.join(",") + "-" + mapZoom}
       >
         <ZoomControl position="bottomleft" />
         <ChangeView
