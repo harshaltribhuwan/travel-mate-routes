@@ -1,4 +1,10 @@
-import React, { useRef, useEffect, useState } from "react";
+import React, {
+  useRef,
+  useEffect,
+  useState,
+  useCallback,
+  useMemo,
+} from "react";
 import {
   MdMyLocation,
   MdAdd,
@@ -33,223 +39,315 @@ function SearchForm({
   const [draggedId, setDraggedId] = useState(null);
   const [isProgrammaticChange, setIsProgrammaticChange] = useState(false); // New state to track programmatic changes
 
-  const fetchSuggestions = async (value, type) => {
-    if (value.length < 2) {
-      setSuggestions([]);
-      return;
-    }
-    try {
-      const res = await fetch(
-        `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(
-          value
-        )}&limit=5&addressdetails=1`
-      );
-      const data = await res.json();
-      setSuggestions(data.map((p) => ({ ...p, inputType: type })));
-    } catch (error) {
-      console.error("Error fetching suggestions:", error);
-      setSuggestions([]);
-    }
-  };
-
-  useEffect(() => {
-    if (activeInput && !isProgrammaticChange) {
-      const waypoint = waypoints.find((wp) => wp.id === activeInput);
-      if (waypoint?.city && waypoint.city.length >= 2) {
-        // Only fetch if city has enough characters
-        if (debounceTimerRef.current) clearTimeout(debounceTimerRef.current);
-        debounceTimerRef.current = setTimeout(
-          () => fetchSuggestions(waypoint.city, activeInput),
-          500
-        );
-      } else {
-        setSuggestions([]); // Clear suggestions if input is too short
+  const fetchSuggestions = useCallback(
+    async (value, type) => {
+      if (typeof value !== "string" || value.length < 2 || !type) {
+        setSuggestions([]);
+        return;
       }
-    }
-    return () => {
+
+      try {
+        const res = await fetch(
+          `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(
+            value
+          )}&limit=5&addressdetails=1`
+        );
+        if (!res.ok) throw new Error(`HTTP error: ${res.status}`);
+        const data = await res.json();
+        if (!Array.isArray(data)) {
+          console.warn("Invalid suggestion data:", data);
+          setSuggestions([]);
+          return;
+        }
+        setSuggestions(data.map((p) => ({ ...p, inputType: type })));
+      } catch (error) {
+        console.error("Error fetching suggestions:", error);
+        setSuggestions([]);
+      }
+    },
+    [setSuggestions]
+  );
+
+  const handleInputChange = useCallback(
+    (id, e) => {
+      const value = e.target.value?.trim() || "";
+      setIsProgrammaticChange(false);
+      setWaypoints((prev) =>
+        prev.map((wp) => (wp.id === id ? { ...wp, city: value } : wp))
+      );
+      setActiveInput(id);
+      setFocusedSuggestionIndex(-1);
+
+      if (value.length < 2) {
+        setSuggestions([]);
+        return;
+      }
+
       if (debounceTimerRef.current) clearTimeout(debounceTimerRef.current);
-    };
-  }, [waypoints, activeInput, isProgrammaticChange]);
+      debounceTimerRef.current = setTimeout(() => {
+        fetchSuggestions(value, id).catch((error) => {
+          console.error("Error in debounced fetchSuggestions:", error);
+          setSuggestions([]);
+        });
+      }, 500);
+    },
+    [
+      setWaypoints,
+      setActiveInput,
+      setSuggestions,
+      setFocusedSuggestionIndex,
+      fetchSuggestions,
+    ]
+  );
 
-  const handleInputChange = (id, e) => {
-    const value = e.target.value;
-    setIsProgrammaticChange(false); // User typing, not programmatic
-    setWaypoints((prev) =>
-      prev.map((wp) => (wp.id === id ? { ...wp, city: value } : wp))
-    );
-    setActiveInput(id);
-    setFocusedSuggestionIndex(-1);
-    if (value.length < 2) {
-      setSuggestions([]); // Clear suggestions if input is too short
-    } else {
-      if (debounceTimerRef.current) clearTimeout(debounceTimerRef.current);
-      debounceTimerRef.current = setTimeout(
-        () => fetchSuggestions(value, id),
-        500
-      );
-    }
-  };
+  const handleSuggestionClick = useCallback(
+    (place) => {
+      if (
+        !place ||
+        !place.display_name ||
+        isNaN(parseFloat(place.lat)) ||
+        isNaN(parseFloat(place.lon)) ||
+        !place.inputType
+      ) {
+        console.warn("Invalid suggestion data:", place);
+        return;
+      }
 
-  const handleSuggestionClick = (place) => {
-    const lat = parseFloat(place.lat);
-    const lon = parseFloat(place.lon);
-    const type = place.inputType;
-    setIsProgrammaticChange(true);
-    setWaypoints((prev) =>
-      prev.map((wp) =>
-        wp.id === type
-          ? { ...wp, city: place.display_name, coords: [lat, lon] }
-          : wp
-      )
-    );
-    setSavedHistory((prev) => {
-      const newHistory = [
-        {
-          id: `hist${Date.now()}`,
-          query: place.display_name,
-          timestamp: new Date().toISOString(),
-        },
-        ...prev,
-      ].slice(0, 10);
-      return newHistory;
-    });
-    setSuggestions([]);
-    setActiveInput(null);
-    setFocusedSuggestionIndex(-1);
-    if (type === "to") setShowSidebar(false);
-    setIsProgrammaticChange(false); // Reset after update
-  };
+      const lat = parseFloat(place.lat);
+      const lon = parseFloat(place.lon);
+      const type = place.inputType;
 
-  const handleKeyDown = (e, wpId) => {
-    const relevantSuggestions = suggestions.filter((s) => s.inputType === wpId);
-    if (e.key === "ArrowDown") {
-      e.preventDefault();
-      setFocusedSuggestionIndex((prev) =>
-        prev < relevantSuggestions.length - 1 ? prev + 1 : 0
+      setIsProgrammaticChange(true);
+      setWaypoints((prev) =>
+        prev.map((wp) =>
+          wp.id === type
+            ? { ...wp, city: place.display_name, coords: [lat, lon] }
+            : wp
+        )
       );
-    } else if (e.key === "ArrowUp") {
-      e.preventDefault();
-      setFocusedSuggestionIndex((prev) =>
-        prev > 0 ? prev - 1 : relevantSuggestions.length - 1
-      );
-    } else if (e.key === "Enter" && focusedSuggestionIndex >= 0) {
-      e.preventDefault();
-      handleSuggestionClick(relevantSuggestions[focusedSuggestionIndex]);
-    } else if (e.key === "Escape") {
+      setSavedHistory((prev) => {
+        const newHistory = [
+          {
+            id: `hist${Date.now()}`,
+            query: place.display_name,
+            timestamp: new Date().toISOString(),
+          },
+          ...prev.slice(0, 10),
+        ];
+        return newHistory;
+      });
       setSuggestions([]);
       setActiveInput(null);
-    }
-  };
+      setFocusedSuggestionIndex(-1);
+      if (type === "to") setShowSidebar(false);
+      setIsProgrammaticChange(false);
+    },
+    [
+      setWaypoints,
+      setSavedHistory,
+      setSuggestions,
+      setActiveInput,
+      setFocusedSuggestionIndex,
+      setShowSidebar,
+    ]
+  );
 
-  const useMyLocation = async () => {
+  const handleKeyDown = useCallback(
+    (e, wpId) => {
+      const relevantSuggestions = useMemo(
+        () => suggestions.filter((s) => s.inputType === wpId),
+        [suggestions, wpId]
+      );
+
+      if (e.key === "ArrowDown") {
+        e.preventDefault();
+        setFocusedSuggestionIndex((prev) =>
+          prev < relevantSuggestions.length - 1 ? prev + 1 : 0
+        );
+      } else if (e.key === "ArrowUp") {
+        e.preventDefault();
+        setFocusedSuggestionIndex((prev) =>
+          prev > 0 ? prev - 1 : relevantSuggestions.length - 1
+        );
+      } else if (e.key === "Enter" && focusedSuggestionIndex >= 0) {
+        e.preventDefault();
+        if (relevantSuggestions[focusedSuggestionIndex]) {
+          handleSuggestionClick(relevantSuggestions[focusedSuggestionIndex]);
+        }
+      } else if (e.key === "Escape") {
+        setSuggestions([]);
+        setActiveInput(null);
+        setFocusedSuggestionIndex(-1);
+      }
+    },
+    [
+      suggestions,
+      focusedSuggestionIndex,
+      setFocusedSuggestionIndex,
+      setSuggestions,
+      setActiveInput,
+      handleSuggestionClick,
+    ]
+  );
+
+  const useMyLocation = useCallback(async () => {
     if (!navigator.geolocation) {
+      console.warn("Geolocation not supported");
       alert("Geolocation not supported.");
       return;
     }
-    setIsProgrammaticChange(true); // Prevent suggestions during location update
-    navigator.geolocation.getCurrentPosition(
-      async (pos) => {
-        const lat = pos.coords.latitude;
-        const lon = pos.coords.longitude;
-        try {
-          const res = await fetch(
-            `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}`
-          );
-          const data = await res.json();
-          const city =
-            data.address.city ||
-            data.address.town ||
-            data.address.village ||
-            "My Location";
-          setWaypoints((prev) =>
-            prev.map((wp) =>
-              wp.id === "from" ? { ...wp, city, coords: [lat, lon] } : wp
-            )
-          );
-          setSavedHistory((prev) => {
-            const newHistory = [
-              {
-                id: `hist${Date.now()}`,
-                query: city,
-                timestamp: new Date().toISOString(),
-              },
-              ...prev,
-            ].slice(0, 10);
-            return newHistory;
-          });
-          setSuggestions([]); // Clear suggestions after setting location
-          setActiveInput(null); // Clear active input
-          setIsProgrammaticChange(false); // Reset after update
-        } catch (err) {
-          console.error("Reverse geocoding failed:", err);
-          alert("Failed to detect city.");
-          setIsProgrammaticChange(false);
-        }
-      },
-      (err) => {
-        alert("Failed to access location.");
-        console.error(err);
-        setIsProgrammaticChange(false);
+
+    setIsProgrammaticChange(true);
+    try {
+      const pos = await new Promise((resolve, reject) => {
+        navigator.geolocation.getCurrentPosition(resolve, reject, {
+          enableHighAccuracy: true,
+          timeout: 10000,
+        });
+      });
+
+      const { latitude: lat, longitude: lon } = pos.coords;
+      const res = await fetch(
+        `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}`
+      );
+      if (!res.ok) throw new Error(`Reverse geocoding failed: ${res.status}`);
+
+      const data = await res.json();
+      if (!data?.address) {
+        console.warn("Invalid reverse geocoding data:", data);
+        throw new Error("Invalid geocoding response");
       }
-    );
-  };
+
+      const city =
+        data.address.city ||
+        data.address.town ||
+        data.address.village ||
+        "My Location";
+
+      setWaypoints((prev) =>
+        prev.map((wp) =>
+          wp.id === "from" ? { ...wp, city, coords: [lat, lon] } : wp
+        )
+      );
+      setSavedHistory((prev) => {
+        const newHistory = [
+          {
+            id: `hist${Date.now()}`,
+            query: city,
+            timestamp: new Date().toISOString(),
+          },
+          ...prev.slice(0, 10),
+        ];
+        return newHistory;
+      });
+      setSuggestions([]);
+      setActiveInput(null);
+      setIsProgrammaticChange(false);
+    } catch (err) {
+      console.error("Error in useMyLocation:", err);
+      alert("Failed to detect location.");
+      setIsProgrammaticChange(false);
+    }
+  }, [setWaypoints, setSavedHistory, setSuggestions, setActiveInput]);
 
   useEffect(() => {
-    if (selectedSaved) {
-      setShowDirections(true);
-    }
-  }, [selectedSaved]);
+    if (!activeInput || isProgrammaticChange) return;
 
-  const handleShowDirections = () => {
-    setShowDirections(true);
-    if (!waypoints.some((wp) => wp.id === "from")) {
-      setWaypoints((prev) => [{ id: "from", city: "", coords: null }, ...prev]);
-    }
-  };
-
-  const handleDragStart = (e, id) => {
-    e.dataTransfer.setData("text/plain", id);
-    setDraggedId(id);
-  };
-
-  const handleDragOver = (e) => {
-    e.preventDefault();
-  };
-
-  const handleDrop = (e, targetId) => {
-    e.preventDefault();
-    const sourceId = e.dataTransfer.getData("text/plain");
-    if (sourceId === targetId) return;
-
-    // Only allow reordering if both source and target are stops (not "from" or "to")
-    if (
-      sourceId === "from" ||
-      sourceId === "to" ||
-      targetId === "from" ||
-      targetId === "to"
-    ) {
-      setDraggedId(null);
+    const waypoint = waypoints.find((wp) => wp.id === activeInput);
+    if (!waypoint?.city || waypoint.city.length < 2) {
+      setSuggestions([]);
       return;
     }
 
-    const reorderedWaypoints = Array.from(waypoints);
-    const sourceIndex = waypoints.findIndex((wp) => wp.id === sourceId);
-    const targetIndex = waypoints.findIndex((wp) => wp.id === targetId);
+    if (debounceTimerRef.current) clearTimeout(debounceTimerRef.current);
+    debounceTimerRef.current = setTimeout(() => {
+      fetchSuggestions(waypoint.city, activeInput).catch((error) => {
+        console.error("Error in debounced fetchSuggestions:", error);
+        setSuggestions([]);
+      });
+    }, 500);
 
-    // Reorder only stops
-    const [movedWaypoint] = reorderedWaypoints.splice(sourceIndex, 1);
-    reorderedWaypoints.splice(targetIndex, 0, movedWaypoint);
-    setWaypoints(reorderedWaypoints);
-    setDraggedId(null);
-  };
+    return () => {
+      if (debounceTimerRef.current) clearTimeout(debounceTimerRef.current);
+    };
+  }, [waypoints, activeInput, isProgrammaticChange, fetchSuggestions]);
 
-  const toWaypoint = waypoints.find((wp) => wp.id === "to");
-  const hasValidTo =
-    toWaypoint?.coords &&
-    Array.isArray(toWaypoint.coords) &&
-    toWaypoint.coords.length === 2 &&
-    !isNaN(toWaypoint.coords[0]) &&
-    !isNaN(toWaypoint.coords[1]);
+  useEffect(() => {
+    if (selectedSaved && waypoints.length >= 2) {
+      setShowDirections(true);
+    }
+  }, [selectedSaved, waypoints]);
+
+  const handleShowDirections = useCallback(() => {
+    setShowDirections(true);
+    setWaypoints((prev) => {
+      if (prev.some((wp) => wp.id === "from")) return prev;
+      return [{ id: "from", city: "", coords: null }, ...prev];
+    });
+  }, [setShowDirections, setWaypoints]);
+
+  const handleDragStart = useCallback(
+    (e, id) => {
+      if (!id) return;
+      e.dataTransfer.setData("text/plain", id);
+      setDraggedId(id);
+    },
+    [setDraggedId]
+  );
+
+  const handleDragOver = useCallback((e) => {
+    e.preventDefault();
+  }, []);
+
+  const handleDrop = useCallback(
+    (e, targetId) => {
+      e.preventDefault();
+      const sourceId = e.dataTransfer.getData("text/plain");
+      if (!sourceId || sourceId === targetId) return;
+
+      if (
+        sourceId === "from" ||
+        sourceId === "to" ||
+        targetId === "from" ||
+        targetId === "to"
+      ) {
+        setDraggedId(null);
+        return;
+      }
+
+      setWaypoints((prev) => {
+        const reorderedWaypoints = [...prev];
+        const sourceIndex = prev.findIndex((wp) => wp.id === sourceId);
+        const targetIndex = prev.findIndex((wp) => wp.id === targetId);
+
+        if (sourceIndex === -1 || targetIndex === -1) {
+          console.warn("Invalid drag indices:", sourceIndex, targetIndex);
+          return prev;
+        }
+
+        const [movedWaypoint] = reorderedWaypoints.splice(sourceIndex, 1);
+        reorderedWaypoints.splice(targetIndex, 0, movedWaypoint);
+        return reorderedWaypoints;
+      });
+      setDraggedId(null);
+    },
+    [setWaypoints, setDraggedId]
+  );
+
+  const toWaypoint = useMemo(
+    () => waypoints.find((wp) => wp.id === "to"),
+    [waypoints]
+  );
+
+  const hasValidTo = useMemo(
+    () =>
+      toWaypoint?.coords &&
+      Array.isArray(toWaypoint.coords) &&
+      toWaypoint.coords.length === 2 &&
+      !isNaN(toWaypoint.coords[0]) &&
+      !isNaN(toWaypoint.coords[1]),
+    [toWaypoint]
+  );
 
   return (
     <div className="search-form">
