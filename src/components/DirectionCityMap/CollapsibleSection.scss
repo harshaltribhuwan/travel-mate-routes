@@ -14,7 +14,6 @@
     transition: all map-get($transitions, fast);
 
     &:hover {
-        background: color(primary-subtle);
         color: color(primary);
     }
 
