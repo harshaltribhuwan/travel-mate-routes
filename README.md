@@ -79,6 +79,7 @@ Choose from 4 map styles:
 "leaflet-routing-machine": "^3.2.12",
 "leaflet.offline": "^3.1.0",
 "speak-tts": "^2.0.0"
+```
 
 ### 🔗 Open APIs Used
 
