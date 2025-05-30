@@ -60,7 +60,7 @@
         border: none;
         border-radius: map-get($radii, full);
         cursor: pointer;
-        font-size: map-get($font-sizes, lg);
+        font-size: map-get($font-sizes, xl);
         color: color(text-secondary);
         display: flex;
         align-items: center;
@@ -68,8 +68,8 @@
         transition: all map-get($transitions, fast);
 
         &:hover {
-            background: color(danger);
-            color: color(surface);
+            // background: color(danger);
+            color: color(danger);
         }
     }
 
