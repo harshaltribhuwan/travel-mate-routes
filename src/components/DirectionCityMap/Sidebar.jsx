@@ -336,24 +336,16 @@ function Sidebar({
     ]
   );
 
-  const toggleCategory = useCallback(
-    (category) => {
-      if (!category) {
-        console.warn("Invalid category:", category);
-        return;
-      }
-      setOpenCategories((prev) => {
-        if (prev[category] === undefined && !prev[category]) {
-          return { ...prev, [category]: true };
-        }
-        if (prev[category]) {
-          return { ...prev, [category]: false };
-        }
-        return prev;
-      });
-    },
-    [setOpenCategories]
-  );
+  const toggleCategory = useCallback((category) => {
+    if (!category) {
+      console.warn("Invalid category:", category);
+      return;
+    }
+    setOpenCategories((prev) => ({
+      ...prev,
+      [category]: !prev[category],
+    }));
+  }, []);
 
   // Group nearby places by type
   const groupedPlaces = groupByType(nearbyPlaces);
