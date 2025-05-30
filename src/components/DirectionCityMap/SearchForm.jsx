@@ -37,87 +37,81 @@ function SearchForm({
   const [focusedSuggestionIndex, setFocusedSuggestionIndex] = useState(-1);
   const [showDirections, setShowDirections] = useState(false);
   const [draggedId, setDraggedId] = useState(null);
-  const [isProgrammaticChange, setIsProgrammaticChange] = useState(false); // New state to track programmatic changes
+  const [isProgrammaticChange, setIsProgrammaticChange] = useState(false);
 
+  // Memoize suggestions map for performance
   const relevantSuggestionsMap = useMemo(() => {
     const map = {};
     waypoints.forEach((wp) => {
-      map[wp.id] = suggestions.filter((s) => s.inputType === wp.id);
+      if (wp.id) {
+        map[wp.id] = suggestions.filter((s) => s.inputType === wp.id);
+      }
     });
     return map;
-  }, [suggestions, waypoints]);
+  }, [suggestions, waypoints.length]);
 
-  const fetchSuggestions = useCallback(
-    async (value, type) => {
-      if (typeof value !== "string" || value.length < 2 || !type) {
-        setSuggestions([]);
-        return;
-      }
+  const fetchSuggestions = async (value, type) => {
+    if (typeof value !== "string" || value.length < 2 || !type) {
+      setSuggestions([]);
+      return;
+    }
 
-      try {
-        const res = await fetch(
-          `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(
-            value
-          )}&limit=5&addressdetails=1`
-        );
-        if (!res.ok) throw new Error(`HTTP error: ${res.status}`);
-        const data = await res.json();
-        if (!Array.isArray(data)) {
-          console.warn("Invalid suggestion data:", data);
-          setSuggestions([]);
-          return;
-        }
-        setSuggestions(data.map((p) => ({ ...p, inputType: type })));
-      } catch (error) {
-        console.error("Error fetching suggestions:", error);
-        setSuggestions([]);
-      }
-    },
-    [setSuggestions]
-  );
-
-  const handleInputChange = useCallback(
-    (id, e) => {
-      const value = e.target.value?.trim() || "";
-      setIsProgrammaticChange(false);
-      setWaypoints((prev) =>
-        prev.map((wp) => (wp.id === id ? { ...wp, city: value } : wp))
+    try {
+      const res = await fetch(
+        `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(
+          value
+        )}&limit=20&addressdetails=1`
       );
-      setActiveInput(id);
-      setFocusedSuggestionIndex(-1);
-
-      if (value.length < 2) {
+      if (!res.ok) throw new Error(`Error: ${res.status}`);
+      const data = await res.json();
+      if (!Array.isArray(data)) {
+        console.warn("Invalid data:", data);
         setSuggestions([]);
         return;
       }
+      setSuggestions(
+        data.map((suggestion) => ({ ...suggestion, inputType: type }))
+      );
+    } catch (error) {
+      console.error("Error:", error);
+      setSuggestions([]);
+    }
+  };
 
-      if (debounceTimerRef.current) clearTimeout(debounceTimerRef.current);
-      debounceTimerRef.current = setTimeout(() => {
-        fetchSuggestions(value, id).catch((error) => {
-          console.error("Error in debounced fetchSuggestions:", error);
-          setSuggestions([]);
-        });
-      }, 500);
-    },
-    [
-      setWaypoints,
-      setActiveInput,
-      setSuggestions,
-      setFocusedSuggestionIndex,
-      fetchSuggestions,
-    ]
-  );
+  const handleInputChange = (id, event) => {
+    const value = event.target.value || "";
+    setIsProgrammaticChange(false);
+    setWaypoints((prev) =>
+      prev.map((wp) => (wp.id === id ? { ...wp, city: value } : wp))
+    );
+    setActiveInput(id);
+    setFocusedSuggestionIndex(-1);
+
+    if (value.length < 2) {
+      setSuggestions([]);
+      return;
+    }
+
+    if (debounceTimerRef.current) {
+      clearTimeout(debounceTimerRef.current);
+    }
+    debounceTimerRef.current = setTimeout(() => {
+      fetchSuggestions(value, id).catch((error) => {
+        console.error("Error in fetch suggestions:", error);
+        setSuggestions([]);
+      });
+    }, 200);
+  };
 
   const handleSuggestionClick = useCallback(
     (place) => {
       if (
-        !place ||
-        !place.display_name ||
+        !place?.display_name ||
         isNaN(parseFloat(place.lat)) ||
         isNaN(parseFloat(place.lon)) ||
         !place.inputType
       ) {
-        console.warn("Invalid suggestion data:", place);
+        console.warn("Invalid suggestion:", place);
         return;
       }
 
@@ -133,21 +127,23 @@ function SearchForm({
             : wp
         )
       );
-      setSavedHistory((prev) => {
+      setSavedHistory((prevHistory) => {
         const newHistory = [
           {
-            id: `hist${Date.now()}`,
+            id: `history-${Date.now()}`,
             query: place.display_name,
             timestamp: new Date().toISOString(),
           },
-          ...prev.slice(0, 10),
+          ...prevHistory.slice(0, 5),
         ];
         return newHistory;
       });
       setSuggestions([]);
       setActiveInput(null);
       setFocusedSuggestionIndex(-1);
-      if (type === "to") setShowSidebar(false);
+      if (type === "to") {
+        setShowSidebar(false);
+      }
       setIsProgrammaticChange(false);
     },
     [
@@ -155,46 +151,36 @@ function SearchForm({
       setSavedHistory,
       setSuggestions,
       setActiveInput,
-      setFocusedSuggestionIndex,
       setShowSidebar,
     ]
   );
 
-  const handleKeyDown = useCallback(
-    (e, wpId) => {
-      const relevantSuggestions = relevantSuggestionsMap[wpId] || [];
+  const handleKeyDown = (event, wpId) => {
+    const relevantSuggestions = relevantSuggestionsMap[wpId] || [];
 
-      if (e.key === "ArrowDown") {
-        e.preventDefault();
-        setFocusedSuggestionIndex((prev) =>
-          prev < relevantSuggestions.length - 1 ? prev + 1 : 0
-        );
-      } else if (e.key === "ArrowUp") {
-        e.preventDefault();
-        setFocusedSuggestionIndex((prev) =>
-          prev > 0 ? prev - 1 : relevantSuggestions.length - 1
-        );
-      } else if (e.key === "Enter" && focusedSuggestionIndex >= 0) {
-        e.preventDefault();
-        if (relevantSuggestions[focusedSuggestionIndex]) {
-          handleSuggestionClick(relevantSuggestions[focusedSuggestionIndex]);
-        }
-      } else if (e.key === "Escape") {
-        setSuggestions([]);
-        setActiveInput(null);
-        setFocusedSuggestionIndex(-1);
+    if (event.key === "ArrowDown") {
+      event.preventDefault();
+      setFocusedSuggestionIndex((prevIndex) =>
+        prevIndex < relevantSuggestions.length - 1 ? prevIndex + 1 : 0
+      );
+    } else if (event.key === "ArrowUp") {
+      event.preventDefault();
+      setFocusedSuggestionIndex((prevIndex) =>
+        prevIndex > 0 ? prevIndex - 1 : relevantSuggestions.length - 1
+      );
+    } else if (event.key === "Enter" && focusedSuggestionIndex >= 0) {
+      event.preventDefault();
+      if (relevantSuggestions[focusedSuggestionIndex]) {
+        handleSuggestionClick(relevantSuggestions[focusedSuggestionIndex]);
       }
-    },
-    [
-      relevantSuggestionsMap,
-      focusedSuggestionIndex,
-      setFocusedSuggestionIndex,
-      setSuggestions,
-      setActiveInput,
-      handleSuggestionClick,
-    ]
-  );
-  const useMyLocation = useCallback(async () => {
+    } else if (event.key === "Escape") {
+      setSuggestions([]);
+      setActiveInput(null);
+      setFocusedSuggestionIndex(-1);
+    }
+  };
+
+  const useMyLocation = async () => {
     if (!navigator.geolocation) {
       console.warn("Geolocation not supported");
       alert("Geolocation not supported.");
@@ -203,59 +189,63 @@ function SearchForm({
 
     setIsProgrammaticChange(true);
     try {
-      const pos = await new Promise((resolve, reject) => {
+      const position = await new Promise((resolve, reject) => {
         navigator.geolocation.getCurrentPosition(resolve, reject, {
           enableHighAccuracy: true,
           timeout: 10000,
         });
       });
 
-      const { latitude: lat, longitude: lon } = pos.coords;
-      const res = await fetch(
+      const { latitude: lat, longitude: lon } = position.coords;
+      const response = await fetch(
         `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}`
       );
-      if (!res.ok) throw new Error(`Reverse geocoding failed: ${res.status}`);
+      if (!response.ok) {
+        throw new Error(`Reverse geocoding failed: ${response.status}`);
+      }
 
-      const data = await res.json();
+      const data = await response.json();
       if (!data?.address) {
-        console.warn("Invalid reverse geocoding data:", data);
+        console.warn("Invalid geocoding data:", data);
         throw new Error("Invalid geocoding response");
       }
 
-      const city =
+      const cityName =
         data.address.city ||
         data.address.town ||
         data.address.village ||
-        "My Location";
+        "Current Location";
 
-      setWaypoints((prev) =>
-        prev.map((wp) =>
-          wp.id === "from" ? { ...wp, city, coords: [lat, lon] } : wp
+      setWaypoints((prevWaypoints) =>
+        prevWaypoints.map((wp) =>
+          wp.id === "from" ? { ...wp, city: cityName, coords: [lat, lon] } : wp
         )
       );
-      setSavedHistory((prev) => {
+      setSavedHistory((prevHistory) => {
         const newHistory = [
           {
-            id: `hist${Date.now()}`,
-            query: city,
+            id: `history-${Date.now()}`,
+            query: cityName,
             timestamp: new Date().toISOString(),
           },
-          ...prev.slice(0, 10),
+          ...prevHistory.slice(0, 5),
         ];
         return newHistory;
       });
       setSuggestions([]);
       setActiveInput(null);
-      setIsProgrammaticChange(false);
-    } catch (err) {
-      console.error("Error in useMyLocation:", err);
+    } catch (error) {
+      console.error("Geolocation error:", error);
       alert("Failed to detect location.");
+    } finally {
       setIsProgrammaticChange(false);
     }
-  }, [setWaypoints, setSavedHistory, setSuggestions, setActiveInput]);
+  };
 
   useEffect(() => {
-    if (!activeInput || isProgrammaticChange) return;
+    if (!activeInput || isProgrammaticChange) {
+      return;
+    }
 
     const waypoint = waypoints.find((wp) => wp.id === activeInput);
     if (!waypoint?.city || waypoint.city.length < 2) {
@@ -263,18 +253,22 @@ function SearchForm({
       return;
     }
 
-    if (debounceTimerRef.current) clearTimeout(debounceTimerRef.current);
+    if (debounceTimerRef.current) {
+      clearTimeout(debounceTimerRef.current);
+    }
     debounceTimerRef.current = setTimeout(() => {
       fetchSuggestions(waypoint.city, activeInput).catch((error) => {
-        console.error("Error in debounced fetchSuggestions:", error);
+        console.error("Error fetching suggestions:", error);
         setSuggestions([]);
       });
-    }, 500);
+    }, 200);
 
     return () => {
-      if (debounceTimerRef.current) clearTimeout(debounceTimerRef.current);
+      if (debounceTimerRef.current) {
+        clearTimeout(debounceTimerRef.current);
+      }
     };
-  }, [waypoints, activeInput, isProgrammaticChange, fetchSuggestions]);
+  }, [activeInput, isProgrammaticChange, waypoints]);
 
   useEffect(() => {
     if (selectedSaved && waypoints.length >= 2) {
@@ -282,61 +276,64 @@ function SearchForm({
     }
   }, [selectedSaved, waypoints]);
 
-  const handleShowDirections = useCallback(() => {
+  const handleShowDirections = () => {
     setShowDirections(true);
-    setWaypoints((prev) => {
-      if (prev.some((wp) => wp.id === "from")) return prev;
-      return [{ id: "from", city: "", coords: null }, ...prev];
+    setWaypoints((prevWaypoints) => {
+      if (prevWaypoints.some((wp) => wp.id === "from")) {
+        return prevWaypoints;
+      }
+      return [{ id: "from", city: "", coords: null }, ...prevWaypoints];
     });
-  }, [setShowDirections, setWaypoints]);
+  };
 
-  const handleDragStart = useCallback(
-    (e, id) => {
-      if (!id) return;
-      e.dataTransfer.setData("text/plain", id);
-      setDraggedId(id);
-    },
-    [setDraggedId]
-  );
+  const handleDragStart = (event, id) => {
+    if (!id || typeof id !== "string") {
+      console.warn("Invalid drag ID:", id);
+      return;
+    }
+    event.dataTransfer.setData("id", id);
+    setDraggedId(id);
+  };
 
-  const handleDragOver = useCallback((e) => {
-    e.preventDefault();
-  }, []);
+  const handleDragOver = (event) => {
+    event.preventDefault();
+  };
 
-  const handleDrop = useCallback(
-    (e, targetId) => {
-      e.preventDefault();
-      const sourceId = e.dataTransfer.getData("text/plain");
-      if (!sourceId || sourceId === targetId) return;
+  const handleDrop = (event, targetId) => {
+    event.preventDefault();
+    const sourceId = event.dataTransfer.getData("id");
+    if (!sourceId || sourceId === targetId || typeof targetId !== "string") {
+      console.warn("Invalid drop:", { sourceId, targetId });
+      setDraggedId(null);
+      return;
+    }
 
-      if (
-        sourceId === "from" ||
-        sourceId === "to" ||
-        targetId === "from" ||
-        targetId === "to"
-      ) {
-        setDraggedId(null);
-        return;
+    if (
+      sourceId === "from" ||
+      sourceId === "to" ||
+      targetId === "from" ||
+      targetId === "to"
+    ) {
+      setDraggedId(null);
+      return;
+    }
+
+    setWaypoints((prevWaypoints) => {
+      const reorderedWaypoints = [...prevWaypoints];
+      const sourceIndex = prevWaypoints.findIndex((wp) => wp.id === sourceId);
+      const targetIndex = prevWaypoints.findIndex((wp) => wp.id === targetId);
+
+      if (sourceIndex === -1 || targetIndex === -1) {
+        console.warn("Invalid indices:", { sourceIndex, targetIndex });
+        return prevWaypoints;
       }
 
-      setWaypoints((prev) => {
-        const reorderedWaypoints = [...prev];
-        const sourceIndex = prev.findIndex((wp) => wp.id === sourceId);
-        const targetIndex = prev.findIndex((wp) => wp.id === targetId);
-
-        if (sourceIndex === -1 || targetIndex === -1) {
-          console.warn("Invalid drag indices:", sourceIndex, targetIndex);
-          return prev;
-        }
-
-        const [movedWaypoint] = reorderedWaypoints.splice(sourceIndex, 1);
-        reorderedWaypoints.splice(targetIndex, 0, movedWaypoint);
-        return reorderedWaypoints;
-      });
-      setDraggedId(null);
-    },
-    [setWaypoints, setDraggedId]
-  );
+      const [movedWaypoint] = reorderedWaypoints.splice(sourceIndex, 1);
+      reorderedWaypoints.splice(targetIndex, 0, movedWaypoint);
+      return reorderedWaypoints;
+    });
+    setDraggedId(null);
+  };
 
   const toWaypoint = useMemo(
     () => waypoints.find((wp) => wp.id === "to"),
@@ -368,9 +365,7 @@ function SearchForm({
                   : undefined
               }
               onDragOver={
-                wp.id !== "from" && wp.id !== "to"
-                  ? (e) => handleDragOver(e, wp.id)
-                  : undefined
+                wp.id !== "from" && wp.id !== "to" ? handleDragOver : undefined
               }
               onDrop={
                 wp.id !== "from" && wp.id !== "to"
@@ -399,7 +394,16 @@ function SearchForm({
                 onKeyDown={(e) => handleKeyDown(e, wp.id)}
                 autoComplete="off"
                 onFocus={() => setActiveInput(wp.id)}
-                onBlur={() => setTimeout(() => setSuggestions([]), 150)}
+                onBlur={() => {
+                  setTimeout(() => {
+                    if (
+                      !document.activeElement.closest(".autocomplete-dropdown")
+                    ) {
+                      setSuggestions([]);
+                      setActiveInput(null);
+                    }
+                  }, 150);
+                }}
                 aria-label={`Enter ${
                   wp.id === "from"
                     ? "starting location"
@@ -430,11 +434,10 @@ function SearchForm({
                   <MdClose />
                 </button>
               )}
-              {activeInput === wp.id && suggestions.length > 0 && (
-                <ul className="autocomplete-dropdown" role="listbox">
-                  {suggestions
-                    .filter((s) => s.inputType === wp.id)
-                    .map((place, index) => (
+              {activeInput === wp.id &&
+                relevantSuggestionsMap[wp.id]?.length > 0 && (
+                  <ul className="autocomplete-dropdown" role="listbox">
+                    {relevantSuggestionsMap[wp.id].map((place, index) => (
                       <li
                         key={place.place_id || `${place.display_name}-${index}`}
                         className={`autocomplete-item ${
@@ -449,8 +452,8 @@ function SearchForm({
                         {place.display_name}
                       </li>
                     ))}
-                </ul>
-              )}
+                  </ul>
+                )}
             </div>
           ) : null
         )}
