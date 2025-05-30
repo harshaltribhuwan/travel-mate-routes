@@ -39,6 +39,14 @@ function SearchForm({
   const [draggedId, setDraggedId] = useState(null);
   const [isProgrammaticChange, setIsProgrammaticChange] = useState(false); // New state to track programmatic changes
 
+  const relevantSuggestionsMap = useMemo(() => {
+    const map = {};
+    waypoints.forEach((wp) => {
+      map[wp.id] = suggestions.filter((s) => s.inputType === wp.id);
+    });
+    return map;
+  }, [suggestions, waypoints]);
+
   const fetchSuggestions = useCallback(
     async (value, type) => {
       if (typeof value !== "string" || value.length < 2 || !type) {
@@ -154,10 +162,7 @@ function SearchForm({
 
   const handleKeyDown = useCallback(
     (e, wpId) => {
-      const relevantSuggestions = useMemo(
-        () => suggestions.filter((s) => s.inputType === wpId),
-        [suggestions, wpId]
-      );
+      const relevantSuggestions = relevantSuggestionsMap[wpId] || [];
 
       if (e.key === "ArrowDown") {
         e.preventDefault();
@@ -181,7 +186,7 @@ function SearchForm({
       }
     },
     [
-      suggestions,
+      relevantSuggestionsMap,
       focusedSuggestionIndex,
       setFocusedSuggestionIndex,
       setSuggestions,
@@ -189,7 +194,6 @@ function SearchForm({
       handleSuggestionClick,
     ]
   );
-
   const useMyLocation = useCallback(async () => {
     if (!navigator.geolocation) {
       console.warn("Geolocation not supported");
