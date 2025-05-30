@@ -316,15 +316,36 @@ export default function DirectionCityMap() {
     }
   };
 
-  const loadHistoryItem = (item) => {
-    if (activeInput) {
-      setWaypoints((prev) =>
-        prev.map((wp) =>
-          wp.id === activeInput ? { ...wp, city: item.query } : wp
-        )
-      );
-    }
-  };
+const loadHistoryItem = async (item) => {
+  try {
+    const response = await fetch(
+      `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(
+        item.query
+      )}&limit=1`
+    );
+    if (!response.ok) throw new Error(`Search failed: ${response.status}`);
+    const data = await response.json();
+    if (!data[0]) throw new Error("No results found");
+
+    const lat = parseFloat(data[0].lat);
+    const lon = parseFloat(data[0].lon);
+    const displayName = data[0].display_name;
+
+    setWaypoints((prev) =>
+      prev.map((wp) =>
+        wp.id === "to"
+          ? { ...wp, city: displayName, coords: [lat, lon] }
+          : wp.id === "from"
+          ? { ...wp, city: "", coords: null }
+          : wp
+      )
+    );
+    setActiveInput(null);
+    setSuggestions([]);
+  } catch (error) {
+    console.error("Error loading history item:", error);
+  }
+};
 
   const deleteHistoryItem = (index) => {
     setSavedHistory((prev) => prev.filter((_, i) => i !== index));
