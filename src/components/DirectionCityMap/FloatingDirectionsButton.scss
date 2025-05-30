@@ -2,39 +2,39 @@
 
 .floating-directions-button {
     position: fixed;
-    bottom: 110px; // Closer to tile-layer-switcher’s bottom: 12px
-    right: 9px; // Closer to tile-layer-switcher’s right: 12px
-    background-color: color(primary); // Primary color from Variables.scss
-    color: color(surface); // Surface color for icon
+    bottom: 110px;
+    right: 9px;
+    background-color: color(primary);
+    color: color(surface);
     border: none;
-    border-radius: map-get($radii, full); // Full radius for circular shape
-    width: 40px; // Smaller, inspired by tile-option’s 32px
-    height: 40px; // Matching width for square button
+    border-radius: map-get($radii, full);
+    width: 40px;
+    height: 40px;
     display: flex;
     align-items: center;
     justify-content: center;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15); // Softer shadow like tile-layer-switcher
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
     cursor: pointer;
-    z-index: 1100; // Matches tile-layer-switcher’s z-index
+    z-index: 1100;
     transition: background-color map-get($transitions, fast), transform map-get($transitions, fast), box-shadow 0.3s ease;
 
     &:hover {
-        background-color: color(primary-light); // Lighter primary on hover
-        transform: scale(1.1); // Slightly larger scale than 1.05
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2); // Enhanced shadow on hover
+        background-color: color(primary-light);
+        transform: scale(1.1);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
     }
 
     &:focus-visible {
         outline: none;
-        box-shadow: 0 0 0 3px color(primary-subtle), 0 2px 8px rgba(0, 0, 0, 0.15); // Focus ring with shadow
+        box-shadow: 0 0 0 3px color(primary-subtle), 0 2px 8px rgba(0, 0, 0, 0.15);
     }
 
     &:active {
-        transform: scale(0.95); // Subtle press effect
+        transform: scale(0.95);
     }
 
     svg {
-        font-size: 20px; // Slightly larger than tile-option’s 18px for visibility
-        pointer-events: none; // Prevent SVG from capturing clicks
+        font-size: 20px;
+        pointer-events: none;
     }
 }
