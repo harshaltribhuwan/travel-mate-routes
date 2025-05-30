@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { MdClose, MdMenu } from "react-icons/md";
 import L from "leaflet";
 import SearchForm from "./SearchForm";
@@ -68,149 +68,292 @@ function Sidebar({
   // State for nested collapsible sections
   const [openCategories, setOpenCategories] = useState({});
 
-  // Invalidate map size on sidebar open/close
   useEffect(() => {
-    if (mapRef.current) {
-      const frame = requestAnimationFrame(() => {
-        mapRef.current.invalidateSize();
-      });
-      return () => cancelAnimationFrame(frame);
-    }
+    if (!mapRef.current) return;
+
+    let timeoutId;
+    const invalidateMap = () => {
+      timeoutId = setTimeout(() => {
+        mapRef.current?.invalidateSize();
+      }, 100); // Debounce to prevent rapid calls
+    };
+
+    invalidateMap();
+
+    return () => {
+      if (timeoutId) clearTimeout(timeoutId);
+    };
   }, [showSidebar, mapRef]);
 
-  const saveRoute = () => {
+  const saveRoute = useCallback(() => {
     if (
-      waypoints.length >= 2 &&
-      waypoints.every(
-        (wp) => Array.isArray(wp.coords) && wp.coords.length === 2
-      ) &&
+      waypoints.length < 2 ||
       !waypoints.every(
-        (wp, i) =>
+        (wp) =>
+          Array.isArray(wp.coords) &&
+          wp.coords.length === 2 &&
+          !isNaN(wp.coords[0]) &&
+          !isNaN(wp.coords[1])
+      ) ||
+      waypoints.every(
+        (wp, i, arr) =>
           i > 0 &&
-          wp.coords[0] === waypoints[0].coords[0] &&
-          wp.coords[1] === waypoints[0].coords[1]
-      )
+          wp.coords[0] === arr[0].coords[0] &&
+          wp.coords[1] === arr[0].coords[1]
+      ) ||
+      distance == null ||
+      duration == null
     ) {
-      setSavedRoutes((prev) => [
-        ...prev,
-        {
-          waypoints,
-          distance,
-          duration,
-          alternatives,
-          timestamp: new Date().toISOString(),
-        },
-      ]);
-    }
-  };
-
-  const deleteRoute = (index) => {
-    setSavedRoutes((prev) => prev.filter((_, i) => i !== index));
-  };
-
-  const handleClearRoute = () => {
-    setWaypoints([
-      { id: "from", city: "", coords: defaultCenter },
-      { id: "to", city: "", coords: null },
-    ]);
-    setDistance(null);
-    setDuration(null);
-    setAlternatives([]);
-    setTracking(false);
-
-    if (mapRef.current) {
-      mapRef.current.setView(defaultCenter, 5);
-      mapRef.current.invalidateSize();
-    }
-    clearRoute();
-  };
-
-  const handleLoadRoute = (route) => {
-    if (
-      !route ||
-      !Array.isArray(route.waypoints) ||
-      route.waypoints.length === 0
-    )
+      console.warn("Invalid route data, not saving");
       return;
+    }
 
-    setWaypoints(route.waypoints);
-    setDistance(route.distance);
-    setDuration(route.duration);
-    setAlternatives(route.alternatives || []);
-    setSelectedSaved(true);
+    const isDuplicate = savedRoutes.some(
+      (route) =>
+        route.waypoints.length === waypoints.length &&
+        route.waypoints.every(
+          (wp, i) =>
+            wp.city === waypoints[i].city &&
+            wp.coords[0] === waypoints[i].coords[0] &&
+            wp.coords[1] === waypoints[i].coords[1]
+        )
+    );
 
-    if (mapRef.current) {
-      try {
-        const bounds = L.latLngBounds(route.waypoints.map((wp) => wp.coords));
-        mapRef.current.fitBounds(bounds, { padding: [50, 50] });
-        mapRef.current.invalidateSize();
-      } catch {
-        const fallbackCenter = route.waypoints[0]?.coords || defaultCenter;
-        mapRef.current.setView(fallbackCenter, 10);
+    if (isDuplicate) {
+      console.warn("Duplicate route, not saving");
+      return;
+    }
+
+    setSavedRoutes((prev) => [
+      {
+        waypoints,
+        distance,
+        duration,
+        alternatives: alternatives || [],
+        timestamp: new Date().toISOString(),
+      },
+      ...prev.slice(0, 50),
+    ]);
+  }, [
+    waypoints,
+    distance,
+    duration,
+    alternatives,
+    savedRoutes,
+    setSavedRoutes,
+  ]);
+
+  const deleteRoute = useCallback(
+    (index) => {
+      if (index < 0 || index >= savedRoutes.length) {
+        console.warn("Invalid route index for deletion:", index);
+        return;
       }
+      setSavedRoutes((prev) => prev.filter((_, i) => i !== index));
+    },
+    [savedRoutes, setSavedRoutes]
+  );
+
+  const handleClearRoute = useCallback(() => {
+    try {
+      setWaypoints([
+        { id: "from", city: "", coords: defaultCenter },
+        { id: "to", city: "", coords: null },
+      ]);
+      setDistance(null);
+      setDuration(null);
+      setAlternatives([]);
+      setTracking(false);
+
+      if (mapRef.current) {
+        mapRef.current.setView(defaultCenter, 5);
+        mapRef.current.invalidateSize();
+      }
+
+      clearRoute();
+    } catch (error) {
+      console.error("Error clearing route:", error);
     }
+  }, [
+    setWaypoints,
+    setDistance,
+    setDuration,
+    setAlternatives,
+    setTracking,
+    mapRef,
+    clearRoute,
+  ]);
 
-    loadRoute(route);
-    setShowSidebar(false);
-  };
+  const handleLoadRoute = useCallback(
+    (route) => {
+      if (
+        !route ||
+        !Array.isArray(route.waypoints) ||
+        route.waypoints.length === 0 ||
+        !route.waypoints.every(
+          (wp) =>
+            wp.id &&
+            wp.city &&
+            Array.isArray(wp.coords) &&
+            wp.coords.length === 2 &&
+            !isNaN(wp.coords[0]) &&
+            !isNaN(wp.coords[1])
+        )
+      ) {
+        console.warn("Invalid route data:", route);
+        return;
+      }
 
-  const handleSelectAlternative = (index) => {
-    selectAlternative(index);
-    if (mapRef.current) {
-      mapRef.current.invalidateSize();
-    }
-  };
+      try {
+        setWaypoints(route.waypoints);
+        setDistance(route.distance ?? null);
+        setDuration(route.duration ?? null);
+        setAlternatives(route.alternatives ?? []);
+        setSelectedSaved(true);
 
-  const handleSelectNearbyPlace = (place) => {
-    const hasToWaypoint = waypoints.some((wp) => wp.id === "to");
-    let updatedWaypoints;
+        if (mapRef.current) {
+          const validCoords = route.waypoints.filter((wp) => wp.coords);
+          if (validCoords.length > 0) {
+            const bounds = L.latLngBounds(validCoords.map((wp) => wp.coords));
+            mapRef.current.fitBounds(bounds, { padding: [50, 50] });
+          } else {
+            mapRef.current.setView(
+              route.waypoints[0].coords || defaultCenter,
+              10
+            );
+          }
+          mapRef.current.invalidateSize();
+        }
 
-    if (!hasToWaypoint) {
-      updatedWaypoints = [
-        ...waypoints,
-        { id: "to", city: place.name, coords: [place.lat, place.lng] },
-      ];
-    } else {
-      updatedWaypoints = waypoints.map((wp) =>
-        wp.id === "to"
-          ? { ...wp, city: place.name, coords: [place.lat, place.lng] }
-          : wp
-      );
-    }
+        loadRoute(route);
+        setShowSidebar(false);
+      } catch (error) {
+        console.error("Error loading route:", error);
+        setWaypoints([
+          { id: "from", city: "", coords: defaultCenter },
+          { id: "to", city: "", coords: null },
+        ]);
+        setDistance(null);
+        setDuration(null);
+        setAlternatives([]);
+      }
+    },
+    [
+      setWaypoints,
+      setDistance,
+      setDuration,
+      setAlternatives,
+      setSelectedSaved,
+      mapRef,
+      loadRoute,
+      setShowSidebar,
+    ]
+  );
 
-    setWaypoints(updatedWaypoints);
-    setSuggestions([]); // Clear suggestions immediately
-    setActiveInput(null); // Ensure no input is active
+  const handleSelectAlternative = useCallback(
+    (index) => {
+      if (index < 0 || index >= alternatives.length) {
+        console.warn("Invalid alternative index:", index);
+        return;
+      }
 
-    if (mapRef.current) {
-      mapRef.current.setView([place.lat, place.lng], 14);
-      mapRef.current.invalidateSize();
-    }
+      try {
+        selectAlternative(index);
+        if (mapRef.current) {
+          mapRef.current.invalidateSize();
+        }
+      } catch (error) {
+        console.error("Error selecting alternative:", error);
+      }
+    },
+    [alternatives, selectAlternative, mapRef]
+  );
 
-    loadRoute({ waypoints: updatedWaypoints });
+  const handleSelectNearbyPlace = useCallback(
+    (place) => {
+      if (
+        !place ||
+        !place.name ||
+        typeof place.lat !== "number" ||
+        typeof place.lng !== "number" ||
+        isNaN(place.lat) ||
+        isNaN(place.lng)
+      ) {
+        console.warn("Invalid place data:", place);
+        return;
+      }
 
-    setShowSidebar(false);
+      try {
+        const hasToWaypoint = waypoints.some((wp) => wp.id === "to");
+        const updatedWaypoints = hasToWaypoint
+          ? waypoints.map((wp) =>
+              wp.id === "to"
+                ? { ...wp, city: place.name, coords: [place.lat, place.lng] }
+                : wp
+            )
+          : [
+              ...waypoints,
+              { id: "to", city: place.name, coords: [place.lat, place.lng] },
+            ];
 
-    setSavedHistory((prev) => {
-      const newHistory = [
-        {
-          id: `hist${Date.now()}`,
-          query: place.name,
-          timestamp: new Date().toISOString(),
-        },
-        ...prev,
-      ].slice(0, 10);
-      return newHistory;
-    });
-  };
+        setWaypoints(updatedWaypoints);
+        setSuggestions([]);
+        setActiveInput(null);
 
-  // Toggle function for nested category sections
-  const toggleCategory = (category) => {
-    setOpenCategories((prev) => ({
-      ...prev,
-      [category]: !prev[category],
-    }));
-  };
+        if (mapRef.current) {
+          mapRef.current.setView([place.lat, place.lng], 14);
+          mapRef.current.invalidateSize();
+        }
+
+        loadRoute({ waypoints: updatedWaypoints });
+
+        setSavedHistory((prev) => {
+          const newHistory = [
+            {
+              id: `hist${Date.now()}`,
+              query: place.name,
+              timestamp: new Date().toISOString(),
+            },
+            ...prev.slice(0, 10),
+          ];
+          return newHistory;
+        });
+
+        setShowSidebar(false);
+      } catch (error) {
+        console.error("Error selecting nearby place:", error);
+      }
+    },
+    [
+      waypoints,
+      setWaypoints,
+      setSuggestions,
+      setActiveInput,
+      mapRef,
+      loadRoute,
+      setSavedHistory,
+      setShowSidebar,
+    ]
+  );
+
+  const toggleCategory = useCallback(
+    (category) => {
+      if (!category) {
+        console.warn("Invalid category:", category);
+        return;
+      }
+      setOpenCategories((prev) => {
+        if (prev[category] === undefined && !prev[category]) {
+          return { ...prev, [category]: true };
+        }
+        if (prev[category]) {
+          return { ...prev, [category]: false };
+        }
+        return prev;
+      });
+    },
+    [setOpenCategories]
+  );
 
   // Group nearby places by type
   const groupedPlaces = groupByType(nearbyPlaces);
