@@ -4,8 +4,6 @@ TravelMate Routes is a lightweight, powerful **React.js-based mapping applicatio
 
 🔗 **Live Demo**: [travelmate-routes.netlify.app](https://travelmate-routes.netlify.app)
 
----
-
 ## ✨ Features
 
 ### 🔍 Destination Search & Routing
