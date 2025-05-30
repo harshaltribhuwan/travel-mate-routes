@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState, lazy, Suspense } from "react";
+import React, { useEffect, useRef, useState, lazy, Suspense, useCallback } from "react";
 import L from "leaflet";
 import "leaflet.offline";
 const MapView = lazy(() => import("./MapView"));
@@ -8,9 +8,10 @@ import "./DirectionCityMap.scss";
 import Loader from "./Loader";
 
 export default function DirectionCityMap() {
-  const [waypoints, setWaypoints] = useState([
-    { id: "to", city: "", coords: null },
-  ]);
+const [waypoints, setWaypoints] = useState([
+  { id: "from", city: "", coords: null },
+  { id: "to", city: "", coords: null },
+]);
   const [suggestions, setSuggestions] = useState([]);
   const [activeInput, setActiveInput] = useState(null);
   const [distance, setDistance] = useState(null);
@@ -37,123 +38,139 @@ export default function DirectionCityMap() {
   const watchIdRef = useRef(null);
   const routeControlRef = useRef(null);
   const lastFetchedCoordsRef = useRef(null);
+  const lastGeolocationAttemptRef = useRef(null);
 
-  const fetchNearbyPlaces = async (lat, lng) => {
-    if (!lat || !lng) return;
-    try {
-      const query = `
-        [out:json][timeout:25];
-        (
-          node["amenity"="cafe"](around:1000,${lat},${lng});
-          node["amenity"="restaurant"](around:1000,${lat},${lng});
-          node["amenity"="bar"](around:1000,${lat},${lng});
-          node["shop"](around:1000,${lat},${lng});
-          node["amenity"="pharmacy"](around:1000,${lat},${lng});
-          node["tourism"="attraction"](around:1000,${lat},${lng});
-          node["tourism"="hotel"](around:1000,${lat},${lng});
-          node["leisure"="park"](around:1000,${lat},${lng});
-          node["historic"](around:1000,${lat},${lng});
-        );
-        out body;
-      `;
-      const url =
-        "https://overpass-api.de/api/interpreter?data=" +
-        encodeURIComponent(query);
-      const response = await fetch(url);
-      if (!response.ok) throw new Error("Failed to fetch nearby places");
-      const data = await response.json();
-      const places = data.elements.map((el) => ({
-        id: el.id,
-        name: el.tags.name || "Unnamed",
-        lat: el.lat,
-        lng: el.lon,
-        type:
-          el.tags.amenity ||
-          el.tags.shop ||
-          el.tags.tourism ||
-          el.tags.leisure ||
-          el.tags.historic ||
-          "unknown",
-      }));
-
-      const filteredPlaces = places.filter(
-        (place) => place.name !== "Unnamed" && place.type !== "butcher"
+const fetchNearbyPlaces = useCallback(async (lat, lng) => {
+  if (!lat || !lng || isNaN(lat) || isNaN(lng)) return;
+  try {
+    const query = `
+      [out:json][timeout:25];
+      (
+        node["amenity"="cafe"](around:1000,${lat},${lng});
+        node["amenity"="restaurant"](around:1000,${lat},${lng});
+        node["amenity"="bar"](around:1000,${lat},${lng});
+        node["shop"](around:1000,${lat},${lng});
+        node["amenity"="pharmacy"](around:1000,${lat},${lng});
+        node["tourism"="attraction"](around:1000,${lat},${lng});
+        node["tourism"="hotel"](around:1000,${lat},${lng});
+        node["leisure"="park"](around:1000,${lat},${lng});
+        node["historic"](around:1000,${lat},${lng});
       );
+      out body;
+    `;
+    const url =
+      "https://overpass-api.de/api/interpreter?data=" +
+      encodeURIComponent(query);
+    const response = await fetch(url);
+    if (!response.ok) throw new Error("Failed to fetch nearby places");
+    const data = await response.json();
+    const places = data.elements.map((el) => ({
+      id: el.id,
+      name: el.tags.name || "Unnamed",
+      lat: el.lat,
+      lng: el.lon,
+      type:
+        el.tags.amenity ||
+        el.tags.shop ||
+        el.tags.tourism ||
+        el.tags.leisure ||
+        el.tags.historic ||
+        "unknown",
+    }));
 
-      // Group by type
-      const grouped = filteredPlaces.reduce((acc, place) => {
-        if (!acc[place.type]) acc[place.type] = [];
-        acc[place.type].push(place);
-        return acc;
-      }, {});
+    const filteredPlaces = places.filter(
+      (place) => place.name !== "Unnamed" && place.type !== "butcher"
+    );
 
-      const priority = [
-        "restaurant",
-        "cafe",
-        "hotel",
-        "bakery",
-        "pharmacy",
-        "chemist",
-        "jwelery",
-      ];
+    const grouped = filteredPlaces.reduce((acc, place) => {
+      if (!acc[place.type]) acc[place.type] = [];
+      acc[place.type].push(place);
+      return acc;
+    }, {});
 
-      const sortedGroupedPlaces = [
-        ...priority.flatMap((type) => grouped[type] || []),
-        ...Object.entries(grouped)
-          .filter(([type]) => !priority.includes(type))
-          .sort(([a], [b]) => a.localeCompare(b))
-          .flatMap(([, places]) => places),
-      ];
+    const priority = [
+      "restaurant",
+      "cafe",
+      "hotel",
+      "bakery",
+      "pharmacy",
+      "chemist",
+      "jwelery",
+    ];
 
-      // Now use `sortedGroupedPlaces`
-      setNearbyPlaces(sortedGroupedPlaces);
+    const sortedGroupedPlaces = [
+      ...priority.flatMap((type) => grouped[type] || []),
+      ...Object.entries(grouped)
+        .filter(([type]) => !priority.includes(type))
+        .sort(([a], [b]) => a.localeCompare(b))
+        .flatMap(([, places]) => places),
+    ];
 
-      lastFetchedCoordsRef.current = [lat, lng];
-    } catch (err) {
-      console.error(err);
-      setNearbyPlaces([]);
-      lastFetchedCoordsRef.current = null;
+    setNearbyPlaces(sortedGroupedPlaces);
+    lastFetchedCoordsRef.current = [lat, lng];
+  } catch (err) {
+    console.error(err);
+    setNearbyPlaces([]);
+    lastFetchedCoordsRef.current = null;
+  }
+}, []);
+
+useEffect(() => {
+  const toWaypoint = waypoints.find((wp) => wp.id === "to");
+  const hasValidToCoords =
+    toWaypoint &&
+    Array.isArray(toWaypoint.coords) &&
+    toWaypoint.coords.length === 2 &&
+    typeof toWaypoint.coords[0] === "number" &&
+    typeof toWaypoint.coords[1] === "number" &&
+    !isNaN(toWaypoint.coords[0]) &&
+    !isNaN(toWaypoint.coords[1]);
+
+  let debounceTimer;
+  const fetchWithDebounce = () => {
+    if (
+      hasValidToCoords &&
+      (!lastFetchedCoordsRef.current ||
+        lastFetchedCoordsRef.current[0] !== toWaypoint.coords[0] ||
+        lastFetchedCoordsRef.current[1] !== toWaypoint.coords[1])
+    ) {
+      fetchNearbyPlaces(toWaypoint.coords[0], toWaypoint.coords[1]);
     }
   };
 
-  useEffect(() => {
-    const toWaypoint = waypoints.find((wp) => wp.id === "to");
-    const hasValidToCoords =
-      toWaypoint &&
-      Array.isArray(toWaypoint.coords) &&
-      toWaypoint.coords.length === 2 &&
-      typeof toWaypoint.coords[0] === "number" &&
-      typeof toWaypoint.coords[1] === "number" &&
-      !isNaN(toWaypoint.coords[0]) &&
-      !isNaN(toWaypoint.coords[1]);
+  if (hasValidToCoords) {
+    debounceTimer = setTimeout(fetchWithDebounce, 500);
+  } else if (
+    navigator.geolocation &&
+    (!lastGeolocationAttemptRef.current ||
+      Date.now() - lastGeolocationAttemptRef.current > 60000) // Limit to once per minute
+  ) {
+    lastGeolocationAttemptRef.current = Date.now();
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const { latitude, longitude } = position.coords;
+        if (
+          !lastFetchedCoordsRef.current ||
+          lastFetchedCoordsRef.current[0] !== latitude ||
+          lastFetchedCoordsRef.current[1] !== longitude
+        ) {
+          fetchNearbyPlaces(latitude, longitude);
+        }
+      },
+      (error) => {
+        console.warn("Geolocation failed:", error);
+        setNearbyPlaces([]); // Clear places if geolocation fails
+      },
+      { enableHighAccuracy: true, timeout: 10000 }
+    );
+  } else if (!hasValidToCoords) {
+    setNearbyPlaces([]); // Clear places if no valid coordinates
+  }
 
-    if (hasValidToCoords) {
-      if (
-        !lastFetchedCoordsRef.current ||
-        lastFetchedCoordsRef.current[0] !== toWaypoint.coords[0] ||
-        lastFetchedCoordsRef.current[1] !== toWaypoint.coords[1]
-      ) {
-        fetchNearbyPlaces(toWaypoint.coords[0], toWaypoint.coords[1]);
-      }
-    } else if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          const { latitude, longitude } = position.coords;
-          if (
-            !lastFetchedCoordsRef.current ||
-            lastFetchedCoordsRef.current[0] !== latitude ||
-            lastFetchedCoordsRef.current[1] !== longitude
-          ) {
-            fetchNearbyPlaces(latitude, longitude);
-          }
-        },
-        (error) => {
-          console.warn("Geolocation failed:", error);
-        },
-        { enableHighAccuracy: true, timeout: 10000 }
-      );
-    }
-  }, [waypoints]);
+  return () => {
+    if (debounceTimer) clearTimeout(debounceTimer);
+  };
+}, [waypoints, fetchNearbyPlaces]);
 
   useEffect(() => {
     localStorage.setItem("savedRoutes", JSON.stringify(savedRoutes));
@@ -242,13 +259,17 @@ export default function DirectionCityMap() {
     setWaypoints((prev) => prev.filter((wp) => wp.id !== id));
   };
 
-  const clearRoute = () => {
-    setWaypoints([{ id: "to", city: "", coords: null }]);
-    setDistance(null);
-    setDuration(null);
-    setAlternatives([]);
-    setTracking(false);
-  };
+const clearRoute = () => {
+  setWaypoints([
+    { id: "from", city: "", coords: null },
+    { id: "to", city: "", coords: null },
+  ]);
+  setDistance(null);
+  setDuration(null);
+  setAlternatives([]);
+  setTracking(false);
+  setNearbyPlaces([]); // Clear nearby places
+};
 
   const loadRoute = (route) => {
     setWaypoints(route.waypoints);
