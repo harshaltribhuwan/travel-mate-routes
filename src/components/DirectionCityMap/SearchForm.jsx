@@ -14,6 +14,7 @@ import {
   MdDirections,
   MdDragIndicator,
 } from "react-icons/md";
+import { useDirections } from "./DirectionsContext";
 import "./SearchForm.scss";
 
 function SearchForm({
@@ -35,9 +36,16 @@ function SearchForm({
 }) {
   const debounceTimerRef = useRef(null);
   const [focusedSuggestionIndex, setFocusedSuggestionIndex] = useState(-1);
-  const [showDirections, setShowDirections] = useState(false);
   const [draggedId, setDraggedId] = useState(null);
   const [isProgrammaticChange, setIsProgrammaticChange] = useState(false);
+
+  // Use DirectionsContext
+  const {
+    showDirections,
+    setShowDirections,
+    hasValidTo,
+    handleShowDirections,
+  } = useDirections();
 
   // Memoize suggestions map for performance
   const relevantSuggestionsMap = useMemo(() => {
@@ -274,17 +282,7 @@ function SearchForm({
     if (selectedSaved && waypoints.length >= 2) {
       setShowDirections(true);
     }
-  }, [selectedSaved, waypoints]);
-
-  const handleShowDirections = () => {
-    setShowDirections(true);
-    setWaypoints((prevWaypoints) => {
-      if (prevWaypoints.some((wp) => wp.id === "from")) {
-        return prevWaypoints;
-      }
-      return [{ id: "from", city: "", coords: null }, ...prevWaypoints];
-    });
-  };
+  }, [selectedSaved, waypoints, setShowDirections]);
 
   const handleDragStart = (event, id) => {
     if (!id || typeof id !== "string") {
@@ -334,21 +332,6 @@ function SearchForm({
     });
     setDraggedId(null);
   };
-
-  const toWaypoint = useMemo(
-    () => waypoints.find((wp) => wp.id === "to"),
-    [waypoints]
-  );
-
-  const hasValidTo = useMemo(
-    () =>
-      toWaypoint?.coords &&
-      Array.isArray(toWaypoint.coords) &&
-      toWaypoint.coords.length === 2 &&
-      !isNaN(toWaypoint.coords[0]) &&
-      !isNaN(toWaypoint.coords[1]),
-    [toWaypoint]
-  );
 
   return (
     <div className="search-form">

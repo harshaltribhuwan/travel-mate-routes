@@ -4,31 +4,31 @@
     position: fixed;
     bottom: 100px;
     right: 20px;
-    background-color: map-get($colors, primary);
-    color: map-get($colors, surface);
+    background-color: color(primary);
+    color: color(surface);
     border: none;
-    border-radius: 50%;
+    border-radius: map-get($radii, full);
     width: 48px;
     height: 48px;
     display: flex;
     align-items: center;
     justify-content: center;
-    box-shadow: 0 2px 4px map-get($colors, shadow-sm);
+    box-shadow: 0 2px 4px color(shadow-sm);
     cursor: pointer;
     z-index: 1000;
-    transition: background-color 0.2s ease, transform 0.2s ease;
+    transition: background-color map-get($transitions, fast), transform map-get($transitions, fast);
 
     &:hover {
-        background-color: map-get($colors, primary-light);
+        background-color: color(primary-light);
         transform: scale(1.05);
     }
 
     &:focus {
         outline: none;
-        box-shadow: 0 0 0 3px map-get($colors, primary-subtle);
+        box-shadow: 0 0 0 3px color(primary-subtle);
     }
 
     svg {
-        font-size: 24px;
+        font-size: map-get($font-sizes, base);
     }
 }
