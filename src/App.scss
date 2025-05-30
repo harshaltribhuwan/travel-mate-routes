@@ -14,13 +14,3 @@ body {
   border-radius: 12px;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
 }
-
-@media (max-width: 768px) {
-
-  input:not(.large-input),
-  textarea:not(.large-input),
-  select:not(.large-input) {
-    font-size: 16px;
-  }
-}
-

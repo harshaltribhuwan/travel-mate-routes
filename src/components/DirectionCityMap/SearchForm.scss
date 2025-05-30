@@ -216,3 +216,9 @@
         color: color(primary);
     }
 }
+
+@media (max-width: 768px) {
+    .prevent-zoom {
+        font-size: 16px !important;
+    }
+}
