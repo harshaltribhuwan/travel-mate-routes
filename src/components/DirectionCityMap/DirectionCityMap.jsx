@@ -171,11 +171,7 @@ export default function DirectionCityMap() {
 
     if (hasValidToCoords) {
       debounceTimer = setTimeout(fetchWithDebounce, 500);
-    } else if (
-      navigator.geolocation &&
-      (!lastGeolocationAttemptRef.current ||
-        Date.now() - lastGeolocationAttemptRef.current > 60000)
-    ) {
+    } else if (navigator.geolocation) {
       navigator.permissions.query({ name: "geolocation" }).then((result) => {
         if (result.state === "granted") {
           fetchWithGeolocation();
@@ -192,7 +188,7 @@ export default function DirectionCityMap() {
           }
         };
       });
-    } else if (!hasValidToCoords) {
+    } else {
       setNearbyPlaces([]);
     }
 
