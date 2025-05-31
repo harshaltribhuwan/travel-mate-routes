@@ -211,13 +211,14 @@
     font-size: map-get($font-sizes, sm);
     color: color(text-primary);
     background: color(surface-secondary);
-    transition: map-get($transitions, normal);
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+    // transition: map-get($transitions, normal);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
 
     &:focus {
         outline: none;
-        background: color(surface);
-        box-shadow: 0 0 0 2px color(primary-subtle);
+        // background: color(surface);
+        // box-shadow: 0 0 0 2px color(primary-subtle);
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
     }
 
     &::placeholder {
@@ -320,7 +321,7 @@
 
     .input-field {
         padding: space(2);
-                padding-left: 20px;
+        padding-left: 20px;
         font-size: map-get($font-sizes, xs);
     }
 
@@ -351,6 +352,6 @@
     }
 
     .chat-input {
-        bottom: 50px;
+        bottom: 40px;
     }
 }

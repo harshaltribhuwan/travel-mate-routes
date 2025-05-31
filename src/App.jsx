@@ -7,7 +7,7 @@ const ChatBot = lazy(() => import("./components/ChatBot/ChatBot.jsx"));
 import "leaflet/dist/leaflet.css";
 import "./App.scss";
 import Loader from "./components/DirectionCityMap/Loader.jsx";
-import Navbar from "./components/Navbar/Navbar.jsx";
+import Landing from "./components/Pages/Landing.jsx";
 
 export default function App() {
   return (
@@ -15,7 +15,7 @@ export default function App() {
       <Suspense fallback={<Loader />}>
         <div className="App">
           <Routes>
-            <Route path="/" element={<Navbar />} />
+            <Route path="/" element={<Landing />} />
             <Route path="/map" element={<DirectionCityMap />} />
             <Route path="/chat" element={<ChatBot />} />
           </Routes>
