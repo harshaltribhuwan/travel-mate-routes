@@ -220,7 +220,6 @@
         border: none;
         // background: color(surface);
         // box-shadow: 0 0 0 2px color(primary-subtle);
-        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
     }
 
     &::placeholder {
@@ -246,7 +245,6 @@
 
     &:hover {
         background: linear-gradient(45deg, color(primary-light), color(primary));
-        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
     }
 
     &:active {
@@ -288,11 +286,11 @@
 /* Media Queries */
 @media (max-width: 768px) {
     .chat-header {
-        padding: space(3) space(4);
+        // padding: space(3) space(4);
 
         h2 {
             font-size: map-get($font-sizes, lg);
-            letter-spacing: 1.5px;
+            // letter-spacing: 1.5px;
 
             &::after {
                 width: 40px;
@@ -304,7 +302,7 @@
     .chat-messages {
         padding: space(3);
         gap: space(2);
-        margin-bottom: space(8);
+        // margin-bottom: space(8);
     }
 
     .message {
@@ -354,6 +352,6 @@
     }
 
     .chat-input {
-        bottom: 40px;
+        bottom: 35px;
     }
 }

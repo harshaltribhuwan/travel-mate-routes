@@ -187,6 +187,21 @@ Need a guide? Let’s plan it.`,
     }
   };
 
+  useEffect(() => {
+    const timestamp = new Date().toLocaleTimeString([], {
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+    setMessages([
+      {
+        text: "Hi there! 👋 I’m your TravelMate Buddy. Ask me anything about your next trip!",
+        sender: "bot",
+        timestamp,
+      },
+    ]);
+  }, []);
+
+
   // Auto-scroll to the latest message
   useEffect(() => {
     const chatMessages = document.querySelector(".chat-messages");
