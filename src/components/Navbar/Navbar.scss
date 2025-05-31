@@ -1,0 +1,28 @@
+@import "../../styles/Variables.scss";
+
+.navbar-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: space(4);
+    padding: space(4);
+    background: color(surface);
+    border-bottom: 1px solid color(border-light);
+}
+
+.nav-button {
+    padding: space(2) space(4);
+    background: color(primary);
+    color: color(surface);
+    border: none;
+    border-radius: radius(md);
+    font-size: map-get($font-sizes, base);
+    font-weight: map-get($font-weights, medium);
+    text-decoration: none;
+    transition: map-get($transitions, normal);
+
+    &:hover {
+        background: color(primary-light);
+        box-shadow: map-get($shadows, primary);
+    }
+}
