@@ -10,10 +10,10 @@ const Landing = () => {
         <p>Plan your next adventure with ease!</p>
         <div className="landing-buttons">
           <Link to="/map" className="landing-button map-button">
-            Explore Map
+            Explore Map With Routes
           </Link>
           <Link to="/chat" className="landing-button chat-button">
-            Chat with TravelMate
+            Chat with Buddy
           </Link>
         </div>
       </div>
